@@ -1,7 +1,7 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
 import inspect
 import re
-from typing import Any, List, Optional, Union, get_type_hints
+from typing import Any, Dict, List, Optional, Union, get_type_hints
 
 from pyspark.sql import DataFrame
 from pyspark.sql.types import StructType
@@ -31,7 +31,7 @@ class MetaSchema(type):
     _current_id: Optional[int] = None
     _original_name: Optional[str] = None
 
-    def __new__(cls, name: str, bases: Any, dct: dict[str, Any]):
+    def __new__(cls, name: str, bases: Any, dct: Dict[str, Any]):
         # initializes all uninitialied variables with a type annotation as None
         # this allows for auto-complete in Databricks notebooks (uninitialized variables
         # don't show up in auto-complete there).

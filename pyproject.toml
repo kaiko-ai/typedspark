@@ -27,3 +27,6 @@ enable = [
     "inconsistent-return-statements",
     "consider-using-set-comprehension"
 ]
+
+[tool.coverage.run]
+source = ["typedspark/"]

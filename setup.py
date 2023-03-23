@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 def get_requirements():
-    with open('requirements.txt') as f:
+    with open("requirements.txt") as f:
         return f.read().splitlines()
 
 
@@ -23,9 +23,9 @@ setup(
     long_description_content_type="text/x-rst",
     packages=find_packages(include=["typedspark", "typedspark.*"]),
     install_requires=get_requirements(),
-    python_requires=">3.7.0",
+    python_requires=">3.9.0",
     classifiers=["Programming Language :: Python", "Typing :: Typed"],
     version_config=True,
-    setup_requires=['setuptools-git-versioning'],
+    setup_requires=["setuptools-git-versioning"],
     package_data={"typedspark": ["py.typed"]},
 )

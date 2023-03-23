@@ -1,6 +1,6 @@
 """Functions for loading `DataSet` and `Schema` in notebooks."""
 
-from typing import Tuple, Type
+from typing import Dict, Tuple, Type
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType as SparkArrayType
@@ -18,7 +18,7 @@ from typedspark._utils.register_schema_to_dataset import register_schema_to_data
 def _create_schema(structtype: SparkStructType) -> Type[Schema]:
     """Dynamically builds a `Schema` based on a `DataFrame`'s `StructType`"""
     type_annotations = {}
-    attributes: dict[str, None] = {}
+    attributes: Dict[str, None] = {}
     for column in structtype:
         name = column.name
         data_type = _extract_data_type(column.dataType)
