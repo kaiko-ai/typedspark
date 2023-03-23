@@ -52,7 +52,7 @@ class DecimalTypeWithIncorrectArguments(Schema):
     a: Column[DecimalType[int, int]]  # type: ignore
 
 
-offending_schemas: list[Type[Schema]] = [
+offending_schemas: List[Type[Schema]] = [
     InvalidColumn,
     ColumnWithoutType,
     AnnotationWithoutColumn,

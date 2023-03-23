@@ -23,7 +23,7 @@ setup(
     long_description_content_type="text/x-rst",
     packages=find_packages(include=["typedspark", "typedspark.*"]),
     install_requires=get_requirements(),
-    python_requires=">3.7.0",
+    python_requires=">3.9.0",
     classifiers=["Programming Language :: Python", "Typing :: Typed"],
     version_config=True,
     setup_requires=["setuptools-git-versioning"],
