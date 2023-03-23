@@ -17,8 +17,8 @@ jobs:
             java-version: 11
       - uses: vemonet/setup-spark@v1
         with:
-          spark-version: '3.2.2'
-          hadoop-version: '3.3'
+          spark-version: '3.3.2'
+          hadoop-version: '3'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -46,10 +46,4 @@ jobs:
           coverage report -m --fail-under 100
       - name: Run notebooks
         run: |
-           papermill docs/1_schema_attributes.ipynb output.json -k python3
-           papermill docs/2_type_checking.ipynb output.json -k python3
-           papermill docs/3_documentation.ipynb output.json -k python3
-           papermill docs/4_databricks.ipynb output.json -k python3
-           papermill docs/5_complex_datatypes.ipynb output.json -k python3
-           papermill docs/6_create_empty_datasets.ipynb output.json -k python3
-           papermill docs/7_subclassing_schemas.ipynb output.json -k python3
+          for FILE in docs/*.ipynb; do papermill $FILE output.json -k python3; done
