@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 def get_requirements():
-    with open('requirements.txt') as f:
+    with open("requirements.txt") as f:
         return f.read().splitlines()
 
 
@@ -26,6 +26,6 @@ setup(
     python_requires=">3.7.0",
     classifiers=["Programming Language :: Python", "Typing :: Typed"],
     version_config=True,
-    setup_requires=['setuptools-git-versioning'],
+    setup_requires=["setuptools-git-versioning"],
     package_data={"typedspark": ["py.typed"]},
 )
