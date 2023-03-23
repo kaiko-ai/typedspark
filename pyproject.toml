@@ -1,0 +1,29 @@
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.pylint."messages control"]
+disable = "all"
+enable = [
+    "empty-docstring",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "unidiomatic-typecheck",
+    "no-else-return",
+    "consider-using-dict-comprehension",
+    "dangerous-default-value",
+    "unspecified-encoding",
+    "unnecessary-pass",
+    "redefined-outer-name",
+    "invalid-name",
+    "unused-argument",
+    "redefined-builtin",
+    "simplifiable-if-expression",
+    "logging-fstring-interpolation",
+    "inconsistent-return-statements",
+    "consider-using-set-comprehension"
+]

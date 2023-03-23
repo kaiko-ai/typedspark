@@ -1,0 +1,55 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+            java-version: 11
+      - uses: vemonet/setup-spark@v1
+        with:
+          spark-version: '3.2.2'
+          hadoop-version: '3.3'
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+      - name: Linting
+        run: |
+          flake8
+          pylint typedspark
+          mypy ./typedspark ./tests
+          bandit typedspark/**/*.py
+          black --check .
+          isort --check .
+          docformatter -c **/*.py
+      - name: Testing
+        run: |
+          # we run this test seperately, to ensure that it is run without an active Spark session
+          python -m pytest tests/_core/test_column.py::test_column_reference_without_spark_session
+          
+          coverage run -m pytest
+          coverage report -m --fail-under 100
+      - name: Run notebooks
+        run: |
+           papermill docs/1_schema_attributes.ipynb output.json -k python3
+           papermill docs/2_type_checking.ipynb output.json -k python3
+           papermill docs/3_documentation.ipynb output.json -k python3
+           papermill docs/4_databricks.ipynb output.json -k python3
+           papermill docs/5_complex_datatypes.ipynb output.json -k python3
+           papermill docs/6_create_empty_datasets.ipynb output.json -k python3
+           papermill docs/7_subclassing_schemas.ipynb output.json -k python3

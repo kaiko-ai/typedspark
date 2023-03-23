@@ -1,0 +1,12 @@
+.mypy_cache
+.pytest_cache
+**/__pycache__
+.vscode
+*.pyc
+*.ipynb_checkpoints*
+.DS_Store
+.coverage
+.cache
+*.egg*
+docs/build
+spark-warehouse
