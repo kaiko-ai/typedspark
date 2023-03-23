@@ -1,11 +1,10 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
 import inspect
 import re
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, get_type_hints
 
 from pyspark.sql import DataFrame
 from pyspark.sql.types import StructType
-from typing_extensions import get_type_hints
 
 from typedspark._core.column import Column
 from typedspark._schema.dlt_kwargs import DltKwargs
