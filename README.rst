@@ -12,9 +12,9 @@ I love Spark! But in production code I'm always a bit wary when I see:
         # do stuff
         return df
 
-Because… How do I know which columns are supposed to be in `df`?
+Because… How do I know which columns are supposed to be in ``df``?
 
-Using _typedspark_, we can be a bit more explicit about what these data should look like.
+Using *typedspark*, we can be more explicit about what these data should look like.
 
 .. code-block:: python
 
