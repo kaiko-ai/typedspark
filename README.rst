@@ -34,10 +34,10 @@ The advantages include:
 
 * Improved readibility of the code
 * Typechecking, both during runtime and linting
-* Reduced number of magic strings referring to column names
+* Auto-complete of column names
+* Easy refactoring of column names
 * Easier unit testing through the generation of empty ``DataSet`` based on their schemas
 * Improved documentation of tables
-* Auto-complete of column names in Databricks notebooks
 
 Installation
 ============
