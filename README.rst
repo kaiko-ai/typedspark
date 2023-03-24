@@ -36,7 +36,7 @@ The advantages include:
 * Typechecking, both during runtime and linting
 * Auto-complete of column names
 * Easy refactoring of column names
-* Easier unit testing through the generation of empty ``DataSet``s based on their schemas
+* Easier unit testing through the generation of empty ``DataSets`` based on their schemas
 * Improved documentation of tables
 
 Installation
