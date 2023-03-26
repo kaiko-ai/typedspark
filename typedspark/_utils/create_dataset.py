@@ -11,8 +11,17 @@ T = TypeVar("T", bound=Schema)
 
 
 def create_empty_dataset(spark: SparkSession, schema: Type[T], n_rows: int = 3) -> DataSet[T]:
-    """Creates a `DataSet` with `Schema` schema, containing `n_rows` rows,
-    filled with None values."""
+    """Creates a ``DataSet`` with ``Schema`` schema, containing ``n_rows`` rows,
+    filled with ``None`` values.
+
+    .. code-block:: python
+
+        class Person(Schema):
+            name: Column[StringType]
+            age: Column[LongType]
+
+        df = create_empty_dataset(spark, Person)
+    """
     n_cols = len(get_type_hints(schema))
     rows = tuple([None] * n_cols)
     data = [rows] * n_rows
@@ -24,11 +33,25 @@ def create_empty_dataset(spark: SparkSession, schema: Type[T], n_rows: int = 3) 
 def create_partially_filled_dataset(
     spark: SparkSession, schema: Type[T], data: Dict[Column, List[Any]]
 ) -> DataSet[T]:
-    """Creates a `DataSet` with `Schema` schema, where `data` is a mapping from
+    """Creates a ``DataSet`` with ``Schema`` schema, where ``data`` is a mapping from
     column to data in the respective column.
 
+    .. code-block:: python
+
+        class Person(Schema):
+            name: Column[StringType]
+            age: Column[LongType]
+
+        df = create_partially_filled_dataset(
+            spark,
+            Person,
+            {
+                Person.name: ["John", "Jack", "Jane"],
+            }
+        )
+
     Any columns in the schema that are not present in the data will be
-    initialized with None values.
+    initialized with ``None`` values.
     """
     data_converted = {k.str: v for k, v in data.items()}
     n_rows_unique = {len(v) for _, v in data.items()}

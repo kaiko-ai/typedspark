@@ -13,18 +13,21 @@ from typedspark._schema.structfield import get_structfield
 
 
 class MetaSchema(type):
-    """`MetaSchema` is the metaclass of `Schema`.
+    """``MetaSchema`` is the metaclass of ``Schema``.
 
-    It basically implements all functionality of `Schema`. But since
-    people are more comfortable with classes (rather than metaclasses),
-    we provide `Schema` as the public interface. Should be used as:
+    It basically implements all functionality of ``Schema``. But since
+    classes are typically considered more convenient than metaclasses,
+    we provide ``Schema`` as the public interface.
 
     .. code-block:: python
+
         class A(Schema):
             a: Column[IntegerType]
             b: Column[StringType]
 
         DataSet[A](df)
+
+    The class methods of ``Schema`` are described here.
     """
 
     _linked_dataframe: Optional[DataFrame] = None
@@ -50,11 +53,12 @@ class MetaSchema(type):
     def __getattribute__(cls, name: str) -> Any:
         """Python base function that gets attributes.
 
-        We listen here for anyone getting `Column`s from the `Schema`.
+        We listen here for anyone getting ``Column`` from the ``Schema``.
         Even though they're not explicitely instantiated, we can instantiate
         them here whenever someone attempts to get them. This allows us to do the following:
 
         .. code-block:: python
+
             class A(Schema):
                 a: Column[IntegerType]
 
@@ -91,7 +95,7 @@ class MetaSchema(type):
 
     def all_column_names_except_for(cls, except_for: List[str]) -> List[str]:
         """Returns all column names for a given schema except for the columns
-        specified in the `except_for` parameter."""
+        specified in the ``except_for`` parameter."""
         return list(name for name in get_type_hints(cls).keys() if name not in except_for)
 
     def get_snake_case(cls) -> str:
@@ -108,7 +112,7 @@ class MetaSchema(type):
         include_documentation: bool = False,
         generate_imports: bool = True,
     ) -> str:
-        """Return the code for the `Schema` as a string."""
+        """Return the code for the ``Schema`` as a string."""
         if schema_name is None:
             schema_name = cls.get_schema_name()
         return get_schema_definition_as_string(
@@ -124,8 +128,7 @@ class MetaSchema(type):
         include_documentation: bool = False,
         generate_imports: bool = True,
     ):  # pragma: no cover
-        """Print the code for the `Schema`, including the template for
-        documentation (i.e. docstring and `ColumMeta(comment="")`)."""
+        """Print the code for the ``Schema``."""
         print(
             cls.get_schema_definition_as_string(
                 schema_name=schema_name,
@@ -148,10 +151,11 @@ class MetaSchema(type):
         )
 
     def get_dlt_kwargs(cls, name: Optional[str] = None) -> DltKwargs:
-        """Creates a representation of the `Schema` to be used by Delta Live
+        """Creates a representation of the ``Schema`` to be used by Delta Live
         Tables.
 
         .. code-block:: python
+
             @dlt.table(**DimPatient.get_dlt_kwargs())
             def table_definition() -> DataSet[DimPatient]:
                 <your table definition here>

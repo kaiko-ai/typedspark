@@ -15,10 +15,11 @@ def structtype_column(
     transformations: Optional[Dict[Column, SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
 ) -> SparkColumn:
-    """Helps with creating new `StructType` columns of a certain schema, for
+    """Helps with creating new ``StructType`` columns of a certain schema, for
     example:
 
     .. code-block:: python
+
         transform_to_schema(
             df,
             Output,

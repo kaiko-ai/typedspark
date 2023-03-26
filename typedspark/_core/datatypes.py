@@ -1,5 +1,5 @@
-"""Here, we make our own definitions of `MapType`, `ArrayType` and `StructType`
-in order to allow e.g. for `ArrayType[StringType]`."""
+"""Here, we make our own definitions of ``MapType``, ``ArrayType`` and ``StructType``
+in order to allow e.g. for ``ArrayType[StringType]``."""
 from __future__ import annotations
 
 from abc import ABC
@@ -21,22 +21,51 @@ _Scale = TypeVar("_Scale", bound=int)  # pylint: disable=invalid-name
 
 
 class TypedSparkDataType(DataType, ABC):
-    """Abstract base class for typedspark specific `DataTypes`."""
+    """Abstract base class for typedspark specific ``DataTypes``."""
 
 
 class StructType(Generic[_Schema], TypedSparkDataType):
-    """Allows for type annotations such as:"""
+    """Allows for type annotations such as:
+
+    .. code-block:: python
+
+        class Job(Schema):
+            position: Column[StringType]
+            salary: Column[LongType]
+
+        class Person(Schema):
+            job: Column[StructType[Job]]
+    """
 
 
 class MapType(Generic[_KeyType, _ValueType], TypedSparkDataType):
-    """Allows for type annotations such as `Column[MapType[StringType,
-    StringType]]`"""
+    """Allows for type annotations such as
+
+    .. code-block:: python
+
+        class Basket(Schema):
+            items: Column[MapType[StringType, StringType]]
+
+    """
 
 
 class ArrayType(Generic[_ValueType], TypedSparkDataType):
-    """Allows for type annotations such as `Column[ArrayType[StringType]]"""
+    """Allows for type annotations such as
+
+    .. code-block:: python
+
+        class Basket(Schema):
+            items: Column[ArrayType[StringType]]
+
+    """
 
 
 class DecimalType(Generic[_Precision, _Scale], TypedSparkDataType):
-    """Allows for type annotations such as `Column[DecimalType[Literal[10],
-    Literal[0]]]."""
+    """Allows for type annotations such as
+
+    .. code-block:: python
+
+        class Numbers(Schema):
+            number: Column[DecimalType[Literal[10], Literal[0]]]
+
+    """

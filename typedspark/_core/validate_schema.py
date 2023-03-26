@@ -20,7 +20,7 @@ def unpack_schema(schema: StructType) -> Dict[str, StructField]:
     """Converts the observed schema to a dictionary mapping column name to
     StructField.
 
-    We ignore columns that start with `__`.
+    We ignore columns that start with ``__``.
     """
     res = {}
     for field in schema.fields:

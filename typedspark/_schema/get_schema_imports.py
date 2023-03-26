@@ -1,4 +1,4 @@
-"""Builds an import statement for everything imported by a given `Schema`."""
+"""Builds an import statement for everything imported by a given ``Schema``."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Type, get_args, get_origin, get_type_hints
@@ -18,7 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def get_schema_imports(schema: Type[Schema], include_documentation: bool) -> str:
-    """Builds an import statement for everything imported by the `schema`."""
+    """Builds an import statement for everything imported by the ``Schema``."""
     dtypes = _get_imported_dtypes(schema)
     return _build_import_string(dtypes, include_documentation)
 
@@ -63,13 +63,14 @@ def _build_import_string(
     Import sorting is applied.
 
     If the schema uses IntegerType, BooleanType, StringType, this functions result would be
-        ```
+
+    .. code-block:: python
+
         from pyspark.sql.types import BooleanType, IntegerType, StringType
 
         from typedspark import Column, Schema
 
 
-        ```
     """
     return (
         _typing_imports(encountered_datatypes, include_documentation)
