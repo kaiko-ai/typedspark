@@ -69,8 +69,6 @@ def _build_import_string(
         from pyspark.sql.types import BooleanType, IntegerType, StringType
 
         from typedspark import Column, Schema
-
-
     """
     return (
         _typing_imports(encountered_datatypes, include_documentation)

@@ -37,9 +37,9 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
                 )
             )
 
-    Calling ``foo()`` would result in a ``AnalysisException``, because Spark can't figure out whether
-    ``id`` belongs to ``df_a`` or ``df_b``. To deal with this, you need to register your ``Schema`` to the
-    ``DataSet``.
+    Calling ``foo()`` would result in a ``AnalysisException``, because Spark can't figure out
+    whether ``id`` belongs to ``df_a`` or ``df_b``. To deal with this, you need to register
+    your ``Schema`` to the ``DataSet``.
 
     .. code-block:: python
 

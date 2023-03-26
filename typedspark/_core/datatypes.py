@@ -1,5 +1,5 @@
-"""Here, we make our own definitions of ``MapType``, ``ArrayType`` and ``StructType``
-in order to allow e.g. for ``ArrayType[StringType]``."""
+"""Here, we make our own definitions of ``MapType``, ``ArrayType`` and
+``StructType`` in order to allow e.g. for ``ArrayType[StringType]``."""
 from __future__ import annotations
 
 from abc import ABC
@@ -39,33 +39,30 @@ class StructType(Generic[_Schema], TypedSparkDataType):
 
 
 class MapType(Generic[_KeyType, _ValueType], TypedSparkDataType):
-    """Allows for type annotations such as
+    """Allows for type annotations such as.
 
     .. code-block:: python
 
         class Basket(Schema):
             items: Column[MapType[StringType, StringType]]
-
     """
 
 
 class ArrayType(Generic[_ValueType], TypedSparkDataType):
-    """Allows for type annotations such as
+    """Allows for type annotations such as.
 
     .. code-block:: python
 
         class Basket(Schema):
             items: Column[ArrayType[StringType]]
-
     """
 
 
 class DecimalType(Generic[_Precision, _Scale], TypedSparkDataType):
-    """Allows for type annotations such as
+    """Allows for type annotations such as.
 
     .. code-block:: python
 
         class Numbers(Schema):
             number: Column[DecimalType[Literal[10], Literal[0]]]
-
     """

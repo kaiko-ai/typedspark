@@ -122,8 +122,8 @@ def _extract_maptype(maptype: Type[DataType], colname: str) -> SparkMapType:
 
 def _extract_structtype(structtype: Type[DataType]) -> SparkStructType:
     """Takes a ``StructType[Schema]`` annotation and creates a
-    ``StructType(schema_list)``, where ``schema_list`` contains all ``StructField()``
-    defined in the ``Schema``."""
+    ``StructType(schema_list)``, where ``schema_list`` contains all
+    ``StructField()`` defined in the ``Schema``."""
     params = get_args(structtype)
     schema: Type[Schema] = params[0]
     return schema.get_structtype()

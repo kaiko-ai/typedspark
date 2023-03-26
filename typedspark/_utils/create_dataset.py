@@ -11,8 +11,8 @@ T = TypeVar("T", bound=Schema)
 
 
 def create_empty_dataset(spark: SparkSession, schema: Type[T], n_rows: int = 3) -> DataSet[T]:
-    """Creates a ``DataSet`` with ``Schema`` schema, containing ``n_rows`` rows,
-    filled with ``None`` values.
+    """Creates a ``DataSet`` with ``Schema`` schema, containing ``n_rows``
+    rows, filled with ``None`` values.
 
     .. code-block:: python
 
@@ -33,8 +33,8 @@ def create_empty_dataset(spark: SparkSession, schema: Type[T], n_rows: int = 3) 
 def create_partially_filled_dataset(
     spark: SparkSession, schema: Type[T], data: Dict[Column, List[Any]]
 ) -> DataSet[T]:
-    """Creates a ``DataSet`` with ``Schema`` schema, where ``data`` is a mapping from
-    column to data in the respective column.
+    """Creates a ``DataSet`` with ``Schema`` schema, where ``data`` is a
+    mapping from column to data in the respective column.
 
     .. code-block:: python
 

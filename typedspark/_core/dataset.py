@@ -27,7 +27,8 @@ P = ParamSpec("P")
 
 
 class DataSet(DataFrame, Generic[T]):
-    """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same functionality, with in addition the possibility to define a schema.
+    """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same
+    functionality, with in addition the possibility to define a schema.
 
     .. code-block:: python
 
@@ -38,16 +39,15 @@ class DataSet(DataFrame, Generic[T]):
         def foo(df: DataSet[Person]) -> DataSet[Person]:
             # do stuff
             return df
-
     """
 
     def __new__(cls, dataframe: DataFrame) -> "DataSet[T]":
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
         Here, we simply take the provided ``df`` and cast it to a
-        ``DataSet``. This allows us to bypass the ``DataFrame`` constuctor
-        in ``__init__()``, which requires parameters that may be difficult
-        to access.
+        ``DataSet``. This allows us to bypass the ``DataFrame``
+        constuctor in ``__init__()``, which requires parameters that may
+        be difficult to access.
         """
         dataframe.__class__ = DataSet
         return dataframe  # type: ignore
@@ -59,8 +59,8 @@ class DataSet(DataFrame, Generic[T]):
         """Python base function that sets attributes.
 
         We listen here for the setting of ``__orig_class__``, which
-        contains the ``Schema`` of the ``DataSet``. Note that this gets set
-        after ``__new__()`` and ``__init__()`` are finished.
+        contains the ``Schema`` of the ``DataSet``. Note that this gets
+        set after ``__new__()`` and ``__init__()`` are finished.
         """
         object.__setattr__(self, name, value)
 

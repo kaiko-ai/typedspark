@@ -16,7 +16,8 @@ from typedspark._utils.register_schema_to_dataset import register_schema_to_data
 
 
 def _create_schema(structtype: SparkStructType) -> Type[Schema]:
-    """Dynamically builds a ``Schema`` based on a ``DataFrame``'s ``StructType``"""
+    """Dynamically builds a ``Schema`` based on a ``DataFrame``'s
+    ``StructType``"""
     type_annotations = {}
     attributes: Dict[str, None] = {}
     for column in structtype:
@@ -52,8 +53,8 @@ def _extract_data_type(dtype: DataType) -> Type[DataType]:
 
 
 def load_table(spark: SparkSession, table_name: str) -> Tuple[DataSet[Schema], Type[Schema]]:
-    """This function loads a ``DataSet``, along with its inferred ``Schema``, in a
-    notebook.
+    """This function loads a ``DataSet``, along with its inferred ``Schema``,
+    in a notebook.
 
     This allows for autocompletion on column names, amongst other
     things.
@@ -61,7 +62,6 @@ def load_table(spark: SparkSession, table_name: str) -> Tuple[DataSet[Schema], T
     .. code-block:: python
 
         df, Person = load_table(spark, "path.to.table")
-
     """
 
     dataframe = spark.table(table_name)

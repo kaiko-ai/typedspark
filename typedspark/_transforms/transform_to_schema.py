@@ -20,9 +20,9 @@ def transform_to_schema(
     transformations: Optional[Dict[Column, SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
 ) -> DataSet[T]:
-    """On the provided DataFrame ``df``, it performs the ``transformations`` (if
-    provided), and subsequently subsets the resulting DataFrame to the columns
-    specified in ``schema``.
+    """On the provided DataFrame ``df``, it performs the ``transformations``
+    (if provided), and subsequently subsets the resulting DataFrame to the
+    columns specified in ``schema``.
 
     .. code-block:: python
 
