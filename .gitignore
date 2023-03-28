@@ -10,3 +10,5 @@
 *.egg*
 docs/build
 spark-warehouse
+dist/
+build/
