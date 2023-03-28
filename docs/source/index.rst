@@ -5,4 +5,5 @@
    
    basics
    advanced
+   contributing
    api
