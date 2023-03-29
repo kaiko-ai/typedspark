@@ -28,4 +28,7 @@ setup(
     version_config=True,
     setup_requires=["setuptools-git-versioning"],
     package_data={"typedspark": ["py.typed"]},
+    extras_require={
+        "pyspark":  ["pyspark"],
+    }
 )

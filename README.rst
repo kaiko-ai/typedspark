@@ -46,6 +46,12 @@ Installation
 
     pip install typedspark
 
+By deafult, ``typedspark`` does not list ``pyspark`` as a dependency, since many platforms (e.g. Databricks) come with ``pyspark`` preinstalled.  If you want to use ``typedspark`` with ``pyspark``, you can install it with:
+
+.. code-block:: bash
+
+    pip install typedspark[pyspark]
+
 
 Documentation
 =================
