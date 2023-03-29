@@ -50,7 +50,7 @@ By deafult, ``typedspark`` does not list ``pyspark`` as a dependency, since many
 
 .. code-block:: bash
 
-    pip install typedspark[pyspark]
+    pip install "typedspark[pyspark]"
 
 
 Documentation
