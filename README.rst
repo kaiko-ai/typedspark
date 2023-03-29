@@ -55,7 +55,7 @@ By deafult, ``typedspark`` does not list ``pyspark`` as a dependency, since many
 
 Documentation
 =================
-Please see our documentation `here <https://github.com/kaiko-ai/typedspark/tree/main/docs>`_.
+Please see our documentation on `ReadTheDocs <https://typedspark.readthedocs.io/en/latest/index.html>`_.
 
 FAQ
 ===
