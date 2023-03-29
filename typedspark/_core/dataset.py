@@ -27,15 +27,27 @@ P = ParamSpec("P")
 
 
 class DataSet(DataFrame, Generic[T]):
-    """TypedSpark DataSet."""
+    """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same
+    functionality, with in addition the possibility to define a schema.
+
+    .. code-block:: python
+
+        class Person(Schema):
+            name: Column[StringType]
+            age: Column[LongType]
+
+        def foo(df: DataSet[Person]) -> DataSet[Person]:
+            # do stuff
+            return df
+    """
 
     def __new__(cls, dataframe: DataFrame) -> "DataSet[T]":
-        """`__new__()` instantiates the object (prior to `__init__()`).
+        """``__new__()`` instantiates the object (prior to ``__init__()``).
 
-        Here, we simply take the provided `df` and cast it to a
-        `DataSet`. This allows us to bypass the `DataFrame` constuctor
-        in `__init__()`, which requires parameters that may be difficult
-        to access.
+        Here, we simply take the provided ``df`` and cast it to a
+        ``DataSet``. This allows us to bypass the ``DataFrame``
+        constuctor in ``__init__()``, which requires parameters that may
+        be difficult to access.
         """
         dataframe.__class__ = DataSet
         return dataframe  # type: ignore
@@ -46,9 +58,9 @@ class DataSet(DataFrame, Generic[T]):
     def __setattr__(self, name: str, value: Any) -> None:
         """Python base function that sets attributes.
 
-        We listen here for the setting of `__orig_class__`, which
-        contains the `Schema` of the `DataSet`. Note that this gets set
-        after `__new__()` and `__init__()` are finished.
+        We listen here for the setting of ``__orig_class__``, which
+        contains the ``Schema`` of the ``DataSet``. Note that this gets
+        set after ``__new__()`` and ``__init__()`` are finished.
         """
         object.__setattr__(self, name, value)
 
@@ -64,18 +76,18 @@ class DataSet(DataFrame, Generic[T]):
                 self._add_schema_metadata()
 
     def _add_schema_metadata(self) -> None:
-        """Adds the `ColumnMeta` comments as metadata to the `DataSet`.
+        """Adds the ``ColumnMeta`` comments as metadata to the ``DataSet``.
 
-        Previously set metadata is deleted. Hence, if `foo(dataframe: DataSet[A]) -> DataSet[B]`,
-        then `DataSet[B]` will not inherrit any metadata from `DataSet[A]`.
+        Previously set metadata is deleted. Hence, if ``foo(dataframe: DataSet[A]) -> DataSet[B]``,
+        then ``DataSet[B]`` will not inherrit any metadata from ``DataSet[A]``.
 
         Assumes validate_schema() in __setattr__() has been run.
         """
         for field in self._schema_annotations.get_structtype().fields:
             self.schema[field.name].metadata = field.metadata
 
-    """The following functions are equivalent to their parents in `DataFrame`, but since they
-    don't affect the `Schema`, we can add type annotations here. We're omitting docstrings,
+    """The following functions are equivalent to their parents in ``DataFrame``, but since they
+    don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
     such that the docstring from the parent will appear."""
 
     def distinct(self) -> "DataSet[T]":  # pylint: disable=C0116

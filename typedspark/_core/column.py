@@ -19,9 +19,10 @@ class EmptyColumn(SparkColumn):
 
 
 class Column(SparkColumn, Generic[T]):
-    """Represents a `Column` in a `Schema`. Can be used as:
+    """Represents a ``Column`` in a ``Schema``. Can be used as:
 
     .. code-block:: python
+
         class A(Schema):
             a: Column[IntegerType]
             b: Column[StringType]
@@ -33,13 +34,13 @@ class Column(SparkColumn, Generic[T]):
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
     ):
-        """`__new__()` instantiates the object (prior to `__init__()`).
+        """``__new__()`` instantiates the object (prior to ``__init__()``).
 
-        Here, we simply take the provided `name`, create a pyspark
-        `Column` object and cast it to a typedspark `Column` object.
-        This allows us to bypass the pypsark `Column` constuctor in
-        `__init__()`, which requires parameters that may be difficult to
-        access.
+        Here, we simply take the provided ``name``, create a pyspark
+        ``Column`` object and cast it to a typedspark ``Column`` object.
+        This allows us to bypass the pypsark ``Column`` constuctor in
+        ``__init__()``, which requires parameters that may be difficult
+        to access.
         """
         # pylint: disable=unused-argument
 

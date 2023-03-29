@@ -17,6 +17,7 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
     """Helps combat column ambiguity. For example:
 
     .. code-block:: python
+
         class Person(Schema):
             id: Column[IntegerType]
             name: Column[StringType]
@@ -36,11 +37,12 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
                 )
             )
 
-    Calling `foo()` would result in a `AnalysisException`, because Spark can't figure out whether
-    `id` belongs to `df_a` or `df_b`. To deal with this, you need to register your `Schema` to the
-    `DataSet`.
+    Calling ``foo()`` would result in a ``AnalysisException``, because Spark can't figure out
+    whether ``id`` belongs to ``df_a`` or ``df_b``. To deal with this, you need to register
+    your ``Schema`` to the ``DataSet``.
 
     .. code-block:: python
+
         from typedspark import register_schema_to_dataset
 
         def foo(df_a: DataSet[Person], df_b: DataSet[Job]) -> DataSet[PersonWithSalary]:

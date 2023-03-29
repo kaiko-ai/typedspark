@@ -46,4 +46,4 @@ jobs:
           coverage report -m --fail-under 100
       - name: Run notebooks
         run: |
-          for FILE in docs/*.ipynb; do papermill $FILE output.json -k python3; done
+          for FILE in docs/source/*.ipynb; do papermill $FILE output.json -k python3; done

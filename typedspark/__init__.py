@@ -4,7 +4,7 @@ from typedspark._core.column import Column
 from typedspark._core.column_meta import ColumnMeta
 from typedspark._core.dataset import DataSet
 from typedspark._core.datatypes import ArrayType, DecimalType, MapType, StructType
-from typedspark._schema.schema import Schema
+from typedspark._schema.schema import MetaSchema, Schema
 from typedspark._transforms.structtype_column import structtype_column
 from typedspark._transforms.transform_to_schema import transform_to_schema
 from typedspark._utils.create_dataset import create_empty_dataset, create_partially_filled_dataset
@@ -18,6 +18,7 @@ __all__ = [
     "DataSet",
     "DecimalType",
     "MapType",
+    "MetaSchema",
     "Schema",
     "StructType",
     "create_empty_dataset",
