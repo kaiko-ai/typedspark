@@ -55,7 +55,7 @@ By deafult, ``typedspark`` does not list ``pyspark`` as a dependency, since many
 
 Documentation
 =================
-Please see our documentation on `Read the Docs <https://typedspark.readthedocs.io/en/latest/index.html>`_.
+Please see our documentation on `readthedocs <https://typedspark.readthedocs.io/en/latest/index.html>`_.
 
 FAQ
 ===
