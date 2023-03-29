@@ -1,2 +1,2 @@
-pyspark<=3.3.2
-typing-extensions<=4.5.0
+pyspark
+typing-extensions
