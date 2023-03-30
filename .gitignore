@@ -12,3 +12,4 @@ docs/build
 spark-warehouse
 dist/
 build/
+output.json
