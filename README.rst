@@ -2,7 +2,7 @@
 Typedspark: column-wise type annotations for pyspark DataFrames
 ===============================================================
 
-I love Spark! But in production code I'm always a bit wary when I see:
+We love Spark! But in production code we're wary when we see:
 
 .. code-block:: python
 
@@ -12,7 +12,7 @@ I love Spark! But in production code I'm always a bit wary when I see:
         # do stuff
         return df
 
-Because… How do I know which columns are supposed to be in ``df``?
+Because… How do we know which columns are supposed to be in ``df``?
 
 Using ``typedspark``, we can be more explicit about what these data should look like.
 
