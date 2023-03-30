@@ -35,6 +35,8 @@ class MetaSchema(type):
     _original_name: Optional[str] = None
 
     def __new__(cls, name: str, bases: Any, dct: Dict[str, Any]):
+        cls._attributes = dir(cls)
+
         # initializes all uninitialied variables with a type annotation as None
         # this allows for auto-complete in Databricks notebooks (uninitialized variables
         # don't show up in auto-complete there).
@@ -67,21 +69,7 @@ class MetaSchema(type):
                 .select(A.a)
             )
         """
-        if name.startswith("__") or name in [
-            "all_column_names",
-            "all_column_names_except_for",
-            "get_docstring",
-            "get_dlt_kwargs",
-            "get_primary_key_names",
-            "get_schema_definition_as_string",
-            "get_snake_case",
-            "get_structtype",
-            "get_schema_name",
-            "print_schema",
-            "_current_id",
-            "_linked_dataframe",
-            "_original_name",
-        ]:
+        if name.startswith("__") or name == "_attributes" or name in cls._attributes:
             return object.__getattribute__(cls, name)
 
         if name in get_type_hints(cls).keys():
