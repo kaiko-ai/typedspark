@@ -97,20 +97,6 @@ class DataSet(DataFrame, Generic[T]):
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
     @overload
-    def intersect(self, other: "DataSet[T]") -> "DataSet[T]":
-        ...  # pragma: no cover
-
-    @overload
-    def intersect(self, other: DataFrame) -> DataFrame:
-        ...  # pragma: no cover
-
-    def intersect(self, other: DataFrame) -> DataFrame:  # pylint: disable=C0116
-        res = super().intersect(other)
-        if isinstance(other, DataSet) and other._schema_annotations == self._schema_annotations:
-            return DataSet[self._schema_annotations](res)  # type: ignore
-        return res  # pragma: no cover
-
-    @overload
     def join(
         self,
         other: DataFrame,
@@ -162,20 +148,6 @@ class DataSet(DataFrame, Generic[T]):
         self, func: Callable[..., "DataFrame"], *args: Any, **kwargs: Any
     ) -> "DataFrame":
         return super().transform(func, *args, **kwargs)
-
-    @overload
-    def union(self, other: "DataSet[T]") -> "DataSet[T]":
-        ...  # pragma: no cover
-
-    @overload
-    def union(self, other: DataFrame) -> DataFrame:
-        ...  # pragma: no cover
-
-    def union(self, other: DataFrame) -> DataFrame:  # pylint: disable=C0116
-        res = super().union(other)
-        if isinstance(other, DataSet) and other._schema_annotations == self._schema_annotations:
-            return DataSet[self._schema_annotations](res)  # type: ignore
-        return res  # pragma: no cover
 
     @overload
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103

@@ -81,7 +81,5 @@ def test_inherrited_functions_with_other_dataset(spark: SparkSession):
     df_a = create_empty_dataset(spark, A)
     df_b = create_empty_dataset(spark, A)
 
-    df_a.intersect(df_b)
     df_a.join(df_b, A.a.str)
-    df_a.union(df_b)
     df_a.unionByName(df_b)
