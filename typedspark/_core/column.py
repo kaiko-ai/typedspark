@@ -1,6 +1,9 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar, get_args, Any
+
+from typedspark._core.datatypes import StructType
+from typedspark._schema.schema import Schema
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
@@ -64,6 +67,24 @@ class Column(SparkColumn, Generic[T]):
         # pylint: disable=unused-argument
         self.str = name
         self._curid = curid
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Python base function that sets attributes.
+
+        We listen here for the setting of ``__orig_class__``, which
+        contains the type of the column. Note that this gets
+        set after ``__new__()`` and ``__init__()`` are finished.
+        """
+        object.__setattr__(self, name, value)
+
+        if name == "__orig_class__":
+            orig_class_args = get_args(self.__orig_class__)
+            if orig_class_args and orig_class_args[0] == StructType:
+                structtype_args = get_args(orig_class_args[0])
+                if structtype_args and issubclass(structtype_args[0], Schema):
+                    schema = structtype_args[0]
+                    for field in schema.get_structtype().fields:
+                        self.__setattr__(field.name, self.__getattribute__(field.name))
 
     def __hash__(self) -> int:
         return hash((self.str, self._curid))
