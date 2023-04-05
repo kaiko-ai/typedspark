@@ -33,6 +33,7 @@ jobs:
           flake8
           pylint typedspark
           mypy ./typedspark ./tests
+          pyright .
           bandit typedspark/**/*.py
           black --check .
           isort --check .
