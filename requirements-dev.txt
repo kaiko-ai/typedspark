@@ -10,7 +10,7 @@ docformatter==1.6.0
 mypy==1.2.0
 pyright==1.1.302
 # testing
-pytest==7.2.2
+pytest==7.3.0
 coverage==7.2.3
 pandas==1.5.3
 pandas-stubs==1.5.3.230321
