@@ -13,7 +13,7 @@ pyright==1.1.302
 pytest==7.3.0
 coverage==7.2.3
 pandas==1.5.3
-pandas-stubs==1.5.3.230321
+pandas-stubs==2.0.0.230412
 chispa==0.9.2
 # notebooks
 papermill==2.4.0
