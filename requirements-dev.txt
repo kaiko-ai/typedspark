@@ -1,5 +1,5 @@
 # pyspark
-pyspark==3.3.2
+pyspark==3.4.0
 # linters
 flake8==6.0.0
 pylint==2.17.2
