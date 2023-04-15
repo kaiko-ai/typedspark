@@ -12,7 +12,7 @@ pyright==1.1.303
 # testing
 pytest==7.3.0
 coverage==7.2.3
-pandas==1.5.3
+pandas==2.0.0
 pandas-stubs==2.0.0.230412
 chispa==0.9.2
 # notebooks
