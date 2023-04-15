@@ -10,4 +10,5 @@ Advanced
    subclassing_schemas
    column_ambiguity
    advanced_linting_support
-   databricks
+   generating_schemas
+   autocomplete_in_databricks

@@ -1,7 +1,7 @@
 import pytest
+from pyspark.errors import AnalysisException
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType
-from pyspark.sql.utils import AnalysisException
 
 from typedspark import Column, Schema, create_partially_filled_dataset, register_schema_to_dataset
 
