@@ -8,7 +8,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
             java-version: 11
       - uses: vemonet/setup-spark@v1
         with:
-          spark-version: '3.3.2'
+          spark-version: '3.4.0'
           hadoop-version: '3'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
