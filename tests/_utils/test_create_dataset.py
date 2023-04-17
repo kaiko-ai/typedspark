@@ -3,7 +3,7 @@ from typing import Literal
 
 import pytest
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
-from pyspark.sql import SparkSession
+from pyspark.sql import Row, SparkSession
 from pyspark.sql.types import StringType
 
 from typedspark import (
@@ -15,6 +15,7 @@ from typedspark import (
     StructType,
     create_empty_dataset,
     create_partially_filled_dataset,
+    create_structtype_row,
 )
 from typedspark._core.datatypes import DecimalType
 
@@ -62,7 +63,7 @@ class B(Schema):
 def test_create_empty_dataset_with_complex_data(spark: SparkSession):
     df_a = create_partially_filled_dataset(spark, A, {A.a: [Decimal(x) for x in [1, 2, 3]]})
 
-    create_partially_filled_dataset(
+    observed = create_partially_filled_dataset(
         spark,
         B,
         {
@@ -71,3 +72,56 @@ def test_create_empty_dataset_with_complex_data(spark: SparkSession):
             B.c: df_a.collect(),
         },
     )
+
+    spark_schema = B.get_structtype()
+    row_data = [
+        (["a"], {"a": "1"}, (Decimal(1), None)),
+        (["b", "c"], {"b": "2", "c": "3"}, (Decimal(2), None)),
+        (["d"], {"d": "4"}, (Decimal(3), None)),
+    ]
+    expected = spark.createDataFrame(row_data, spark_schema)
+
+    assert_df_equality(observed, expected)
+
+
+def test_create_partially_filled_dataset_from_list(spark: SparkSession):
+    data = [
+        {A.a: Decimal(1), A.b: "a"},
+        {A.a: Decimal(2)},
+        {A.b: "c", A.a: Decimal(3)},
+    ]
+    result = create_partially_filled_dataset(spark, A, data)
+
+    spark_schema = A.get_structtype()
+    row_data = [(Decimal(1), "a"), (Decimal(2), None), (Decimal(3), "c")]
+    expected = spark.createDataFrame(row_data, spark_schema)
+
+    assert_df_equality(result, expected)
+
+
+def test_create_partially_filled_dataset_from_list_with_complex_data(spark: SparkSession):
+    data = [
+        {B.a: ["a"], B.b: {"a": "1"}, B.c: create_structtype_row(A, {A.a: Decimal(1), A.b: "a"})},
+        {
+            B.a: ["b", "c"],
+            B.b: {"b": "2", "c": "3"},
+            B.c: create_structtype_row(A, {A.a: Decimal(2)}),
+        },
+        {B.a: ["d"], B.b: {"d": "4"}, B.c: create_structtype_row(A, {A.b: "c", A.a: Decimal(3)})},
+    ]
+    result = create_partially_filled_dataset(spark, B, data)
+
+    spark_schema = B.get_structtype()
+    row_data = [
+        (["a"], {"a": "1"}, (Decimal(1), "a")),
+        (["b", "c"], {"b": "2", "c": "3"}, (Decimal(2), None)),
+        (["d"], {"d": "4"}, (Decimal(3), "c")),
+    ]
+    expected = spark.createDataFrame(row_data, spark_schema)
+
+    assert_df_equality(result, expected)
+
+
+def test_create_partially_filled_dataset_with_invalid_argument(spark: SparkSession):
+    with pytest.raises(ValueError):
+        create_partially_filled_dataset(spark, A, ())
