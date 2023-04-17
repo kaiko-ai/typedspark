@@ -3,7 +3,7 @@ from typing import Literal
 
 import pytest
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
-from pyspark.sql import Row, SparkSession
+from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType
 
 from typedspark import (
