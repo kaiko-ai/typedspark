@@ -35,21 +35,37 @@ def create_partially_filled_dataset(
     schema: Type[T],
     data: Union[Dict[Column, List[Any]], List[Dict[Column, Any]]],
 ) -> DataSet[T]:
-    """Creates a ``DataSet`` with ``Schema`` schema, where ``data`` is a
-    mapping from column to data in the respective column.
+    """Creates a ``DataSet`` with ``Schema`` schema, where ``data`` can
+    be defined in either of the following two ways:
 
     .. code-block:: python
 
         class Person(Schema):
             name: Column[StringType]
             age: Column[LongType]
+            job: Column[StringType]
 
         df = create_partially_filled_dataset(
             spark,
             Person,
             {
                 Person.name: ["John", "Jack", "Jane"],
+                Person.age: [30, 40, 50],
             }
+        )
+
+    Or:
+
+    .. code-block:: python
+
+        df = create_partially_filled_dataset(
+            spark,
+            Person,
+            [
+                {Person.name: "John", Person.age: 30},
+                {Person.name: "Jack", Person.age: 40},
+                {Person.name: "Jane", Person.age: 50},
+            ]
         )
 
     Any columns in the schema that are not present in the data will be
@@ -82,9 +98,8 @@ def create_structtype_row(schema: Type[T], data: Dict[Column, Any]) -> Row:
 def _create_column_wise_data_from_dict(
     schema: Type[T], data: Dict[Column, List[Any]]
 ) -> List[List[Any]]:
-    """Converts a dict of column to data to a list of lists, where each
-    inner list contains the data for a column.
-    """
+    """Converts a dict of column to data to a list of lists, where each inner
+    list contains the data for a column."""
     data_converted = {k.str: v for k, v in data.items()}
     n_rows_unique = {len(v) for _, v in data.items()}
     if len(n_rows_unique) > 1:
@@ -105,8 +120,7 @@ def _create_column_wise_data_from_list(
     schema: Type[T], data: List[Dict[Column, Any]]
 ) -> List[List[Any]]:
     """Converts a list of dicts of column to data to a list of lists, where
-    each inner list contains the data for a column.
-    """
+    each inner list contains the data for a column."""
     data_converted = [{k.str: v for k, v in row.items()} for row in data]
 
     col_data = []

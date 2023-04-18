@@ -63,7 +63,7 @@ class B(Schema):
 def test_create_empty_dataset_with_complex_data(spark: SparkSession):
     df_a = create_partially_filled_dataset(spark, A, {A.a: [Decimal(x) for x in [1, 2, 3]]})
 
-    observed = create_partially_filled_dataset(
+    result = create_partially_filled_dataset(
         spark,
         B,
         {
@@ -81,7 +81,7 @@ def test_create_empty_dataset_with_complex_data(spark: SparkSession):
     ]
     expected = spark.createDataFrame(row_data, spark_schema)
 
-    assert_df_equality(observed, expected)
+    assert_df_equality(result, expected)
 
 
 def test_create_partially_filled_dataset_from_list(spark: SparkSession):
