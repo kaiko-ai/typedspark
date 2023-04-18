@@ -11,8 +11,8 @@ To set up the environment, run:
 
 .. code-block:: bash
 
-    pyenv install 3.10
-    pyenv virtualenv 3.10 typedspark
+    pyenv install 3.11
+    pyenv virtualenv 3.11 typedspark
     pyenv activate typedspark
     pip install -r requirements.txt
     pip install -r requirements-dev.txt
