@@ -3,7 +3,6 @@
 from typing import Generic, Optional, TypeVar, get_args, Any
 
 from typedspark._core.datatypes import StructType
-from typedspark._schema.schema import Schema
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
@@ -78,13 +77,17 @@ class Column(SparkColumn, Generic[T]):
         object.__setattr__(self, name, value)
 
         if name == "__orig_class__":
-            orig_class_args = get_args(self.__orig_class__)
-            if orig_class_args and orig_class_args[0] == StructType:
-                structtype_args = get_args(orig_class_args[0])
-                if structtype_args and issubclass(structtype_args[0], Schema):
-                    schema = structtype_args[0]
-                    for field in schema.get_structtype().fields:
-                        self.__setattr__(field.name, self.__getattribute__(field.name))
+            orig_class_args = get_args(value)
+            if not orig_class_args or orig_class_args[0] != StructType:
+                return
+            
+            structtype_args = get_args(orig_class_args[0])
+            if not structtype_args:  # or not issubclass(structtype_args[0], Schema)
+                return
+            
+            schema = structtype_args[0]
+            for field in schema.get_structtype().fields:
+                self.__setattr__(field.name, self.__getattribute__(field.name))
 
     def __hash__(self) -> int:
         return hash((self.str, self._curid))

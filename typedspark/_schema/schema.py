@@ -37,11 +37,11 @@ class MetaSchema(type):
     def __new__(cls, name: str, bases: Any, dct: Dict[str, Any]):
         cls._attributes = dir(cls)
 
-        # initializes all uninitialied variables with a type annotation as None
-        # this allows for auto-complete in Databricks notebooks (uninitialized variables
-        # don't show up in auto-complete there).
+        # initializes all uninitialied variables with a type annotation
+        # this allows for auto-complete in notebooks (uninitialized variables
+        # don't show up in auto-complete otherwise).
         if "__annotations__" in dct.keys():
-            extra = {attr: None for attr in dct["__annotations__"] if attr not in dct}
+            extra = {name: Column(name) for name in dct["__annotations__"] if name not in dct}
             dct = dict(dct, **extra)
 
         return type.__new__(cls, name, bases, dct)
