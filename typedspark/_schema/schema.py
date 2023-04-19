@@ -41,7 +41,7 @@ class MetaSchema(type):
         # this allows for auto-complete in notebooks (uninitialized variables
         # don't show up in auto-complete otherwise).
         if "__annotations__" in dct.keys():
-            extra = {name: Column(name) for name in dct["__annotations__"] if name not in dct}
+            extra = {name: Column(name, dtype=dtype) for name, dtype in dct["__annotations__"].items() if name not in dct}
             dct = dict(dct, **extra)
 
         return type.__new__(cls, name, bases, dct)

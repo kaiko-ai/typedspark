@@ -1,6 +1,6 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from typing import Generic, Optional, TypeVar, get_args, Any
+from typing import Generic, Optional, TypeVar, get_args, get_origin
 
 from typedspark._core.datatypes import StructType
 
@@ -35,6 +35,7 @@ class Column(SparkColumn, Generic[T]):
         name: str,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
+        dtype: Optional[DataType] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
@@ -62,32 +63,31 @@ class Column(SparkColumn, Generic[T]):
         name: str,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
+        dtype: Optional[DataType] = None,
     ):
         # pylint: disable=unused-argument
         self.str = name
         self._curid = curid
 
-    def __setattr__(self, name: str, value: Any) -> None:
-        """Python base function that sets attributes.
+        if not dtype:
+            return
+        print(dtype)            
+        origin = get_origin(dtype)
+        print(origin)
+        if origin is not StructType:
+            return
+        print("a")
 
-        We listen here for the setting of ``__orig_class__``, which
-        contains the type of the column. Note that this gets
-        set after ``__new__()`` and ``__init__()`` are finished.
-        """
-        object.__setattr__(self, name, value)
-
-        if name == "__orig_class__":
-            orig_class_args = get_args(value)
-            if not orig_class_args or orig_class_args[0] != StructType:
-                return
-            
-            structtype_args = get_args(orig_class_args[0])
-            if not structtype_args:  # or not issubclass(structtype_args[0], Schema)
-                return
-            
-            schema = structtype_args[0]
-            for field in schema.get_structtype().fields:
-                self.__setattr__(field.name, self.__getattribute__(field.name))
+        structtype_args = get_args(dtype)
+        if not structtype_args:  # or not issubclass(structtype_args[0], Schema)
+            return
+        
+        print("b")
+        
+        schema = structtype_args[0]
+        for field in schema.get_structtype().fields:
+            print(field.name)
+            self.__setattr__(field.name, Column(field.name, dtype=field.dataType))
 
     def __hash__(self) -> int:
         return hash((self.str, self._curid))
