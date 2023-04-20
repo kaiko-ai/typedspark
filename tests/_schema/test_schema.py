@@ -52,7 +52,7 @@ class Values(Schema):
 class ComplexDatatypes(Schema):
     value: Column[typedspark.StructType[Values]]
     items: Column[typedspark.ArrayType[StringType]]
-    consequences: Column[typedspark.MapType[StringType, StringType]]
+    consequences: Column[typedspark.MapType[StringType, typedspark.ArrayType[StringType]]]
 
 
 schema_complex_datatypes = '''from typing import Annotated, Literal
@@ -67,7 +67,7 @@ class ComplexDatatypes(Schema):
 
     value: Annotated[Column[StructType[test_schema.Values]], ColumnMeta(comment="")]
     items: Annotated[Column[ArrayType[StringType]], ColumnMeta(comment="")]
-    consequences: Annotated[Column[MapType[StringType, StringType]], ColumnMeta(comment="")]
+    consequences: Annotated[Column[MapType[StringType, ArrayType[StringType]]], ColumnMeta(comment="")]
 
 
 class Values(Schema):
@@ -75,7 +75,7 @@ class Values(Schema):
 
     a: Annotated[Column[DecimalType[Literal[38], Literal[18]]], ColumnMeta(comment="")]
     b: Annotated[Column[StringType], ColumnMeta(comment="")]
-'''
+'''  # noqa: E501
 
 
 class PascalCase(Schema):
