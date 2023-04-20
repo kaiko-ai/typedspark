@@ -24,7 +24,7 @@ Note that in order to run the unit tests, you will need to set up Spark on your 
 ---------
 Notebooks
 ---------
-If you make changes that affect the documentation, please rerun the documentation notebooks in ``docs/source/``. You can do so by runningthe following command in the root of the repository:
+If you make changes that affect the documentation, please rerun the documentation notebooks in ``docs/source/``. You can do so by running the following command in the root of the repository:
 
 .. code-block:: bash
 
