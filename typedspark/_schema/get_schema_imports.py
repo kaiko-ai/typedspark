@@ -38,6 +38,10 @@ def _get_imported_dtypes(schema: Type[Schema]) -> set[Type[DataType]]:
 
 
 def _process_datatype(dtype: Type[DataType]) -> set[Type[DataType]]:
+    """Returns a set of DataTypes that are imported for a given DataType.
+
+    Handles nested DataTypes recursively.
+    """
     encountered_datatypes: set[Type[DataType]] = set()
 
     origin: Optional[Type[DataType]] = get_origin(dtype)
