@@ -32,24 +32,32 @@ def _get_imported_dtypes(schema: Type[Schema]) -> set[Type[DataType]]:
             continue
 
         dtype = args[0]
-        origin: Optional[Type[DataType]] = get_origin(dtype)
-        if origin:
-            encountered_datatypes.add(origin)
-        else:
-            encountered_datatypes.add(dtype)
+        encountered_datatypes |= _process_datatype(dtype)
 
-        if origin == MapType:
-            key, value = get_args(dtype)
-            encountered_datatypes.add(key)
-            encountered_datatypes.add(value)
+    return encountered_datatypes
 
-        if origin == ArrayType:
-            element = get_args(dtype)[0]
-            encountered_datatypes.add(element)
 
-        if get_origin(dtype) == StructType:
-            subschema = get_args(dtype)[0]
-            encountered_datatypes |= _get_imported_dtypes(subschema)
+def _process_datatype(dtype: Type[DataType]) -> set[Type[DataType]]:
+    encountered_datatypes: set[Type[DataType]] = set()
+
+    origin: Optional[Type[DataType]] = get_origin(dtype)
+    if origin:
+        encountered_datatypes.add(origin)
+    else:
+        encountered_datatypes.add(dtype)
+
+    if origin == MapType:
+        key, value = get_args(dtype)
+        encountered_datatypes |= _process_datatype(key)
+        encountered_datatypes |= _process_datatype(value)
+
+    if origin == ArrayType:
+        element = get_args(dtype)[0]
+        encountered_datatypes |= _process_datatype(element)
+
+    if get_origin(dtype) == StructType:
+        subschema = get_args(dtype)[0]
+        encountered_datatypes |= _get_imported_dtypes(subschema)
 
     return encountered_datatypes
 
