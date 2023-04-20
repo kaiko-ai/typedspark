@@ -63,7 +63,6 @@ def load_table(spark: SparkSession, table_name: str) -> Tuple[DataSet[Schema], T
 
         df, Person = load_table(spark, "path.to.table")
     """
-
     dataframe = spark.table(table_name)
     schema = _create_schema(dataframe.schema)
     dataset = DataSet[schema](dataframe)  # type: ignore

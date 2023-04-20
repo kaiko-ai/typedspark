@@ -20,3 +20,14 @@ To set up the environment, run:
 For a list of currently supported Python versions, as well as the various CI/CD steps, we refer to ``.github/workflows/build.yml``.
 
 Note that in order to run the unit tests, you will need to set up Spark on your machine.
+
+---------
+Notebooks
+---------
+If you make changes that affect the documentation, please rerun the documentation notebooks in ``docs/source/``. You can do so by running the following command in the root of the repository:
+
+.. code-block:: bash
+
+    sh docs/run_notebooks.sh
+
+This will run all notebooks and strip the metadata afterwards, such that the diffs in the PR remain manageable.
