@@ -18,6 +18,8 @@ def remove_spark_warnings(cell):
     if "outputs" in cell.keys():
         outputs = []
         for output in cell.outputs:
+            if "text" not in output.keys():
+                continue
             if 'Setting default log level to "WARN"' in output.text:
                 continue
             if (
