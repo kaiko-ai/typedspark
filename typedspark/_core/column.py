@@ -1,14 +1,13 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from typing import Generic, Optional, Type, TypeVar
+from typing import Generic, Optional, Type, TypeVar, get_type_hints
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
 from pyspark.sql.types import DataType
 
-from typedspark._core.datatypes import StructType
-from typedspark._core.utils import get_schema_from_structtype, is_of_typedspark_type
+from typedspark._core.utils import get_dtype_from_column, get_schema_from_structtype, is_structtype
 
 T = TypeVar("T", bound=DataType)
 
@@ -36,7 +35,7 @@ class Column(SparkColumn, Generic[T]):
         name: str,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
-        annotation: Optional[Type[DataType]] = None,
+        dtype: Optional[Type[DataType]] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
@@ -70,13 +69,13 @@ class Column(SparkColumn, Generic[T]):
         self.str = name
         self._curid = curid
 
-        if dtype and is_of_typedspark_type(dtype, StructType):
+        if dtype and is_structtype(dtype):
             self._set_structtype_attributes(dtype)
 
     def _set_structtype_attributes(self, dtype: Type[DataType]) -> None:
         schema = get_schema_from_structtype(dtype)
-        for field in schema.get_structtype().fields:
-            self.__setattr__(field.name, Column(field.name, dtype=field.dataType))
+        for name, column in get_type_hints(schema).items():
+            self.__setattr__(name, Column(name, dtype=get_dtype_from_column(column)))
 
     def __hash__(self) -> int:
         return hash((self.str, self._curid))

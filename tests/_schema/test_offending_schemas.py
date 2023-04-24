@@ -8,24 +8,8 @@ from typedspark import ArrayType, Column, ColumnMeta, MapType, Schema, create_em
 from typedspark._core.datatypes import DecimalType
 
 
-class InvalidColumn(Schema):
-    a: int
-
-
-class ColumnWithoutType(Schema):
-    a: Column
-
-
-class AnnotationWithoutColumn(Schema):
-    a: Annotated  # type: ignore
-
-
 class InvalidColumnMeta(Schema):
     a: Annotated[StringType, str]
-
-
-class InvalidDataTypeWithinAnnotation(Schema):
-    a: Annotated[str, ColumnMeta()]  # type: ignore
 
 
 class InvalidDataType(Schema):
@@ -53,11 +37,7 @@ class DecimalTypeWithIncorrectArguments(Schema):
 
 
 offending_schemas: List[Type[Schema]] = [
-    InvalidColumn,
-    ColumnWithoutType,
-    AnnotationWithoutColumn,
     InvalidColumnMeta,
-    InvalidDataTypeWithinAnnotation,
     InvalidDataType,
     ComplexTypeWithoutSubtype,
     ComplexTypeWithInvalidSubtype,
@@ -79,5 +59,25 @@ def test_offending_schemas_repr_exceptions():
 def test_offending_schemas_runtime_error_on_load():
     with pytest.raises(TypeError):
 
+        class InvalidColumn(Schema):
+            a: int
+
+    with pytest.raises(TypeError):
+
+        class ColumnWithoutType(Schema):
+            a: Column
+
+    with pytest.raises(TypeError):
+
         class WrongNumberOfArguments(Schema):
             a: Column[MapType[StringType]]  # type: ignore
+
+    with pytest.raises(TypeError):
+
+        class AnnotationWithoutColumn(Schema):
+            a: Annotated  # type: ignore
+
+    with pytest.raises(TypeError):
+
+        class InvalidDataTypeWithinAnnotation(Schema):
+            a: Annotated[str, ColumnMeta()]  # type: ignore

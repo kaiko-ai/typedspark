@@ -42,8 +42,8 @@ class MetaSchema(type):
         # this allows for auto-complete in notebooks.
         if "__annotations__" in dct.keys():
             extra: Dict[str, Column] = {
-                name: Column(name, dtype=get_dtype_from_column(annotation))
-                for name, annotation in dct["__annotations__"].items()
+                name: Column(name, dtype=get_dtype_from_column(column))
+                for name, column in dct["__annotations__"].items()
                 if name not in dct
             }
             dct = dict(dct, **extra)

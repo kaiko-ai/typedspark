@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type, get_args, get_type_hints
 
-from typedspark._core.datatypes import StructType
-from typedspark._core.utils import get_dtype_from_column, is_of_typedspark_type
+from typedspark._core.utils import get_dtype_from_column, is_structtype
 from typedspark._schema.get_schema_imports import get_schema_imports
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -63,7 +62,7 @@ def _add_subschemas(schema: Type[Schema], include_documentation: bool) -> str:
     lines = ""
     for val in get_type_hints(schema).values():
         dtype = get_dtype_from_column(val)
-        if is_of_typedspark_type(dtype, StructType):
+        if is_structtype(dtype):
             lines += "\n\n"
             subschema: Type[Schema] = get_args(dtype)[0]
             lines += _build_schema_definition_string(
