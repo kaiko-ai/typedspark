@@ -12,6 +12,7 @@ from typedspark._core.datatypes import (
     StructType,
     TypedSparkDataType,
 )
+from typedspark._core.utils import get_schema_from_structtype, is_of_typedspark_type
 
 if TYPE_CHECKING:  # pragma: no cover
     from typedspark._schema.schema import Schema
@@ -50,17 +51,17 @@ def _process_datatype(dtype: Type[DataType]) -> set[Type[DataType]]:
     else:
         encountered_datatypes.add(dtype)
 
-    if origin == MapType:
+    if is_of_typedspark_type(dtype, MapType):
         key, value = get_args(dtype)
         encountered_datatypes |= _process_datatype(key)
         encountered_datatypes |= _process_datatype(value)
 
-    if origin == ArrayType:
+    if is_of_typedspark_type(dtype, ArrayType):
         element = get_args(dtype)[0]
         encountered_datatypes |= _process_datatype(element)
 
-    if get_origin(dtype) == StructType:
-        subschema = get_args(dtype)[0]
+    if is_of_typedspark_type(dtype, StructType):
+        subschema = get_schema_from_structtype(dtype)
         encountered_datatypes |= _get_imported_dtypes(subschema)
 
     return encountered_datatypes

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING, Annotated, Type, TypeVar, Union, get_args, get_origin
+from typing import TYPE_CHECKING, Annotated, Type, TypeVar, Union, get_args
 
 from pyspark.sql.types import ArrayType as SparkArrayType
 from pyspark.sql.types import DataType
@@ -19,6 +19,13 @@ from typedspark._core.datatypes import (
     MapType,
     StructType,
     TypedSparkDataType,
+)
+from typedspark._core.utils import (
+    get_column_from_annotation,
+    get_dtype_from_column,
+    is_annotated_column,
+    is_column,
+    is_of_typedspark_type,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -55,41 +62,25 @@ def _get_structfield_dtype(
     colname: str,
 ) -> DataType:
     """Get the spark ``DataType`` from the ``Column`` type annotation."""
-    origin = get_origin(column)
-    if origin not in [Annotated, Column]:
+    if not is_column(column) and not is_annotated_column(column):
         raise TypeError(f"Column {colname} needs to be of type Column or Annotated.")
 
-    if origin == Annotated:
-        column = _get_column_from_annotation(column, colname)
+    if is_annotated_column(column):
+        column = get_column_from_annotation(column)
 
-    args = get_args(column)
-    dtype = _get_dtype(args[0], colname)
-    return dtype
-
-
-def _get_column_from_annotation(
-    column: Annotated[Type[Column[_DataType]], ColumnMeta],
-    colname: str,
-) -> Type[Column[_DataType]]:
-    """Takes an ``Annotation[Column[...], ...]`` and returns the
-    ``Column[...]``."""
-    column = get_args(column)[0]
-    if get_origin(column) != Column:
-        raise TypeError(f"Column {colname} needs to have a Column[] within Annotated[].")
-
-    return column
+    dtype = get_dtype_from_column(column)
+    return _initialize_dtype(dtype, colname)
 
 
-def _get_dtype(dtype: Type[DataType], colname: str) -> DataType:
+def _initialize_dtype(dtype: Type[DataType], colname: str) -> DataType:
     """Takes a ``DataType`` class and returns a DataType object."""
-    origin = get_origin(dtype)
-    if origin == ArrayType:
+    if is_of_typedspark_type(dtype, ArrayType):
         return _extract_arraytype(dtype, colname)
-    if origin == MapType:
+    if is_of_typedspark_type(dtype, MapType):
         return _extract_maptype(dtype, colname)
-    if origin == StructType:
+    if is_of_typedspark_type(dtype, StructType):
         return _extract_structtype(dtype)
-    if origin == DecimalType:
+    if is_of_typedspark_type(dtype, DecimalType):
         return _extract_decimaltype(dtype)
     if (
         inspect.isclass(dtype)
@@ -107,7 +98,7 @@ def _extract_arraytype(arraytype: Type[DataType], colname: str) -> SparkArrayTyp
     """Takes e.g. an ``ArrayType[StringType]`` and creates an
     ``ArrayType(StringType(), True)``."""
     params = get_args(arraytype)
-    element_type = _get_dtype(params[0], colname)
+    element_type = _initialize_dtype(params[0], colname)
     return SparkArrayType(element_type)
 
 
@@ -115,8 +106,8 @@ def _extract_maptype(maptype: Type[DataType], colname: str) -> SparkMapType:
     """Takes e.g. a ``MapType[StringType, StringType]`` and creates a ``
     MapType(StringType(), StringType(), True)``."""
     params = get_args(maptype)
-    key_type = _get_dtype(params[0], colname)
-    value_type = _get_dtype(params[1], colname)
+    key_type = _initialize_dtype(params[0], colname)
+    value_type = _initialize_dtype(params[1], colname)
     return SparkMapType(key_type, value_type)
 
 

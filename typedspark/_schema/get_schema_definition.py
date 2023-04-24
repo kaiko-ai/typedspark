@@ -2,9 +2,10 @@
 ``DataFrame``."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type, get_args, get_origin, get_type_hints
+from typing import TYPE_CHECKING, Type, get_args, get_type_hints
 
 from typedspark._core.datatypes import StructType
+from typedspark._core.utils import get_dtype_from_column, is_of_typedspark_type
 from typedspark._schema.get_schema_imports import get_schema_imports
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -61,12 +62,8 @@ def _add_subschemas(schema: Type[Schema], include_documentation: bool) -> str:
     generates their schema recursively."""
     lines = ""
     for val in get_type_hints(schema).values():
-        args = get_args(val)
-        if not args:
-            continue
-
-        dtype = args[0]
-        if get_origin(dtype) == StructType:
+        dtype = get_dtype_from_column(val)
+        if is_of_typedspark_type(dtype, StructType):
             lines += "\n\n"
             subschema: Type[Schema] = get_args(dtype)[0]
             lines += _build_schema_definition_string(

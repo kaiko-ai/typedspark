@@ -1,13 +1,14 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from typing import Generic, Optional, TypeVar, get_args, get_origin
-
-from typedspark._core.datatypes import StructType
+from typing import Generic, Optional, Type, TypeVar
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
 from pyspark.sql.types import DataType
+
+from typedspark._core.datatypes import StructType
+from typedspark._core.utils import get_schema_from_structtype, is_of_typedspark_type
 
 T = TypeVar("T", bound=DataType)
 
@@ -35,7 +36,7 @@ class Column(SparkColumn, Generic[T]):
         name: str,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
-        dtype: Optional[DataType] = None,
+        annotation: Optional[Type[DataType]] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
@@ -63,30 +64,18 @@ class Column(SparkColumn, Generic[T]):
         name: str,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
-        dtype: Optional[DataType] = None,
+        dtype: Optional[Type[DataType]] = None,
     ):
         # pylint: disable=unused-argument
         self.str = name
         self._curid = curid
 
-        if not dtype:
-            return
-        print(dtype)            
-        origin = get_origin(dtype)
-        print(origin)
-        if origin is not StructType:
-            return
-        print("a")
+        if dtype and is_of_typedspark_type(dtype, StructType):
+            self._set_structtype_attributes(dtype)
 
-        structtype_args = get_args(dtype)
-        if not structtype_args:  # or not issubclass(structtype_args[0], Schema)
-            return
-        
-        print("b")
-        
-        schema = structtype_args[0]
+    def _set_structtype_attributes(self, dtype: Type[DataType]) -> None:
+        schema = get_schema_from_structtype(dtype)
         for field in schema.get_structtype().fields:
-            print(field.name)
             self.__setattr__(field.name, Column(field.name, dtype=field.dataType))
 
     def __hash__(self) -> int:

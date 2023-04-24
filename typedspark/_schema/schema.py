@@ -7,6 +7,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.types import StructType
 
 from typedspark._core.column import Column
+from typedspark._core.utils import get_dtype_from_column
 from typedspark._schema.dlt_kwargs import DltKwargs
 from typedspark._schema.get_schema_definition import get_schema_definition_as_string
 from typedspark._schema.structfield import get_structfield
@@ -38,10 +39,13 @@ class MetaSchema(type):
         cls._attributes = dir(cls)
 
         # initializes all uninitialied variables with a type annotation
-        # this allows for auto-complete in notebooks (uninitialized variables
-        # don't show up in auto-complete otherwise).
+        # this allows for auto-complete in notebooks.
         if "__annotations__" in dct.keys():
-            extra = {name: Column(name, dtype=dtype) for name, dtype in dct["__annotations__"].items() if name not in dct}
+            extra: Dict[str, Column] = {
+                name: Column(name, dtype=get_dtype_from_column(annotation))
+                for name, annotation in dct["__annotations__"].items()
+                if name not in dct
+            }
             dct = dict(dct, **extra)
 
         return type.__new__(cls, name, bases, dct)
