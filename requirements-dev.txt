@@ -20,6 +20,6 @@ papermill==2.4.0
 jupyter==1.0.0
 nbformat==5.8.0
 # readthedocs
-sphinx==6.2.0
+sphinx==6.2.1
 sphinx-rtd-theme==1.2.0
 nbsphinx==0.9.1
