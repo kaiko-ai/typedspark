@@ -42,6 +42,8 @@ The advantages include:
 Installation
 ============
 
+You can install ``typedspark`` from `pypi <https://pypi.org/project/typedspark/>`_ by running:
+
 .. code-block:: bash
 
     pip install typedspark
