@@ -55,11 +55,7 @@ def _get_structfield_dtype(
     colname: str,
 ) -> DataType:
     """Get the spark ``DataType`` from the ``Column`` type annotation."""
-    origin = get_origin(column)
-    if origin not in [Annotated, Column]:
-        raise TypeError(f"Column {colname} needs to be of type Column or Annotated.")
-
-    if origin == Annotated:
+    if get_origin(column) == Annotated:
         column = _get_column_from_annotation(column, colname)
 
     args = get_args(column)

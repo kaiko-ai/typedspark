@@ -7,7 +7,7 @@ from pyspark.sql.types import DataType
 
 from typedspark._core.datatypes import StructType
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typedspark import Column, Schema
 
 _DataType = TypeVar("_DataType", bound=DataType)  # pylint: disable=invalid-name
@@ -31,7 +31,4 @@ def is_structtype(dtype_observed: Type[DataType]) -> bool:
 def get_schema_from_structtype(dtype: Type[DataType]) -> Type[Schema]:
     """Returns the Schema from a StructType[Schema]."""
     args = get_args(dtype)
-    if not args:
-        raise TypeError("StructType needs to have a Schema argument, e.g. StructType[MySchema].")
-
     return args[0]
