@@ -11,7 +11,7 @@ mypy==1.2.0
 pyright==1.1.305
 # testing
 pytest==7.3.1
-coverage==7.2.3
+coverage==7.2.4
 pandas==2.0.1
 pandas-stubs==2.0.0.230412
 chispa==0.9.2
