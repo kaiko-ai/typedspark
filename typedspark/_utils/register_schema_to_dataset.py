@@ -1,5 +1,4 @@
-"""Module containing functions that are related to registering schema's to
-DataSets."""
+"""Module containing functions that are related to registering schema's to DataSets."""
 import itertools
 from typing import Type, TypeVar
 
@@ -55,7 +54,6 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
                 )
             )
     """
-
     class LinkedSchema(schema):  # type: ignore
         """TypedSpark LinkedSchema.
 

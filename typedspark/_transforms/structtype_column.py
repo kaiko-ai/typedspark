@@ -47,9 +47,8 @@ def structtype_column(
 def _order_columns(
     transformations: Dict[str, SparkColumn], schema: Type[Schema]
 ) -> Dict[str, SparkColumn]:
-    """chispa's DataFrame comparer doesn't deal nicely with StructTypes whose
-    columns are ordered differently, hence we order them the same as in the
-    schema here."""
+    """Chispa's DataFrame comparer doesn't deal nicely with StructTypes whose columns
+    are ordered differently, hence we order them the same as in the schema here."""
     transformations_ordered = {}
     for field in schema.get_structtype().fields:
         transformations_ordered[field.name] = transformations[field.name]

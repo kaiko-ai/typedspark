@@ -1,7 +1,6 @@
 """Removes the metadata from a notebook.
 
-Also removes the spark warnings from cells where the sparksession is
-initialized.
+Also removes the spark warnings from cells where the sparksession is initialized.
 """
 import sys
 

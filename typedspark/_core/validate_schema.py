@@ -1,5 +1,4 @@
-"""Module containing functions that are related to validating schema's at
-runtime."""
+"""Module containing functions that are related to validating schema's at runtime."""
 from typing import Dict, Set
 
 from pyspark.sql.types import ArrayType, DataType, MapType, StructField, StructType
@@ -17,8 +16,7 @@ def validate_schema(
 
 
 def unpack_schema(schema: StructType) -> Dict[str, StructField]:
-    """Converts the observed schema to a dictionary mapping column name to
-    StructField.
+    """Converts the observed schema to a dictionary mapping column name to StructField.
 
     We ignore columns that start with ``__``.
     """
@@ -56,8 +54,7 @@ def check_dtypes(
     schema_observed: Dict[str, StructField],
     schema_name: str,
 ) -> None:
-    """Checks for each column whether the observed and expected data type
-    match.
+    """Checks for each column whether the observed and expected data type match.
 
     Is order insensitive.
     """

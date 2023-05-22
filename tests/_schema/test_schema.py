@@ -79,7 +79,7 @@ class Values(Schema):
 
 
 class PascalCase(Schema):
-    """schema docstring."""
+    """Schema docstring."""
 
     a: Annotated[Column[StringType], ColumnMeta(comment="some")]
     b: Annotated[Column[LongType], ColumnMeta(comment="other")]

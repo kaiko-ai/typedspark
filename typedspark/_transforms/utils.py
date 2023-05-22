@@ -13,9 +13,9 @@ def add_nulls_for_unspecified_columns(
     schema: Type[Schema],
     previously_existing_columns: Optional[List[str]] = None,
 ) -> Dict[str, SparkColumn]:
-    """Takes the columns from the schema that are not present in the
-    transformation dictionary and sets their values to Null (casted to the
-    corresponding type defined in the schema)."""
+    """Takes the columns from the schema that are not present in the transformation
+    dictionary and sets their values to Null (casted to the corresponding type defined
+    in the schema)."""
     _previously_existing_columns = (
         [] if previously_existing_columns is None else previously_existing_columns
     )
@@ -29,8 +29,7 @@ def add_nulls_for_unspecified_columns(
 def convert_keys_to_strings(
     transformations: Optional[Dict[Column, SparkColumn]]
 ) -> Dict[str, SparkColumn]:
-    """Takes the Column keys in transformations and converts them to
-    strings."""
+    """Takes the Column keys in transformations and converts them to strings."""
     if transformations is None:
         return {}
 
