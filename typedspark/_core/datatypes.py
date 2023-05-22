@@ -37,6 +37,8 @@ class StructType(Generic[_Schema], TypedSparkDataType):
             job: Column[StructType[Job]]
     """
 
+    schema: _Schema
+
 
 class MapType(Generic[_KeyType, _ValueType], TypedSparkDataType):
     """Allows for type annotations such as.

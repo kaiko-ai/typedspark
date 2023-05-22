@@ -67,7 +67,7 @@ class DataSet(DataFrame, Generic[T]):
         if name == "__orig_class__":
             orig_class_args = get_args(self.__orig_class__)
             if orig_class_args and issubclass(orig_class_args[0], Schema):
-                self._schema_annotations: Type[Schema] = get_args(value)[0]
+                self._schema_annotations: Type[Schema] = orig_class_args[0]
                 validate_schema(
                     self._schema_annotations.get_structtype(),
                     deepcopy(self.schema),

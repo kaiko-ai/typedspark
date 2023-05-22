@@ -1,7 +1,7 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
 import inspect
 import re
-from typing import Any, Dict, List, Optional, Union, get_type_hints
+from typing import Any, Dict, List, Optional, Union, get_args, get_type_hints
 
 from pyspark.sql import DataFrame
 from pyspark.sql.types import StructType
@@ -55,7 +55,7 @@ class MetaSchema(type):
     def __getattribute__(cls, name: str) -> Any:
         """Python base function that gets attributes.
 
-        We listen here for anyone getting ``Column`` from the ``Schema``.
+        We listen here for anyone getting a ``Column`` from the ``Schema``.
         Even though they're not explicitely instantiated, we can instantiate
         them here whenever someone attempts to get them. This allows us to do the following:
 
@@ -72,8 +72,10 @@ class MetaSchema(type):
         if name.startswith("__") or name == "_attributes" or name in cls._attributes:
             return object.__getattribute__(cls, name)
 
-        if name in get_type_hints(cls).keys():
-            return Column(name, cls._linked_dataframe, cls._current_id)
+        columns = get_type_hints(cls)
+        if name in columns.keys():
+            dtype = get_args(columns[name])[0]  # TODO
+            return Column(name, dtype, cls._linked_dataframe, cls._current_id)
 
         raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")
 
