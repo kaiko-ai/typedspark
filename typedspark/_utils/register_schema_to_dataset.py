@@ -55,6 +55,7 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
                 )
             )
     """
+
     class LinkedSchema(schema):  # type: ignore
         """TypedSpark LinkedSchema.
 
