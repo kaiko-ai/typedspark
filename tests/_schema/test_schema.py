@@ -79,7 +79,7 @@ class Values(Schema):
 
 
 class PascalCase(Schema):
-    """schema docstring."""
+    """Schema docstring."""
 
     a: Annotated[Column[StringType], ColumnMeta(comment="some")]
     b: Annotated[Column[LongType], ColumnMeta(comment="other")]
@@ -103,7 +103,7 @@ def test_get_snake_case():
 
 def test_get_docstring():
     assert A.get_docstring() is None
-    assert PascalCase.get_docstring() == "schema docstring."
+    assert PascalCase.get_docstring() == "Schema docstring."
 
 
 def test_get_structtype():
@@ -129,7 +129,7 @@ def test_get_dlt_kwargs():
 
     assert PascalCase.get_dlt_kwargs() == DltKwargs(
         name="pascal_case",
-        comment="schema docstring.",
+        comment="Schema docstring.",
         schema=StructType(
             [
                 StructField("a", StringType(), metadata={"comment": "some"}),

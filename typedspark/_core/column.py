@@ -11,8 +11,7 @@ T = TypeVar("T", bound=DataType)
 
 
 class EmptyColumn(SparkColumn):
-    """Column object to be instantiated when there is no active Spark
-    session."""
+    """Column object to be instantiated when there is no active Spark session."""
 
     def __init__(self, *args, **kwargs) -> None:  # pragma: no cover
         pass

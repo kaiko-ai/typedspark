@@ -38,7 +38,7 @@ jobs:
           bandit typedspark/**/*.py
           black --check .
           isort --check .
-          docformatter -c **/*.py
+          docformatter --black -c **/*.py
       - name: Testing
         run: |
           # we run this test seperately, to ensure that it is run without an active Spark session
