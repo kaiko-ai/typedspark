@@ -1,5 +1,4 @@
-"""Module containing functions that are related to transformations to
-DataSets."""
+"""Module containing functions that are related to transformations to DataSets."""
 from functools import reduce
 from typing import Dict, Optional, Type, TypeVar
 

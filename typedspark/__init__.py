@@ -1,4 +1,4 @@
-"""typedspark: column-wise type annotations for pyspark DataFrames"""
+"""Typedspark: column-wise type annotations for pyspark DataFrames."""
 
 from typedspark._core.column import Column
 from typedspark._core.column_meta import ColumnMeta

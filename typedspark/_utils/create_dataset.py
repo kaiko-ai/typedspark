@@ -98,8 +98,8 @@ def create_structtype_row(schema: Type[T], data: Dict[Column, Any]) -> Row:
 def _create_column_wise_data_from_dict(
     schema: Type[T], data: Dict[Column, List[Any]]
 ) -> List[List[Any]]:
-    """Converts a dict of column to data to a list of lists, where each inner
-    list contains the data for a column."""
+    """Converts a dict of column to data to a list of lists, where each inner list
+    contains the data for a column."""
     data_converted = {k.str: v for k, v in data.items()}
     n_rows_unique = {len(v) for _, v in data.items()}
     if len(n_rows_unique) > 1:
@@ -119,8 +119,8 @@ def _create_column_wise_data_from_dict(
 def _create_column_wise_data_from_list(
     schema: Type[T], data: List[Dict[Column, Any]]
 ) -> List[List[Any]]:
-    """Converts a list of dicts of column to data to a list of lists, where
-    each inner list contains the data for a column."""
+    """Converts a list of dicts of column to data to a list of lists, where each inner
+    list contains the data for a column."""
     data_converted = [{k.str: v for k, v in row.items()} for row in data]
 
     col_data = []
