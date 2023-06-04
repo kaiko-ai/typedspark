@@ -1,10 +1,10 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
 import inspect
 import re
-from typing import Any, Dict, List, Optional, Union, get_args, get_type_hints
+from typing import Any, Dict, List, Optional, Type, Union, get_args, get_type_hints
 
 from pyspark.sql import DataFrame
-from pyspark.sql.types import StructType
+from pyspark.sql.types import DataType, StructType
 
 from typedspark._core.column import Column
 from typedspark._schema.dlt_kwargs import DltKwargs
@@ -72,12 +72,28 @@ class MetaSchema(type):
         if name.startswith("__") or name == "_attributes" or name in cls._attributes:
             return object.__getattribute__(cls, name)
 
-        columns = get_type_hints(cls)
-        if name in columns.keys():
-            dtype = get_args(columns[name])[0]  # TODO
-            return Column(name, dtype, cls._linked_dataframe, cls._current_id)
+        if name in get_type_hints(cls):
+            return Column(
+                name,
+                cls._get_dtype(name),  # type: ignore
+                cls._linked_dataframe,
+                cls._current_id,
+            )
 
         raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")
+
+    def _get_dtype(cls, name: str) -> Type[DataType]:
+        """Returns the datatype of a column, e.g. Column[IntegerType] -> IntegerType."""
+        column = get_type_hints(cls)[name]
+        args = get_args(column)
+
+        if not args:
+            raise TypeError(
+                f"Column {cls.get_schema_name()}.{name} does not have an annotated type."
+            )
+
+        dtype = args[0]
+        return dtype
 
     def all_column_names(cls) -> List[str]:
         """Returns all column names for a given schema."""

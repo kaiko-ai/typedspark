@@ -32,7 +32,7 @@ class Column(SparkColumn, Generic[T]):
     def __new__(
         cls,
         name: str,
-        dtype: T,  # TODO: interface change
+        dtype: T,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
     ):
