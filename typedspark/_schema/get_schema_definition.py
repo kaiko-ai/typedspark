@@ -15,6 +15,7 @@ def get_schema_definition_as_string(
     schema: Type[Schema],
     include_documentation: bool,
     generate_imports: bool,
+    add_subschemas: bool,
     class_name: str = "MyNewSchema",
 ) -> str:
     """Return the code for a given ``Schema`` as a string.
@@ -25,13 +26,18 @@ def get_schema_definition_as_string(
     required imports for the schema are included in the string.
     """
     imports = get_schema_imports(schema, include_documentation) if generate_imports else ""
-    schema_string = _build_schema_definition_string(schema, include_documentation, class_name)
+    schema_string = _build_schema_definition_string(
+        schema, include_documentation, add_subschemas, class_name
+    )
 
     return imports + schema_string
 
 
 def _build_schema_definition_string(
-    schema: Type[Schema], include_documentation: bool, class_name: str = "MyNewSchema"
+    schema: Type[Schema],
+    include_documentation: bool,
+    add_subschemas: bool,
+    class_name: str = "MyNewSchema",
 ) -> str:
     """Return the code for a given ``Schema`` as a string."""
     lines = f"class {class_name}(Schema):\n"
@@ -52,11 +58,13 @@ def _build_schema_definition_string(
         else:
             lines += f"    {k}: {typehint}\n"
 
-    lines += _add_subschemas(schema, include_documentation)
+    if add_subschemas:
+        lines += _add_subschemas(schema, add_subschemas, include_documentation)
+
     return lines
 
 
-def _add_subschemas(schema: Type[Schema], include_documentation: bool) -> str:
+def _add_subschemas(schema: Type[Schema], add_subschemas: bool, include_documentation: bool) -> str:
     """Identifies whether any ``Column`` are of the ``StructType`` type and
     generates their schema recursively."""
     lines = ""
@@ -70,7 +78,7 @@ def _add_subschemas(schema: Type[Schema], include_documentation: bool) -> str:
             lines += "\n\n"
             subschema: Type[Schema] = get_args(dtype)[0]
             lines += _build_schema_definition_string(
-                subschema, include_documentation, subschema.get_schema_name()
+                subschema, include_documentation, add_subschemas, subschema.get_schema_name()
             )
 
     return lines

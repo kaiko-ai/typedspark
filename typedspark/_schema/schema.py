@@ -50,7 +50,7 @@ class MetaSchema(type):
         return f"\n{str(cls)}"
 
     def __str__(cls) -> str:
-        return cls.get_schema_definition_as_string()
+        return cls.get_schema_definition_as_string(add_subschemas=False)
 
     def __getattribute__(cls, name: str) -> Any:
         """Python base function that gets attributes.
@@ -117,6 +117,7 @@ class MetaSchema(type):
         schema_name: Optional[str] = None,
         include_documentation: bool = False,
         generate_imports: bool = True,
+        add_subschemas: bool = True,
     ) -> str:
         """Return the code for the ``Schema`` as a string."""
         if schema_name is None:
@@ -125,6 +126,7 @@ class MetaSchema(type):
             cls,  # type: ignore
             include_documentation,
             generate_imports,
+            add_subschemas,
             schema_name,
         )
 
@@ -133,6 +135,7 @@ class MetaSchema(type):
         schema_name: Optional[str] = None,
         include_documentation: bool = False,
         generate_imports: bool = True,
+        add_subschemas: bool = False,
     ):  # pragma: no cover
         """Print the code for the ``Schema``."""
         print(
@@ -140,6 +143,7 @@ class MetaSchema(type):
                 schema_name=schema_name,
                 include_documentation=include_documentation,
                 generate_imports=generate_imports,
+                add_subschemas=add_subschemas,
             )
         )
 
