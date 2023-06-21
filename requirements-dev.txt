@@ -8,7 +8,7 @@ black==23.3.0
 isort==5.12.0
 docformatter==1.7.2
 mypy==1.4.0
-pyright==1.1.314
+pyright==1.1.315
 # testing
 pytest==7.3.2
 coverage==7.2.7
