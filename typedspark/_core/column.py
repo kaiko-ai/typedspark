@@ -1,6 +1,6 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from typing import Generic, Optional, TypeVar, get_args, get_origin
+from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
@@ -33,7 +33,7 @@ class Column(SparkColumn, Generic[T]):
         cls,
         name: str,
         dtype: T,
-        dataframe: Optional[DataFrame] = None,
+        parent: Optional[Union[DataFrame, "Column"]] = None,
         curid: Optional[int] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
@@ -49,10 +49,10 @@ class Column(SparkColumn, Generic[T]):
         column: SparkColumn
         if SparkSession.getActiveSession() is None:
             column = EmptyColumn()  # pragma: no cover
-        elif dataframe is None:
+        elif parent is None:
             column = col(name)
         else:
-            column = dataframe[name]
+            column = parent[name]
 
         column.__class__ = Column
         return column
@@ -61,7 +61,7 @@ class Column(SparkColumn, Generic[T]):
         self,
         name: str,
         dtype: T,
-        dataframe: Optional[DataFrame] = None,
+        parent: Optional[Union[DataFrame, "Column"]] = None,
         curid: Optional[int] = None,
     ):
         # pylint: disable=unused-argument
@@ -78,5 +78,6 @@ class Column(SparkColumn, Generic[T]):
         dtype = self._dtype
         if get_origin(dtype) == StructType:
             dtype.schema = get_args(dtype)[0]  # type: ignore
+            dtype.schema._parent = self  # type: ignore
 
         return dtype

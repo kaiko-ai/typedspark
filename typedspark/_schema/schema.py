@@ -30,7 +30,7 @@ class MetaSchema(type):
     The class methods of ``Schema`` are described here.
     """
 
-    _linked_dataframe: Optional[DataFrame] = None
+    _parent: Optional[Union[DataFrame, Column]] = None
     _current_id: Optional[int] = None
     _original_name: Optional[str] = None
 
@@ -76,7 +76,7 @@ class MetaSchema(type):
             return Column(
                 name,
                 cls._get_dtype(name),  # type: ignore
-                cls._linked_dataframe,
+                cls._parent,
                 cls._current_id,
             )
 
