@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, Type, TypeVar
 
 from pyspark.sql.types import DataType
 
@@ -37,7 +37,7 @@ class StructType(Generic[_Schema], TypedSparkDataType):
             job: Column[StructType[Job]]
     """
 
-    schema: _Schema
+    schema: Type[_Schema]
 
 
 class MapType(Generic[_KeyType, _ValueType], TypedSparkDataType):
