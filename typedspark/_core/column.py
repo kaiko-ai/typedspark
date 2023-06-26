@@ -33,7 +33,7 @@ class Column(SparkColumn, Generic[T]):
         cls,
         name: str,
         dtype: T,
-        parent: Optional[Union[DataFrame, "Column"]] = None,
+        parent: Union[DataFrame, "Column", None] = None,
         curid: Optional[int] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
@@ -61,7 +61,7 @@ class Column(SparkColumn, Generic[T]):
         self,
         name: str,
         dtype: T,
-        parent: Optional[Union[DataFrame, "Column"]] = None,
+        parent: Union[DataFrame, "Column", None] = None,
         curid: Optional[int] = None,
     ):
         # pylint: disable=unused-argument
