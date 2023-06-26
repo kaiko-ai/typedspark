@@ -61,7 +61,7 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
         Contains the DataFrame that this Schema is linked to.
         """
 
-        _linked_dataframe = dataframe
+        _parent = dataframe
         _current_id = _counter()
         _original_name = schema.get_schema_name()
 

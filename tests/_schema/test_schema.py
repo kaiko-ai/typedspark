@@ -153,3 +153,9 @@ def test_repr():
 def test_get_schema(schema: Type[Schema], expected_schema_definition: str):
     schema_definition = schema.get_schema_definition_as_string(include_documentation=True)
     assert schema_definition == expected_schema_definition
+
+
+def test_dtype_attributes():
+    assert ComplexDatatypes.value.dtype == typedspark.StructType[Values]
+    assert ComplexDatatypes.value.dtype.schema == Values
+    assert ComplexDatatypes.value.dtype.schema.b.dtype == StringType

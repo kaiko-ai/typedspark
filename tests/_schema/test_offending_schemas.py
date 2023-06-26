@@ -76,6 +76,11 @@ def test_offending_schemas_repr_exceptions():
         schema.get_schema_definition_as_string(generate_imports=True)
 
 
+def test_offending_schemas_dtype():
+    with pytest.raises(TypeError):
+        ColumnWithoutType.a.dtype
+
+
 def test_offending_schemas_runtime_error_on_load():
     with pytest.raises(TypeError):
 

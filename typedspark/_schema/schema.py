@@ -1,10 +1,10 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
 import inspect
 import re
-from typing import Any, Dict, List, Optional, Union, get_type_hints
+from typing import Any, Dict, List, Optional, Type, Union, get_args, get_type_hints
 
 from pyspark.sql import DataFrame
-from pyspark.sql.types import StructType
+from pyspark.sql.types import DataType, StructType
 
 from typedspark._core.column import Column
 from typedspark._schema.dlt_kwargs import DltKwargs
@@ -30,7 +30,7 @@ class MetaSchema(type):
     The class methods of ``Schema`` are described here.
     """
 
-    _linked_dataframe: Optional[DataFrame] = None
+    _parent: Optional[Union[DataFrame, Column]] = None
     _current_id: Optional[int] = None
     _original_name: Optional[str] = None
 
@@ -50,12 +50,12 @@ class MetaSchema(type):
         return f"\n{str(cls)}"
 
     def __str__(cls) -> str:
-        return cls.get_schema_definition_as_string()
+        return cls.get_schema_definition_as_string(add_subschemas=False)
 
     def __getattribute__(cls, name: str) -> Any:
         """Python base function that gets attributes.
 
-        We listen here for anyone getting ``Column`` from the ``Schema``.
+        We listen here for anyone getting a ``Column`` from the ``Schema``.
         Even though they're not explicitely instantiated, we can instantiate
         them here whenever someone attempts to get them. This allows us to do the following:
 
@@ -72,10 +72,28 @@ class MetaSchema(type):
         if name.startswith("__") or name == "_attributes" or name in cls._attributes:
             return object.__getattribute__(cls, name)
 
-        if name in get_type_hints(cls).keys():
-            return Column(name, cls._linked_dataframe, cls._current_id)
+        if name in get_type_hints(cls):
+            return Column(
+                name,
+                cls._get_dtype(name),  # type: ignore
+                cls._parent,
+                cls._current_id,
+            )
 
         raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")
+
+    def _get_dtype(cls, name: str) -> Type[DataType]:
+        """Returns the datatype of a column, e.g. Column[IntegerType] -> IntegerType."""
+        column = get_type_hints(cls)[name]
+        args = get_args(column)
+
+        if not args:
+            raise TypeError(
+                f"Column {cls.get_schema_name()}.{name} does not have an annotated type."
+            )
+
+        dtype = args[0]
+        return dtype
 
     def all_column_names(cls) -> List[str]:
         """Returns all column names for a given schema."""
@@ -99,6 +117,7 @@ class MetaSchema(type):
         schema_name: Optional[str] = None,
         include_documentation: bool = False,
         generate_imports: bool = True,
+        add_subschemas: bool = True,
     ) -> str:
         """Return the code for the ``Schema`` as a string."""
         if schema_name is None:
@@ -107,6 +126,7 @@ class MetaSchema(type):
             cls,  # type: ignore
             include_documentation,
             generate_imports,
+            add_subschemas,
             schema_name,
         )
 
@@ -115,6 +135,7 @@ class MetaSchema(type):
         schema_name: Optional[str] = None,
         include_documentation: bool = False,
         generate_imports: bool = True,
+        add_subschemas: bool = False,
     ):  # pragma: no cover
         """Print the code for the ``Schema``."""
         print(
@@ -122,6 +143,7 @@ class MetaSchema(type):
                 schema_name=schema_name,
                 include_documentation=include_documentation,
                 generate_imports=generate_imports,
+                add_subschemas=add_subschemas,
             )
         )
 
