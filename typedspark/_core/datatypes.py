@@ -24,7 +24,7 @@ class TypedSparkDataType(DataType):
 
 
 class StructTypeMeta(type):
-    """Initializes schema as None.
+    """Initializes the schema attribute as None.
 
     This allows for auto-complete in Databricks notebooks (uninitialized variables don't
     show up in auto-complete there).
