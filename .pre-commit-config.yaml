@@ -43,7 +43,7 @@ repos:
     types: [python]
   - id: pytest-no-spark
     name: pytest-no-spark
-    entry: python -m pytest tests/_core/test_column.py::test_column_reference_without_spark_session
+    entry: python -m pytest -m no_spark_session
     language: system
     types: [python]
     pass_filenames: false
