@@ -11,6 +11,7 @@ from typedspark import (
     create_empty_dataset,
     load_table,
 )
+from typedspark._core.datatypes import DayTimeIntervalType, IntervalType
 
 
 class SubSchema(Schema):
@@ -22,6 +23,7 @@ class A(Schema):
     b: Column[ArrayType[IntegerType]]
     c: Column[ArrayType[MapType[IntegerType, IntegerType]]]
     d: Column[StructType[SubSchema]]
+    e: Column[DayTimeIntervalType[IntervalType.HOUR, IntervalType.MINUTE]]
 
 
 def test_load_table(spark: SparkSession) -> None:

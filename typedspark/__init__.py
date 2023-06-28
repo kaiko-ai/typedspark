@@ -7,6 +7,7 @@ from typedspark._core.datatypes import (
     ArrayType,
     DayTimeIntervalType,
     DecimalType,
+    IntervalType,
     MapType,
     StructType,
 )
@@ -28,6 +29,7 @@ __all__ = [
     "DataSet",
     "DayTimeIntervalType",
     "DecimalType",
+    "IntervalType",
     "MapType",
     "MetaSchema",
     "Schema",
