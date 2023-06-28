@@ -2,8 +2,7 @@
 ``StructType`` in order to allow e.g. for ``ArrayType[StringType]``."""
 from __future__ import annotations
 
-from abc import ABC
-from typing import TYPE_CHECKING, Generic, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
 
 from pyspark.sql.types import DataType
 
@@ -20,11 +19,23 @@ _Precision = TypeVar("_Precision", bound=int)  # pylint: disable=invalid-name
 _Scale = TypeVar("_Scale", bound=int)  # pylint: disable=invalid-name
 
 
-class TypedSparkDataType(DataType, ABC):
-    """Abstract base class for typedspark specific ``DataTypes``."""
+class TypedSparkDataType(DataType):
+    """Base class for typedspark specific ``DataTypes``."""
 
 
-class StructType(Generic[_Schema], TypedSparkDataType):
+class StructTypeMeta(type):
+    """Initializes the schema attribute as None.
+
+    This allows for auto-complete in Databricks notebooks (uninitialized variables don't
+    show up in auto-complete there).
+    """
+
+    def __new__(cls, name: str, bases: Any, dct: Dict[str, Any]):
+        dct["schema"] = None
+        return super().__new__(cls, name, bases, dct)
+
+
+class StructType(Generic[_Schema], TypedSparkDataType, metaclass=StructTypeMeta):
     """Allows for type annotations such as:
 
     .. code-block:: python
