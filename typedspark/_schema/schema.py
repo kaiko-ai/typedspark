@@ -75,9 +75,9 @@ class MetaSchema(type):
         if name in get_type_hints(cls):
             return Column(
                 name,
-                cls._get_dtype(name),  # type: ignore
-                cls._parent,
-                cls._current_id,
+                dtype=cls._get_dtype(name),  # type: ignore
+                parent=cls._parent,
+                curid=cls._current_id,
             )
 
         raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")
