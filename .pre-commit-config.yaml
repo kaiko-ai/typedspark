@@ -1,0 +1,9 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: pylint
+    -   id: bandit
+    -   id: flake8
+    -   id: mypy
+    -   id: pyright
