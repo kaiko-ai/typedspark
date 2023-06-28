@@ -6,7 +6,7 @@ from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
-from pyspark.sql.types import DataType
+from pyspark.sql.types import DataType, IntegerType
 
 from typedspark._core.datatypes import StructType
 
@@ -35,7 +35,7 @@ class Column(SparkColumn, Generic[T]):
         name: str,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
-        dtype: T = DataType,  # type: ignore
+        dtype: Optional[T] = None,
         parent: Union[DataFrame, "Column", None] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
@@ -72,12 +72,12 @@ class Column(SparkColumn, Generic[T]):
         name: str,
         dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
-        dtype: T = DataType,  # type: ignore
+        dtype: Optional[T] = None,
         parent: Union[DataFrame, "Column", None] = None,
     ):
         # pylint: disable=unused-argument
         self.str = name
-        self._dtype = dtype
+        self._dtype = dtype if dtype is not None else DataType
         self._curid = curid
 
     def __hash__(self) -> int:
