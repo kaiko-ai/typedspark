@@ -1,10 +1,11 @@
 from typing import Annotated, Literal, Type
 
 import pytest
+from pyspark.sql import SparkSession
 from pyspark.sql.types import LongType, StringType, StructField, StructType
 
 import typedspark
-from typedspark import Column, ColumnMeta, Schema
+from typedspark import Column, ColumnMeta, Schema, create_partially_filled_dataset
 from typedspark._schema.schema import DltKwargs
 
 
@@ -155,7 +156,22 @@ def test_get_schema(schema: Type[Schema], expected_schema_definition: str):
     assert schema_definition == expected_schema_definition
 
 
-def test_dtype_attributes():
+def test_dtype_attributes(spark: SparkSession):
     assert ComplexDatatypes.value.dtype == typedspark.StructType[Values]
     assert ComplexDatatypes.value.dtype.schema == Values
     assert ComplexDatatypes.value.dtype.schema.b.dtype == StringType
+
+    df = create_partially_filled_dataset(
+        spark,
+        ComplexDatatypes,
+        {
+            ComplexDatatypes.value: create_partially_filled_dataset(
+                spark,
+                Values,
+                {
+                    Values.a: [1, 2, 3],
+                },
+            ).collect(),
+        },
+    )
+    assert df.filter(ComplexDatatypes.value.dtype.schema.a > 1).count() == 2
