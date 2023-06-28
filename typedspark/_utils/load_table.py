@@ -1,6 +1,6 @@
 """Functions for loading `DataSet` and `Schema` in notebooks."""
 
-from typing import Dict, Tuple, Type
+from typing import Dict, Tuple, Type, Optional
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType as SparkArrayType
@@ -15,7 +15,7 @@ from typedspark._schema.schema import MetaSchema, Schema
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
 
-def _create_schema(structtype: SparkStructType) -> Type[Schema]:
+def _create_schema(structtype: SparkStructType, schema_name: Optional[str] = None) -> Type[Schema]:
     """Dynamically builds a ``Schema`` based on a ``DataFrame``'s
     ``StructType``"""
     type_annotations = {}
@@ -26,7 +26,10 @@ def _create_schema(structtype: SparkStructType) -> Type[Schema]:
         type_annotations[name] = Column[data_type]  # type: ignore
         attributes[name] = None
 
-    schema = MetaSchema("DynamicallyLoadedSchema", tuple([Schema]), attributes)
+    if not schema_name:
+        schema_name = "DynamicallyLoadedSchema"
+
+    schema = MetaSchema(schema_name, tuple([Schema]), attributes)
     schema.__annotations__ = type_annotations
 
     return schema  # type: ignore
@@ -52,7 +55,7 @@ def _extract_data_type(dtype: DataType) -> Type[DataType]:
     return type(dtype)
 
 
-def load_table(spark: SparkSession, table_name: str) -> Tuple[DataSet[Schema], Type[Schema]]:
+def load_table(spark: SparkSession, table_name: str, schema_name: Optional[str] = None) -> Tuple[DataSet[Schema], Type[Schema]]:
     """This function loads a ``DataSet``, along with its inferred ``Schema``,
     in a notebook.
 
@@ -64,7 +67,7 @@ def load_table(spark: SparkSession, table_name: str) -> Tuple[DataSet[Schema], T
         df, Person = load_table(spark, "path.to.table")
     """
     dataframe = spark.table(table_name)
-    schema = _create_schema(dataframe.schema)
+    schema = _create_schema(dataframe.schema, schema_name=schema_name)
     dataset = DataSet[schema](dataframe)  # type: ignore
     schema = register_schema_to_dataset(dataset, schema)
     return dataset, schema
