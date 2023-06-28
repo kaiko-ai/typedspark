@@ -1,6 +1,6 @@
 """Functions for loading `DataSet` and `Schema` in notebooks."""
 
-from typing import Dict, Tuple, Type, Optional
+from typing import Dict, Optional, Tuple, Type
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType as SparkArrayType
@@ -55,7 +55,9 @@ def _extract_data_type(dtype: DataType) -> Type[DataType]:
     return type(dtype)
 
 
-def load_table(spark: SparkSession, table_name: str, schema_name: Optional[str] = None) -> Tuple[DataSet[Schema], Type[Schema]]:
+def load_table(
+    spark: SparkSession, table_name: str, schema_name: Optional[str] = None
+) -> Tuple[DataSet[Schema], Type[Schema]]:
     """This function loads a ``DataSet``, along with its inferred ``Schema``,
     in a notebook.
 
