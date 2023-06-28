@@ -33,7 +33,7 @@ jobs:
         run: |
           flake8
           pylint typedspark
-          mypy ./typedspark ./tests
+          mypy .
           pyright .
           bandit typedspark/**/*.py
           black --check .
