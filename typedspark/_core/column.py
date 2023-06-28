@@ -48,13 +48,9 @@ class Column(SparkColumn, Generic[T]):
         """
         # pylint: disable=unused-argument
 
-        if dataframe is not None and parent is None:  # pragma: no cover
+        if dataframe is not None and parent is None:
             parent = dataframe
-            warn(
-                "The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
+            warn("The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead.")
 
         column: SparkColumn
         if SparkSession.getActiveSession() is None:
