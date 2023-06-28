@@ -1,8 +1,9 @@
 """Functions for loading `DataSet` and `Schema` in notebooks."""
 
+import re
 from typing import Dict, Tuple, Type
 
-from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import ArrayType as SparkArrayType
 from pyspark.sql.types import DataType
 from pyspark.sql.types import MapType as SparkMapType
@@ -13,6 +14,18 @@ from typedspark._core.dataset import DataSet
 from typedspark._core.datatypes import ArrayType, MapType, StructType
 from typedspark._schema.schema import MetaSchema, Schema
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
+
+
+def _replace_illegal_characters(column_name: str) -> str:
+    """Replaces illegal characters in a column name with an underscore."""
+    return re.sub("[^A-Za-z0-9]", "_", column_name)
+
+
+def _replace_illegal_column_names(dataframe: DataFrame) -> DataFrame:
+    """Replaces illegal column names with a legal version."""
+    for column in dataframe.columns:
+        dataframe = dataframe.withColumnRenamed(column, _replace_illegal_characters(column))
+    return dataframe
 
 
 def _create_schema(structtype: SparkStructType) -> Type[Schema]:
@@ -52,6 +65,23 @@ def _extract_data_type(dtype: DataType) -> Type[DataType]:
     return type(dtype)
 
 
+def create_schema(dataframe: DataFrame) -> Tuple[DataSet[Schema], Type[Schema]]:
+    """This function inferres a ``Schema`` in a notebook based on a the provided ``DataFrame``.
+
+    This allows for autocompletion on column names, amongst other
+    things.
+
+    .. code-block:: python
+
+        df, Person = create_schema(df)
+    """
+    dataframe = _replace_illegal_column_names(dataframe)
+    schema = _create_schema(dataframe.schema)
+    dataset = DataSet[schema](dataframe)  # type: ignore
+    schema = register_schema_to_dataset(dataset, schema)
+    return dataset, schema
+
+
 def load_table(spark: SparkSession, table_name: str) -> Tuple[DataSet[Schema], Type[Schema]]:
     """This function loads a ``DataSet``, along with its inferred ``Schema``,
     in a notebook.
@@ -64,7 +94,4 @@ def load_table(spark: SparkSession, table_name: str) -> Tuple[DataSet[Schema], T
         df, Person = load_table(spark, "path.to.table")
     """
     dataframe = spark.table(table_name)
-    schema = _create_schema(dataframe.schema)
-    dataset = DataSet[schema](dataframe)  # type: ignore
-    schema = register_schema_to_dataset(dataset, schema)
-    return dataset, schema
+    return create_schema(dataframe)

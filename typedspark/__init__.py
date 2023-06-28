@@ -12,7 +12,7 @@ from typedspark._utils.create_dataset import (
     create_partially_filled_dataset,
     create_structtype_row,
 )
-from typedspark._utils.load_table import load_table
+from typedspark._utils.load_table import create_schema, load_table
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
 __all__ = [
@@ -28,6 +28,7 @@ __all__ = [
     "create_empty_dataset",
     "create_partially_filled_dataset",
     "create_structtype_row",
+    "create_schema",
     "load_table",
     "register_schema_to_dataset",
     "structtype_column",
