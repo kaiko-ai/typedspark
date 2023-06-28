@@ -1,6 +1,5 @@
 import pandas as pd
 import pytest
-from chispa import assert_df_equality
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
 from pyspark.sql.types import LongType, StringType
