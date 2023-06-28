@@ -32,3 +32,15 @@ def test_load_table(spark: SparkSession) -> None:
 
     assert_df_equality(df, df_loaded)
     assert schema.get_structtype() == A.get_structtype()
+    assert schema.get_schema_name() != "A"
+
+
+def test_load_table_with_schema_name(spark: SparkSession) -> None:
+    df = create_empty_dataset(spark, A)
+    df.createOrReplaceTempView("temp")
+
+    df_loaded, schema = load_table(spark, "temp", schema_name="A")
+
+    assert_df_equality(df, df_loaded)
+    assert schema.get_structtype() == A.get_structtype()
+    assert schema.get_schema_name() == "A"
