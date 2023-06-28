@@ -1,5 +1,6 @@
 """Functions for loading `DataSet` and `Schema` in notebooks."""
 
+import re
 from typing import Dict, Optional, Tuple, Type
 
 from pyspark.sql import DataFrame, SparkSession
@@ -27,7 +28,7 @@ def _replace_illegal_column_names(dataframe: DataFrame) -> DataFrame:
     return dataframe
 
 
-def _create_schema(structtype: SparkStructType) -> Type[Schema]:
+def _create_schema(structtype: SparkStructType, schema_name: Optional[str] = None) -> Type[Schema]:
     """Dynamically builds a ``Schema`` based on a ``DataFrame``'s
     ``StructType``"""
     type_annotations = {}
@@ -67,7 +68,9 @@ def _extract_data_type(dtype: DataType) -> Type[DataType]:
     return type(dtype)
 
 
-def create_schema(dataframe: DataFrame, schema_name: Optional[str] = None) -> Tuple[DataSet[Schema], Type[Schema]]:
+def create_schema(
+    dataframe: DataFrame, schema_name: Optional[str] = None
+) -> Tuple[DataSet[Schema], Type[Schema]]:
     """This function inferres a ``Schema`` in a notebook based on a the provided ``DataFrame``.
 
     This allows for autocompletion on column names, amongst other
@@ -78,7 +81,7 @@ def create_schema(dataframe: DataFrame, schema_name: Optional[str] = None) -> Tu
         df, Person = create_schema(df)
     """
     dataframe = _replace_illegal_column_names(dataframe)
-    schema = _create_schema(dataframe.schema)
+    schema = _create_schema(dataframe.schema, schema_name)
     dataset = DataSet[schema](dataframe)  # type: ignore
     schema = register_schema_to_dataset(dataset, schema)
     return dataset, schema
