@@ -169,9 +169,9 @@ def test_dtype_attributes(spark: SparkSession):
                 spark,
                 Values,
                 {
-                    Values.a: [1, 2, 3],
+                    Values.b: ["a", "b", "c"],
                 },
             ).collect(),
         },
     )
-    assert df.filter(ComplexDatatypes.value.dtype.schema.a > 1).count() == 2
+    assert df.filter(ComplexDatatypes.value.dtype.schema.b == "b").count() == 1
