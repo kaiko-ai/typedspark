@@ -7,6 +7,7 @@ from pyspark.sql.types import DataType
 
 from typedspark._core.datatypes import (
     ArrayType,
+    DayTimeIntervalType,
     DecimalType,
     MapType,
     StructType,
@@ -92,10 +93,9 @@ def _build_import_string(
 def _typing_imports(encountered_datatypes: set[Type[DataType]], include_documentation: bool) -> str:
     """Returns the import statement for the typing library."""
     imports = []
-    for dtype in encountered_datatypes:
-        if dtype == DecimalType:
-            imports += ["Literal"]
-            break
+
+    if any([dtype == DecimalType for dtype in encountered_datatypes]):
+        imports += ["Literal"]
 
     if include_documentation:
         imports += ["Annotated"]
@@ -132,6 +132,9 @@ def _typedspark_imports(
     dtypes = [
         dtype.__name__ for dtype in encountered_datatypes if issubclass(dtype, TypedSparkDataType)
     ] + ["Column", "Schema"]
+
+    if any([dtype == DayTimeIntervalType for dtype in encountered_datatypes]):
+        dtypes += ["IntervalType"]
 
     if include_documentation:
         dtypes.append("ColumnMeta")

@@ -2,7 +2,7 @@
 ``StructType`` in order to allow e.g. for ``ArrayType[StringType]``."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Generic, Literal, Type, TypeVar
 
 from pyspark.sql.types import DataType
 
@@ -81,6 +81,15 @@ class DecimalType(Generic[_Precision, _Scale], TypedSparkDataType):
         class Numbers(Schema):
             number: Column[DecimalType[Literal[10], Literal[0]]]
     """
+
+
+class IntervalType:
+    """Interval types for ``DayTimeIntervalType``."""
+
+    DAY = Literal[0]
+    HOUR = Literal[1]
+    MINUTE = Literal[2]
+    SECOND = Literal[3]
 
 
 class DayTimeIntervalType(Generic[_StartField, _EndField], TypedSparkDataType):

@@ -2,6 +2,7 @@
 ``DataFrame``."""
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Type, get_args, get_origin, get_type_hints
 
 from typedspark._core.datatypes import StructType
@@ -53,6 +54,7 @@ def _build_schema_definition_string(
             .replace("pyspark.sql.types.", "")
             .replace("typing.", "")
         )
+        typehint = _replace_literals_in_day_time_interval_type(typehint)
         if include_documentation:
             lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
         else:
@@ -62,6 +64,25 @@ def _build_schema_definition_string(
         lines += _add_subschemas(schema, add_subschemas, include_documentation)
 
     return lines
+
+
+def _replace_literal_by_intervaltype(typehint, literal, intervaltype):
+    """Replace a Literal by a IntervalType, e.g. Literal[0] by IntervalType.DAY."""
+    return re.sub(
+        r"DayTimeIntervalType\[[^]]*\]",
+        lambda x: x.group(0).replace(literal, intervaltype),
+        typehint,
+    )
+
+
+def _replace_literals_in_day_time_interval_type(typehint):
+    """Replace all Literals in a DayTimeIntervalType by IntervalTypes, e.g. Literal[0]
+    by IntervalType.DAY."""
+    typehint = _replace_literal_by_intervaltype(typehint, "Literal[0]", "IntervalType.DAY")
+    typehint = _replace_literal_by_intervaltype(typehint, "Literal[1]", "IntervalType.HOUR")
+    typehint = _replace_literal_by_intervaltype(typehint, "Literal[2]", "IntervalType.MINUTE")
+    typehint = _replace_literal_by_intervaltype(typehint, "Literal[3]", "IntervalType.SECOND")
+    return typehint
 
 
 def _add_subschemas(schema: Type[Schema], add_subschemas: bool, include_documentation: bool) -> str:
