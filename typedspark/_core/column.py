@@ -91,4 +91,4 @@ class Column(SparkColumn, Generic[T]):
             dtype.schema = get_args(dtype)[0]  # type: ignore
             dtype.schema._parent = self  # type: ignore
 
-        return dtype
+        return dtype  # type: ignore
