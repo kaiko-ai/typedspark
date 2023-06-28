@@ -1,6 +1,6 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
+from typing import Generic, Optional, Type, TypeVar, Union, get_args, get_origin
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
@@ -32,7 +32,7 @@ class Column(SparkColumn, Generic[T]):
     def __new__(
         cls,
         name: str,
-        dtype: T,
+        dtype: T = DataType,  # type: ignore
         parent: Union[DataFrame, "Column", None] = None,
         curid: Optional[int] = None,
     ):
@@ -60,7 +60,7 @@ class Column(SparkColumn, Generic[T]):
     def __init__(
         self,
         name: str,
-        dtype: T,
+        dtype: T = DataType,  # type: ignore
         parent: Union[DataFrame, "Column", None] = None,
         curid: Optional[int] = None,
     ):
