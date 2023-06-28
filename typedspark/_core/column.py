@@ -6,7 +6,7 @@ from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
-from pyspark.sql.types import DataType, IntegerType
+from pyspark.sql.types import DataType
 
 from typedspark._core.datatypes import StructType
 
