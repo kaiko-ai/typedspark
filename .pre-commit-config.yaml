@@ -55,7 +55,7 @@ repos:
     pass_filenames: false
   - id: pytest-spark-coverage
     name: pytest-spark-coverage
-    entry: coverage report -m
+    entry: coverage report -m --fail-under 100
     language: system
     types: [python]
     pass_filenames: false
