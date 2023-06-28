@@ -1,6 +1,6 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from typing import Generic, Optional, Type, TypeVar, Union, get_args, get_origin
+from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
