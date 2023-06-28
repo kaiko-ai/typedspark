@@ -32,7 +32,7 @@ class Column(SparkColumn, Generic[T]):
     def __new__(
         cls,
         name: str,
-        dtype: T,
+        dtype: T = DataType,  # type: ignore
         parent: Union[DataFrame, "Column", None] = None,
         curid: Optional[int] = None,
     ):
@@ -60,7 +60,7 @@ class Column(SparkColumn, Generic[T]):
     def __init__(
         self,
         name: str,
-        dtype: T,
+        dtype: T = DataType,  # type: ignore
         parent: Union[DataFrame, "Column", None] = None,
         curid: Optional[int] = None,
     ):
