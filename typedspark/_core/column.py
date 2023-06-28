@@ -1,5 +1,6 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
+from logging import warn
 from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
 
 from pyspark.sql import Column as SparkColumn
@@ -32,9 +33,10 @@ class Column(SparkColumn, Generic[T]):
     def __new__(
         cls,
         name: str,
-        dtype: T = DataType,  # type: ignore
-        parent: Union[DataFrame, "Column", None] = None,
+        dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
+        dtype: Optional[T] = None,
+        parent: Union[DataFrame, "Column", None] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
@@ -45,6 +47,10 @@ class Column(SparkColumn, Generic[T]):
         to access.
         """
         # pylint: disable=unused-argument
+
+        if dataframe is not None and parent is None:
+            parent = dataframe
+            warn("The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead.")
 
         column: SparkColumn
         if SparkSession.getActiveSession() is None:
@@ -60,13 +66,14 @@ class Column(SparkColumn, Generic[T]):
     def __init__(
         self,
         name: str,
-        dtype: T = DataType,  # type: ignore
-        parent: Union[DataFrame, "Column", None] = None,
+        dataframe: Optional[DataFrame] = None,
         curid: Optional[int] = None,
+        dtype: Optional[T] = None,
+        parent: Union[DataFrame, "Column", None] = None,
     ):
         # pylint: disable=unused-argument
         self.str = name
-        self._dtype = dtype
+        self._dtype = dtype if dtype is not None else DataType
         self._curid = curid
 
     def __hash__(self) -> int:
@@ -80,4 +87,4 @@ class Column(SparkColumn, Generic[T]):
             dtype.schema = get_args(dtype)[0]  # type: ignore
             dtype.schema._parent = self  # type: ignore
 
-        return dtype
+        return dtype  # type: ignore
