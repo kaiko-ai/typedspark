@@ -60,4 +60,4 @@ You can build the documentation locally by running:
 
     cd docs/; make clean; make html; cd ..
 
-You can find the documentation in ``docs/build/html/index.html``.
+You can find the resulting documentation in ``docs/build/html/index.html``.

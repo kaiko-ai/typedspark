@@ -3,6 +3,7 @@
 .. toctree::
    :hidden:
    
+   README
    ide
    notebook
    advanced
