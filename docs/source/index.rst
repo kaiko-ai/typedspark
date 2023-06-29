@@ -3,7 +3,8 @@
 .. toctree::
    :hidden:
    
-   basics
+   ide
+   notebook
    advanced
    contributing
    api
