@@ -41,7 +41,16 @@ class MetaSchema(type):
         # this allows for auto-complete in Databricks notebooks (uninitialized variables
         # don't show up in auto-complete there).
         if "__annotations__" in dct.keys():
-            extra = {attr: None for attr in dct["__annotations__"] if attr not in dct}
+            extra: Dict[str, Column] = {
+                attr: Column(
+                    name,
+                    dtype=get_args(annotation)[0],
+                    parent=cls._parent,
+                    curid=cls._current_id,
+                )
+                for attr, annotation in dct["__annotations__"].items()
+                if attr not in dct and len(get_args(annotation)) > 0
+            }
             dct = dict(dct, **extra)
 
         return type.__new__(cls, name, bases, dct)
@@ -52,35 +61,35 @@ class MetaSchema(type):
     def __str__(cls) -> str:
         return cls.get_schema_definition_as_string(add_subschemas=False)
 
-    def __getattribute__(cls, name: str) -> Any:
-        """Python base function that gets attributes.
+    # def __getattribute__(cls, name: str) -> Any:
+    #     """Python base function that gets attributes.
 
-        We listen here for anyone getting a ``Column`` from the ``Schema``.
-        Even though they're not explicitely instantiated, we can instantiate
-        them here whenever someone attempts to get them. This allows us to do the following:
+    #     We listen here for anyone getting a ``Column`` from the ``Schema``.
+    #     Even though they're not explicitely instantiated, we can instantiate
+    #     them here whenever someone attempts to get them. This allows us to do the following:
 
-        .. code-block:: python
+    #     .. code-block:: python
 
-            class A(Schema):
-                a: Column[IntegerType]
+    #         class A(Schema):
+    #             a: Column[IntegerType]
 
-            (
-                df.withColumn(A.a.str, lit(1))
-                .select(A.a)
-            )
-        """
-        if name.startswith("__") or name == "_attributes" or name in cls._attributes:
-            return object.__getattribute__(cls, name)
+    #         (
+    #             df.withColumn(A.a.str, lit(1))
+    #             .select(A.a)
+    #         )
+    #     """
+    #     if name.startswith("__") or name == "_attributes" or name in cls._attributes:
+    #         return object.__getattribute__(cls, name)
 
-        if name in get_type_hints(cls):
-            return Column(
-                name,
-                dtype=cls._get_dtype(name),  # type: ignore
-                parent=cls._parent,
-                curid=cls._current_id,
-            )
+    #     if name in get_type_hints(cls):
+    #         return Column(
+    #             name,
+    #             dtype=cls._get_dtype(name),  # type: ignore
+    #             parent=cls._parent,
+    #             curid=cls._current_id,
+    #         )
 
-        raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")
+    #     raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")
 
     def _get_dtype(cls, name: str) -> Type[DataType]:
         """Returns the datatype of a column, e.g. Column[IntegerType] -> IntegerType."""

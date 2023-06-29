@@ -24,7 +24,7 @@ def _create_schema(structtype: SparkStructType, schema_name: Optional[str] = Non
         name = column.name
         data_type = _extract_data_type(column.dataType)
         type_annotations[name] = Column[data_type]  # type: ignore
-        attributes[name] = Column(name)
+        attributes[name] = Column(name, dtype=data_type)  # type: ignore
 
     if not schema_name:
         schema_name = "DynamicallyLoadedSchema"
