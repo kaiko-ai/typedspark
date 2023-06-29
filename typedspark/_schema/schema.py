@@ -43,7 +43,7 @@ class MetaSchema(type):
         if "__annotations__" in dct.keys():
             extra: Dict[str, Column] = {
                 attr: Column(
-                    name,
+                    attr,
                     dtype=get_args(annotation)[0],
                     parent=cls._parent,
                     curid=cls._current_id,
