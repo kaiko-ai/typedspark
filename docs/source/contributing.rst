@@ -17,9 +17,27 @@ To set up the environment, run:
     pip install -r requirements.txt
     pip install -r requirements-dev.txt
 
-For a list of currently supported Python versions, as well as the various CI/CD steps, we refer to ``.github/workflows/build.yml``.
+For a list of currently supported Python versions, we refer to ``.github/workflows/build.yml``.
 
 Note that in order to run the unit tests, you will need to set up Spark on your machine.
+
+---------------
+Pre-commit hook
+---------------
+We use ``pre-commit`` to run a number of checks on the code before it is committed. To install the pre-commit hook, run:
+
+.. code-block:: bash
+
+    pre-commit install
+
+Note that this will require you to set up Spark on your machine.
+
+There are currently two steps from the CI/CD that we do not check using the pre-commit hook:
+
+* bandit
+* notebooks
+
+Since they rarely fail, this shouldn't be a problem. We recommend that you test these using the CI/CD pipeline.
 
 ---------
 Notebooks

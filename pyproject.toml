@@ -5,6 +5,9 @@ line-length = 100
 profile = "black"
 line_length = 100
 
+[tool.pylint]
+ignore-paths = ['^tests/.+.py$', 'setup.py']
+
 [tool.pylint."messages control"]
 disable = "all"
 enable = [
@@ -30,3 +33,9 @@ enable = [
 
 [tool.coverage.run]
 source = ["typedspark/"]
+
+[tool.mypy]
+exclude = ['^docs\/.+\.py$']
+
+[tool.bandit]
+exclude_dirs = ["tests"]
