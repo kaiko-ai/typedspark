@@ -32,6 +32,7 @@ def test_column_doesnt_exist():
         A.z
 
 
+@pytest.mark.no_spark_session
 def test_column_reference_without_spark_session():
     a = A.a
     assert a.str == "a"
