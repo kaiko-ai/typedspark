@@ -49,3 +49,15 @@ If you make changes that affect the documentation, please rerun the documentatio
     sh docs/run_notebooks.sh
 
 This will run all notebooks and strip the metadata afterwards, such that the diffs in the PR remain manageable.
+
+----------------------
+Building documentation
+----------------------
+
+You can build the documentation locally by running:
+
+.. code-block:: bash
+
+    cd docs/; make clean; make html; cd ..
+
+You can find the documentation in ``docs/build/html/index.html``.
