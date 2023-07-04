@@ -11,7 +11,7 @@ mypy==1.4.1
 pyright==1.1.316
 # stubs
 pandas-stubs==2.0.2.230605
-types-setuptools==68.0.0.0
+types-setuptools==68.0.0.1
 # testing
 pytest==7.4.0
 coverage==7.2.7
