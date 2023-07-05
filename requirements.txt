@@ -1,1 +1,1 @@
-typing-extensions<=4.7.0
+typing-extensions<=4.7.1
