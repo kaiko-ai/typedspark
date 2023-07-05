@@ -12,7 +12,7 @@ from typedspark import (
     Schema,
     StructType,
     create_empty_dataset,
-    load_table,
+    load_table
 )
 
 
