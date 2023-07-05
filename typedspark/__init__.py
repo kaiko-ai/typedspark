@@ -2,7 +2,7 @@
 
 from typedspark._core.column import Column
 from typedspark._core.column_meta import ColumnMeta
-from typedspark._core.dataset import DataSet
+from typedspark._core.dataset import DataSet, PartialDataSet
 from typedspark._core.datatypes import ArrayType, DecimalType, MapType, StructType
 from typedspark._schema.schema import MetaSchema, Schema
 from typedspark._transforms.structtype_column import structtype_column
@@ -23,6 +23,7 @@ __all__ = [
     "DecimalType",
     "MapType",
     "MetaSchema",
+    "PartialDataSet",
     "Schema",
     "StructType",
     "create_empty_dataset",

@@ -25,8 +25,14 @@ T = TypeVar("T", bound=Schema)
 _ReturnType = TypeVar("_ReturnType", bound=DataFrame)  # pylint: disable=C0103
 P = ParamSpec("P")
 
+V = TypeVar("V", bound=Schema, covariant=True)
 
-class DataSet(DataFrame, Generic[T]):
+
+class PartialDataSet(DataFrame, Generic[V]):
+    pass
+
+
+class DataSet(PartialDataSet, Generic[T]):
     """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same
     functionality, with in addition the possibility to define a schema.
 
@@ -66,7 +72,7 @@ class DataSet(DataFrame, Generic[T]):
 
         if name == "__orig_class__":
             orig_class_args = get_args(self.__orig_class__)
-            if orig_class_args and issubclass(orig_class_args[0], Schema):
+            if orig_class_args:
                 self._schema_annotations: Type[Schema] = orig_class_args[0]
                 validate_schema(
                     self._schema_annotations.get_structtype(),
