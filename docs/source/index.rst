@@ -3,7 +3,9 @@
 .. toctree::
    :hidden:
    
-   basics
+   README
+   ide
+   notebook
    advanced
    contributing
    api
