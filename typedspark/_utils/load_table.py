@@ -1,16 +1,17 @@
 """Functions for loading `DataSet` and `Schema` in notebooks."""
 
-from typing import Dict, Optional, Tuple, Type
+from typing import Dict, Literal, Optional, Tuple, Type
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType as SparkArrayType
 from pyspark.sql.types import DataType
+from pyspark.sql.types import DecimalType as SparkDecimalType
 from pyspark.sql.types import MapType as SparkMapType
 from pyspark.sql.types import StructType as SparkStructType
 
 from typedspark._core.column import Column
 from typedspark._core.dataset import DataSet
-from typedspark._core.datatypes import ArrayType, MapType, StructType
+from typedspark._core.datatypes import ArrayType, DecimalType, MapType, StructType
 from typedspark._schema.schema import MetaSchema, Schema
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
@@ -51,6 +52,11 @@ def _extract_data_type(dtype: DataType) -> Type[DataType]:
     if isinstance(dtype, SparkStructType):
         subschema = _create_schema(dtype)
         return StructType[subschema]  # type: ignore
+
+    if isinstance(dtype, SparkDecimalType):
+        precision = dtype.precision
+        scale = dtype.scale
+        return DecimalType[Literal[precision], Literal[scale]]  # type: ignore
 
     return type(dtype)
 
