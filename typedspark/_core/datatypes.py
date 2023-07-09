@@ -98,5 +98,5 @@ class DayTimeIntervalType(Generic[_StartField, _EndField], TypedSparkDataType):
     .. code-block:: python
 
         class TimeInterval(Schema):
-            interval: Column[DayTimeIntervalType[Literal[0], Literal[10]]]
+            interval: Column[DayTimeIntervalType[IntervalType.HOUR, IntervalType.SECOND]
     """
