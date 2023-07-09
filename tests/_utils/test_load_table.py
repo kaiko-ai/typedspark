@@ -1,3 +1,5 @@
+from typing import Literal
+
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType
@@ -5,6 +7,7 @@ from pyspark.sql.types import IntegerType
 from typedspark import (
     ArrayType,
     Column,
+    DecimalType,
     MapType,
     Schema,
     StructType,
@@ -25,6 +28,7 @@ class A(Schema):
     c: Column[ArrayType[MapType[IntegerType, IntegerType]]]
     d: Column[StructType[SubSchema]]
     e: Column[DayTimeIntervalType[IntervalType.HOUR, IntervalType.MINUTE]]
+    f: Column[DecimalType[Literal[7], Literal[2]]]
 
 
 def test_load_table(spark: SparkSession) -> None:

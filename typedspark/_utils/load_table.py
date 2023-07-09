@@ -6,12 +6,13 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType as SparkArrayType
 from pyspark.sql.types import DataType
 from pyspark.sql.types import DayTimeIntervalType as SparkDayTimeIntervalType
+from pyspark.sql.types import DecimalType as SparkDecimalType
 from pyspark.sql.types import MapType as SparkMapType
 from pyspark.sql.types import StructType as SparkStructType
 
 from typedspark._core.column import Column
 from typedspark._core.dataset import DataSet
-from typedspark._core.datatypes import ArrayType, DayTimeIntervalType, MapType, StructType
+from typedspark._core.datatypes import ArrayType, DayTimeIntervalType, DecimalType, MapType, StructType
 from typedspark._schema.schema import MetaSchema, Schema
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
@@ -57,6 +58,11 @@ def _extract_data_type(dtype: DataType) -> Type[DataType]:
         start_field = dtype.startField
         end_field = dtype.endField
         return DayTimeIntervalType[Literal[start_field], Literal[end_field]]  # type: ignore
+
+    if isinstance(dtype, SparkDecimalType):
+        precision = dtype.precision
+        scale = dtype.scale
+        return DecimalType[Literal[precision], Literal[scale]]  # type: ignore
 
     return type(dtype)
 
