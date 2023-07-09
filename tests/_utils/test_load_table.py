@@ -1,5 +1,6 @@
 from typing import Literal
 
+import pytest
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import first
@@ -81,6 +82,26 @@ def test_create_schema(spark: SparkSession) -> None:
     assert "a" in MySchema.all_column_names()
     assert "b__" in MySchema.all_column_names()
     assert "c" in MySchema.all_column_names()
+
+
+def test_create_schema_with_duplicated_column_names(spark: SparkSession) -> None:
+    df = (
+        create_partially_filled_dataset(
+            spark,
+            B,
+            {
+                B.a: ["a", "b??", "c", "a", "b!!", "c", "a", "b!!", "c"],
+                B.b: [1, 1, 1, 2, 2, 2, 3, 3, 3],
+                B.c: ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota"],
+            },
+        )
+        .groupby(B.b)
+        .pivot(B.a.str)
+        .agg(first(B.c))
+    )
+
+    with pytest.raises(ValueError):
+        create_schema(df, "B")
 
 
 def test_name_of_structtype_schema(spark):
