@@ -1,3 +1,5 @@
+from typing import Literal
+
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import first
@@ -6,6 +8,7 @@ from pyspark.sql.types import IntegerType, StringType
 from typedspark import (
     ArrayType,
     Column,
+    DecimalType,
     MapType,
     Schema,
     StructType,
@@ -24,6 +27,7 @@ class A(Schema):
     a: Column[IntegerType]
     b: Column[ArrayType[IntegerType]]
     c: Column[ArrayType[MapType[IntegerType, IntegerType]]]
+    e: Column[DecimalType[Literal[7], Literal[2]]]
     value_container: Column[StructType[SubSchema]]
 
 
