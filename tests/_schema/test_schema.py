@@ -6,7 +6,7 @@ from pyspark.sql.types import LongType, StringType, StructField, StructType
 
 import typedspark
 from typedspark import Column, ColumnMeta, Schema, create_partially_filled_dataset
-from typedspark._core.datatypes import IntervalType
+from typedspark._core.literaltype import IntervalType
 from typedspark._schema.schema import DltKwargs
 
 

@@ -11,7 +11,8 @@ from typedspark import (
     create_empty_dataset,
     load_table,
 )
-from typedspark._core.datatypes import DayTimeIntervalType, IntervalType
+from typedspark._core.datatypes import DayTimeIntervalType
+from typedspark._core.literaltype import IntervalType
 
 
 class SubSchema(Schema):

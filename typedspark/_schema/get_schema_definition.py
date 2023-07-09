@@ -5,7 +5,8 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Type, get_args, get_origin, get_type_hints
 
-from typedspark._core.datatypes import StructType
+from typedspark._core.datatypes import DayTimeIntervalType, StructType, TypedSparkDataType
+from typedspark._core.literaltype import IntervalType, LiteralType
 from typedspark._schema.get_schema_imports import get_schema_imports
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -54,7 +55,9 @@ def _build_schema_definition_string(
             .replace("pyspark.sql.types.", "")
             .replace("typing.", "")
         )
-        typehint = _replace_literals_in_day_time_interval_type(typehint)
+        typehint = _replace_literals(
+            typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
+        )
         if include_documentation:
             lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
         else:
@@ -66,23 +69,39 @@ def _build_schema_definition_string(
     return lines
 
 
-def _replace_literal_by_intervaltype(typehint, literal, intervaltype):
-    """Replace a Literal by a IntervalType, e.g. Literal[0] by IntervalType.DAY."""
+def _replace_literals(
+    typehint: str,
+    replace_literals_in: Type[TypedSparkDataType],
+    replace_literals_by: Type[LiteralType],
+) -> str:
+    """Replace all Literals in a LiteralType, e.g.
+
+    "DayTimeIntervalType[Literal[0], Literal[1]]" ->
+    "DayTimeIntervalType[IntervalType.DAY, IntervalType.HOUR]"
+    """
+    mapping = replace_literals_by.get_inverse_dict()
+    for original, replacement in mapping.items():
+        typehint = _replace_literal(typehint, replace_literals_in, original, replacement)
+
+    return typehint
+
+
+def _replace_literal(
+    typehint: str,
+    replace_literals_in: Type[TypedSparkDataType],
+    original: str,
+    replacement: str,
+) -> str:
+    """Replaces a single Literal in a LiteralType, e.g.
+
+    "DayTimeIntervalType[Literal[0], Literal[1]]" ->
+    "DayTimeIntervalType[IntervalType.DAY, Literal[1]]"
+    """
     return re.sub(
-        r"DayTimeIntervalType\[[^]]*\]",
-        lambda x: x.group(0).replace(literal, intervaltype),
+        rf"{replace_literals_in.get_name()}\[[^]]*\]",
+        lambda x: x.group(0).replace(original, replacement),
         typehint,
     )
-
-
-def _replace_literals_in_day_time_interval_type(typehint):
-    """Replace all Literals in a DayTimeIntervalType by IntervalTypes, e.g. Literal[0]
-    by IntervalType.DAY."""
-    typehint = _replace_literal_by_intervaltype(typehint, "Literal[0]", "IntervalType.DAY")
-    typehint = _replace_literal_by_intervaltype(typehint, "Literal[1]", "IntervalType.HOUR")
-    typehint = _replace_literal_by_intervaltype(typehint, "Literal[2]", "IntervalType.MINUTE")
-    typehint = _replace_literal_by_intervaltype(typehint, "Literal[3]", "IntervalType.SECOND")
-    return typehint
 
 
 def _add_subschemas(schema: Type[Schema], add_subschemas: bool, include_documentation: bool) -> str:
