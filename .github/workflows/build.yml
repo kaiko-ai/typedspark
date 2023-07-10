@@ -1,8 +1,6 @@
 name: Python package
 
-on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+on: [push]
 
 jobs:
   build:
@@ -23,7 +21,7 @@ jobs:
           spark-version: '3.4.1'
           hadoop-version: '3'
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
