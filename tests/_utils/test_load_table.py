@@ -18,6 +18,8 @@ from typedspark import (
 )
 from typedspark._utils.create_dataset import create_partially_filled_dataset
 from typedspark._utils.load_table import create_schema
+from typedspark._core.datatypes import DayTimeIntervalType
+from typedspark._core.literaltype import IntervalType
 
 
 class SubSchema(Schema):
@@ -28,6 +30,7 @@ class A(Schema):
     a: Column[IntegerType]
     b: Column[ArrayType[IntegerType]]
     c: Column[ArrayType[MapType[IntegerType, IntegerType]]]
+    d: Column[DayTimeIntervalType[IntervalType.HOUR, IntervalType.MINUTE]]
     e: Column[DecimalType[Literal[7], Literal[2]]]
     value_container: Column[StructType[SubSchema]]
 
