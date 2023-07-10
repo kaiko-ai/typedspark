@@ -1,8 +1,6 @@
 name: Python package
 
-on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+on: push
 
 jobs:
   build:
