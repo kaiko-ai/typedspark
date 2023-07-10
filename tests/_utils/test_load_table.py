@@ -16,10 +16,10 @@ from typedspark import (
     create_empty_dataset,
     load_table,
 )
-from typedspark._utils.create_dataset import create_partially_filled_dataset
-from typedspark._utils.load_table import create_schema
 from typedspark._core.datatypes import DayTimeIntervalType
 from typedspark._core.literaltype import IntervalType
+from typedspark._utils.create_dataset import create_partially_filled_dataset
+from typedspark._utils.load_table import create_schema
 
 
 class SubSchema(Schema):
