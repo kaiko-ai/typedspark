@@ -14,6 +14,8 @@ from typedspark import (
     create_empty_dataset,
     load_table,
 )
+from typedspark._core.datatypes import DayTimeIntervalType
+from typedspark._core.literaltype import IntervalType
 
 
 class SubSchema(Schema):
@@ -25,7 +27,8 @@ class A(Schema):
     b: Column[ArrayType[IntegerType]]
     c: Column[ArrayType[MapType[IntegerType, IntegerType]]]
     d: Column[StructType[SubSchema]]
-    e: Column[DecimalType[Literal[7], Literal[2]]]
+    e: Column[DayTimeIntervalType[IntervalType.HOUR, IntervalType.MINUTE]]
+    f: Column[DecimalType[Literal[7], Literal[2]]]
 
 
 def test_load_table(spark: SparkSession) -> None:
