@@ -103,7 +103,10 @@ def _extract_data_type(dtype: DataType, name: str) -> Type[DataType]:
     if isinstance(dtype, SparkDayTimeIntervalType):
         start_field = dtype.startField
         end_field = dtype.endField
-        return DayTimeIntervalType[Literal[start_field], Literal[end_field]]  # type: ignore
+        return DayTimeIntervalType[
+            Literal[start_field],  # type: ignore
+            Literal[end_field],  # type: ignore
+        ]
 
     if isinstance(dtype, SparkDecimalType):
         precision = dtype.precision
