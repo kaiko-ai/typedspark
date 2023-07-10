@@ -2,7 +2,7 @@
 Typedspark: column-wise type annotations for pyspark DataFrames
 ===============================================================
 
-We love Spark! But in production code we're wary when we see:
+We love Spark! But in production code we're wary when we see: 
 
 .. code-block:: python
 
