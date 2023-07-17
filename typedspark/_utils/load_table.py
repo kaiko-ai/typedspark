@@ -21,6 +21,7 @@ from typedspark._core.datatypes import (
     StructType,
 )
 from typedspark._schema.schema import MetaSchema, Schema
+from typedspark._utils.camelcase import to_camel_case
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
 
@@ -97,7 +98,7 @@ def _extract_data_type(dtype: DataType, name: str) -> Type[DataType]:
         return MapType[key_type, value_type]  # type: ignore
 
     if isinstance(dtype, SparkStructType):
-        subschema = _create_schema(dtype, _to_camel_case(name))
+        subschema = _create_schema(dtype, to_camel_case(name))
         return StructType[subschema]  # type: ignore
 
     if isinstance(dtype, SparkDayTimeIntervalType):
@@ -111,11 +112,6 @@ def _extract_data_type(dtype: DataType, name: str) -> Type[DataType]:
         return DecimalType[Literal[precision], Literal[scale]]  # type: ignore
 
     return type(dtype)
-
-
-def _to_camel_case(name: str) -> str:
-    """Converts a string to camel case."""
-    return "".join([word.capitalize() for word in name.split("_")])
 
 
 def create_schema(

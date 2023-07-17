@@ -19,6 +19,7 @@ from typedspark._utils.create_dataset import (
     create_partially_filled_dataset,
     create_structtype_row,
 )
+from typedspark._utils.databases import Database, Databases
 from typedspark._utils.load_table import create_schema, load_table
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
@@ -26,6 +27,8 @@ __all__ = [
     "ArrayType",
     "Column",
     "ColumnMeta",
+    "Database",
+    "Databases",
     "DataSet",
     "DayTimeIntervalType",
     "DecimalType",

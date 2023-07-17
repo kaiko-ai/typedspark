@@ -9,6 +9,7 @@ from pyspark.sql.types import IntegerType, StringType
 from typedspark import (
     ArrayType,
     Column,
+    Databases,
     DecimalType,
     MapType,
     Schema,
@@ -112,3 +113,41 @@ def test_name_of_structtype_schema(spark):
     df, MySchema = create_schema(df, "A")
 
     assert MySchema.value_container.dtype.schema.get_schema_name() == "ValueContainer"
+
+
+def test_databases_with_temp_view(spark):
+    df = create_empty_dataset(spark, A)
+    df.createOrReplaceTempView("table_a")
+
+    DBs = Databases(spark)
+    df_loaded, schema = DBs.default.table_a.load()  # type: ignore
+
+    assert_df_equality(df, df_loaded)
+    assert schema.get_structtype() == A.get_structtype()
+    assert schema.get_schema_name() == "TableA"
+    assert DBs.default.table_a.str == "table_a"  # type: ignore
+    assert DBs.default.str == "default"  # type: ignore
+
+
+def _drop_table(spark: SparkSession):
+    spark.sql("DROP TABLE IF EXISTS default.table_b")
+
+
+def test_databases_with_table(spark):
+    df = create_empty_dataset(spark, A)
+    df.write.saveAsTable("default.table_b")
+
+    try:
+        DBs = Databases(spark)
+        df_loaded, schema = DBs.default.table_b.load()  # type: ignore
+
+        assert_df_equality(df, df_loaded)
+        assert schema.get_structtype() == A.get_structtype()
+        assert schema.get_schema_name() == "TableB"
+        assert DBs.default.table_b.str == "default.table_b"  # type: ignore
+        assert DBs.default.str == "default"  # type: ignore
+    except Exception as exception:
+        _drop_table(spark)
+        raise exception
+
+    _drop_table(spark)
