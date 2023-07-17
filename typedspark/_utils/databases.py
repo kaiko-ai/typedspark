@@ -53,7 +53,14 @@ class Table:
 
     @property
     def str(self) -> str:
-        """Returns the database and table name, i.e. 'db_name.table_name'."""
+        """Returns the path to the table, e.g. ``default.person``.
+
+        While temporary tables are always stored in the ``default`` db, they are saved and
+        loaded directly from their table name, e.g. ``person``.
+
+        Non-temporary tables are saved and loaded from their full name, e.g.
+        ``default.person``.
+        """
         if self._is_temporary:
             return self._table_name
 
@@ -97,15 +104,17 @@ class Databases:
 
         for i, database in enumerate(databases):
             timeout.check_for_warning(i)
-
             db_name = self._extract_db_name(database)
             self.__setattr__(db_name, Database(spark, db_name))
 
     def _extract_db_name(self, database: Row) -> str:
-        """Extracts the database name from a Row."""
+        """Extracts the database name from a Row.
+
+        Old versions of Spark use ``databaseName``, newer versions use ``namespace``.
+        """
         if hasattr(database, "databaseName"):  # pragma: no cover
             return database.databaseName
         if hasattr(database, "namespace"):
             return database.namespace
 
-        raise ValueError(f"Could not find database name in {database}")  # pragma: no cover
+        raise ValueError(f"Could not find database name in {database}.")  # pragma: no cover
