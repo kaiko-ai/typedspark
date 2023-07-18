@@ -3,5 +3,5 @@
   "extends": [
     "config:base"
   ]
-  "autoApprove": True,
+  "autoApprove": true,
 }
