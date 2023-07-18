@@ -6,7 +6,7 @@ profile = "black"
 line_length = 100
 
 [tool.pylint]
-ignore-paths = ['^tests/.+.py$', 'setup.py']
+ignore-paths = ['^tests/.+.py$', 'setup.py', '^docs/.+.py$']
 
 [tool.pylint."messages control"]
 disable = "all"

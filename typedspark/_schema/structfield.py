@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Annotated, Type, TypeVar, Union, get_args, get
 
 from pyspark.sql.types import ArrayType as SparkArrayType
 from pyspark.sql.types import DataType
+from pyspark.sql.types import DayTimeIntervalType as SparkDayTimeIntervalType
 from pyspark.sql.types import DecimalType as SparkDecimalType
 from pyspark.sql.types import MapType as SparkMapType
 from pyspark.sql.types import StructField
@@ -15,6 +16,7 @@ from typedspark._core.column import Column
 from typedspark._core.column_meta import ColumnMeta
 from typedspark._core.datatypes import (
     ArrayType,
+    DayTimeIntervalType,
     DecimalType,
     MapType,
     StructType,
@@ -91,6 +93,8 @@ def _get_dtype(dtype: Type[DataType], colname: str) -> DataType:
         return _extract_structtype(dtype)
     if origin == DecimalType:
         return _extract_decimaltype(dtype)
+    if origin == DayTimeIntervalType:
+        return _extract_daytimeintervaltype(dtype)
     if (
         inspect.isclass(dtype)
         and issubclass(dtype, DataType)
@@ -136,6 +140,15 @@ def _extract_decimaltype(decimaltype: Type[DataType]) -> SparkDecimalType:
     key_type: int = _unpack_literal(params[0])
     value_type: int = _unpack_literal(params[1])
     return SparkDecimalType(key_type, value_type)
+
+
+def _extract_daytimeintervaltype(daytimeintervaltype: Type[DataType]) -> SparkDayTimeIntervalType:
+    """Takes e.g. a ``DayTimeIntervalType[Literal[1], Literal[2]]`` and returns
+    ``DayTimeIntervalType(1, 2)``."""
+    params = get_args(daytimeintervaltype)
+    start_field: int = _unpack_literal(params[0])
+    end_field: int = _unpack_literal(params[1])
+    return SparkDayTimeIntervalType(start_field, end_field)
 
 
 def _unpack_literal(literal):

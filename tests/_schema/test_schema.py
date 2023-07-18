@@ -6,6 +6,7 @@ from pyspark.sql.types import LongType, StringType, StructField, StructType
 
 import typedspark
 from typedspark import Column, ColumnMeta, Schema, create_partially_filled_dataset
+from typedspark._core.literaltype import IntervalType
 from typedspark._schema.schema import DltKwargs
 
 
@@ -54,13 +55,14 @@ class ComplexDatatypes(Schema):
     value: Column[typedspark.StructType[Values]]
     items: Column[typedspark.ArrayType[StringType]]
     consequences: Column[typedspark.MapType[StringType, typedspark.ArrayType[StringType]]]
+    diff: Column[typedspark.DayTimeIntervalType[IntervalType.DAY, IntervalType.SECOND]]
 
 
 schema_complex_datatypes = '''from typing import Annotated, Literal
 
 from pyspark.sql.types import StringType
 
-from typedspark import ArrayType, Column, ColumnMeta, DecimalType, MapType, Schema, StructType
+from typedspark import ArrayType, Column, ColumnMeta, DayTimeIntervalType, DecimalType, IntervalType, MapType, Schema, StructType
 
 
 class ComplexDatatypes(Schema):
@@ -69,6 +71,7 @@ class ComplexDatatypes(Schema):
     value: Annotated[Column[StructType[test_schema.Values]], ColumnMeta(comment="")]
     items: Annotated[Column[ArrayType[StringType]], ColumnMeta(comment="")]
     consequences: Annotated[Column[MapType[StringType, ArrayType[StringType]]], ColumnMeta(comment="")]
+    diff: Annotated[Column[DayTimeIntervalType[IntervalType.DAY, IntervalType.SECOND]], ColumnMeta(comment="")]
 
 
 class Values(Schema):
