@@ -120,14 +120,14 @@ def test_databases_with_temp_view(spark):
     df = create_empty_dataset(spark, A)
     df.createOrReplaceTempView("table_a")
 
-    DBs = Databases(spark)
-    df_loaded, schema = DBs.default.table_a.load()  # type: ignore
+    db = Databases(spark)
+    df_loaded, schema = db.default.table_a.load()  # type: ignore
 
     assert_df_equality(df, df_loaded)
     assert schema.get_structtype() == A.get_structtype()
     assert schema.get_schema_name() == "TableA"
-    assert DBs.default.table_a.str == "table_a"  # type: ignore
-    assert DBs.default.str == "default"  # type: ignore
+    assert db.default.table_a.str == "table_a"  # type: ignore
+    assert db.default.str == "default"  # type: ignore
 
 
 def _drop_table(spark: SparkSession, table_name: str) -> None:
@@ -139,14 +139,14 @@ def test_databases_with_table(spark):
     df.write.saveAsTable("default.table_b")
 
     try:
-        DBs = Databases(spark)
-        df_loaded, schema = DBs.default.table_b.load()  # type: ignore
+        db = Databases(spark)
+        df_loaded, schema = db.default.table_b.load()  # type: ignore
 
         assert_df_equality(df, df_loaded)
         assert schema.get_structtype() == A.get_structtype()
         assert schema.get_schema_name() == "TableB"
-        assert DBs.default.table_b.str == "default.table_b"  # type: ignore
-        assert DBs.default.str == "default"  # type: ignore
+        assert db.default.table_b.str == "default.table_b"  # type: ignore
+        assert db.default.str == "default"  # type: ignore
     except Exception as exception:
         _drop_table(spark, "default.table_b")
         raise exception
@@ -159,13 +159,13 @@ def test_catalogs(spark):
     df.write.saveAsTable("spark_catalog.default.table_b")
 
     try:
-        DBs = Catalogs(spark)
-        df_loaded, schema = DBs.spark_catalog.default.table_b.load()  # type: ignore
+        db = Catalogs(spark)
+        df_loaded, schema = db.spark_catalog.default.table_b.load()  # type: ignore
 
         assert_df_equality(df, df_loaded)
         assert schema.get_structtype() == A.get_structtype()
         assert schema.get_schema_name() == "TableB"
-        assert DBs.spark_catalog.default.table_b.str == "spark_catalog.default.table_b"  # type: ignore  # noqa: E501
+        assert db.spark_catalog.default.table_b.str == "spark_catalog.default.table_b"  # type: ignore  # noqa: E501
     except Exception as exception:
         _drop_table(spark, "spark_catalog.default.table_b")
         raise exception

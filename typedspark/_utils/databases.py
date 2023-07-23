@@ -45,7 +45,7 @@ If this is too slow, consider loading a single database using:
 
 from typedspark import Database
 
-DB = Database(spark, db_name=...)
+db = Database(spark, db_name=...)
 """
 
 
@@ -58,7 +58,7 @@ If this is too slow, consider loading a single catalog using:
 
 from typedspark import Databases
 
-DB = Databases(spark, catalog_name=...)
+db = Databases(spark, catalog_name=...)
 """
 
 
