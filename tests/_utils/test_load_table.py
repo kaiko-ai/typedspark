@@ -20,6 +20,7 @@ from typedspark import (
 from typedspark._core.datatypes import DayTimeIntervalType
 from typedspark._core.literaltype import IntervalType
 from typedspark._utils.create_dataset import create_partially_filled_dataset
+from typedspark._utils.databases import Catalogs
 from typedspark._utils.load_table import create_schema
 
 
@@ -129,8 +130,8 @@ def test_databases_with_temp_view(spark):
     assert DBs.default.str == "default"  # type: ignore
 
 
-def _drop_table(spark: SparkSession):
-    spark.sql("DROP TABLE IF EXISTS default.table_b")
+def _drop_table(spark: SparkSession, table_name: str) -> None:
+    spark.sql(f"DROP TABLE IF EXISTS {table_name}")
 
 
 def test_databases_with_table(spark):
@@ -147,7 +148,26 @@ def test_databases_with_table(spark):
         assert DBs.default.table_b.str == "default.table_b"  # type: ignore
         assert DBs.default.str == "default"  # type: ignore
     except Exception as exception:
-        _drop_table(spark)
+        _drop_table(spark, "default.table_b")
         raise exception
 
-    _drop_table(spark)
+    _drop_table(spark, "default.table_b")
+
+
+def test_catalogs(spark):
+    df = create_empty_dataset(spark, A)
+    df.write.saveAsTable("spark_catalog.default.table_b")
+
+    try:
+        DBs = Catalogs(spark)
+        df_loaded, schema = DBs.spark_catalog.default.table_b.load()  # type: ignore
+
+        assert_df_equality(df, df_loaded)
+        assert schema.get_structtype() == A.get_structtype()
+        assert schema.get_schema_name() == "TableB"
+        assert DBs.spark_catalog.default.table_b.str == "spark_catalog.default.table_b"  # type: ignore  # noqa: E501
+    except Exception as exception:
+        _drop_table(spark, "spark_catalog.default.table_b")
+        raise exception
+
+    _drop_table(spark, "spark_catalog.default.table_b")
