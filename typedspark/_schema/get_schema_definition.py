@@ -65,7 +65,8 @@ def _build_schema_definition_string(
             if hasattr(schema.__annotations__[k], "__metadata__"):
                 print("attribute exists")
                 if schema.__annotations__[k].__metadata__ is not None:
-                    lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="{schema.__annotations__[k].__metadata__[0]}")]\n'
+                    lines += f'    {k}: Annotated[{typehint}, '
+                    + 'ColumnMeta(comment="{schema.__annotations__[k].__metadata__[0]}")]\n'
             else:
                 lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
         else:
