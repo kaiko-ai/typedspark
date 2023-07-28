@@ -66,7 +66,7 @@ def _build_schema_definition_string(
                 print("attribute exists")
                 if schema.__annotations__[k].__metadata__ is not None:
                     lines += (
-                        f'    {k}: Annotated[{typehint}, '
+                        f"    {k}: Annotated[{typehint}, "
                         + f'ColumnMeta(comment="{schema.__annotations__[k].__metadata__[0]}")]\n'
                     )
             else:
