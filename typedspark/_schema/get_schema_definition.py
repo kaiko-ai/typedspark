@@ -63,7 +63,6 @@ def _build_schema_definition_string(
         )
         if include_documentation:
             if hasattr(schema.__annotations__[k], "__metadata__"):
-                print("attribute exists")
                 if schema.__annotations__[k].__metadata__ is not None:
                     lines += (
                         f"    {k}: Annotated[{typehint}, "
