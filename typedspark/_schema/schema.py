@@ -1,10 +1,10 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
 import inspect
 import re
-from typing import Any, Dict, List, Optional, Type, Union, get_args, get_type_hints
+from typing import Annotated, Any, Dict, List, Optional, Type, Union, get_args, get_type_hints
 
 from pyspark.sql import DataFrame
-from pyspark.sql.types import DataType, StructType
+from pyspark.sql.types import DataType, IntegerType, StructType
 
 from typedspark._core.column import Column
 from typedspark._schema.dlt_kwargs import DltKwargs
@@ -49,9 +49,9 @@ class MetaSchema(type):
     def __repr__(cls) -> str:
         return f"\n{str(cls)}"
 
-    def __str__(cls, include_documentation=False) -> str:
+    def __str__(cls) -> str:
         return cls.get_schema_definition_as_string(
-            include_documentation=include_documentation, add_subschemas=False
+            add_subschemas=False
         )
 
     def __getattribute__(cls, name: str) -> Any:
@@ -190,3 +190,15 @@ class Schema(metaclass=MetaSchema):
     # to not add a docstring to the Schema class (otherwise the Schema
     # docstring would be added to any schema without a docstring).
     pass
+
+
+new_schema = type("SomeModel", (Schema,), {})
+cols = {
+    "a": Annotated[Column[IntegerType], "Some column"], 
+    "b": Column[IntegerType]
+}
+new_schema.__annotations__ = cols
+new_schema.__doc__ = "This is a docstring for SomeModel."
+
+print(new_schema.get_schema_definition_as_string(include_documentation=True))
+print(new_schema)
