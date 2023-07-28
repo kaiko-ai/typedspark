@@ -50,7 +50,7 @@ class MetaSchema(type):
         return f"\n{str(cls)}"
 
     def __str__(cls) -> str:
-        return cls.get_schema_definition_as_string(add_subschemas=False)
+        return cls.get_schema_definition_as_string(include_documentation=True, add_subschemas=False)
 
     def __getattribute__(cls, name: str) -> Any:
         """Python base function that gets attributes.
