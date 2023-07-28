@@ -60,7 +60,7 @@ def _build_schema_definition_string(
         )
         typehint = _replace_literals(
             typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
-        ) 
+        )
         if include_documentation:
             if hasattr(schema.__annotations__[k], "__metadata__"):
                 print("attribute exists")
