@@ -62,8 +62,11 @@ def _build_schema_definition_string(
             typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
         )
         if include_documentation:
-            if hasattr(schema.__annotations__[k], "__metadata__"):
-                if schema.__annotations__[k].__metadata__ is not None:
+            if k in schema.__annotations__:
+                if (
+                    hasattr(schema.__annotations__[k], "__metadata__")
+                    and schema.__annotations__[k].__metadata__ is not None
+                ):
                     lines += (
                         f"    {k}: Annotated[{typehint}, "
                         + f'ColumnMeta(comment="{schema.__annotations__[k].__metadata__[0]}")]\n'
