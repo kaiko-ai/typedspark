@@ -44,7 +44,10 @@ def _build_schema_definition_string(
     """Return the code for a given ``Schema`` as a string."""
     lines = f"class {class_name}(Schema):\n"
     if include_documentation:
-        lines += '    """Add documentation here."""\n\n'
+        if schema.get_docstring() is not None:
+            lines += f'    """{schema.get_docstring()}"""\n\n'
+        else:
+            lines += '    """Add documentation here."""\n\n'
 
     for k, val in get_type_hints(schema).items():
         typehint = (
@@ -57,9 +60,14 @@ def _build_schema_definition_string(
         )
         typehint = _replace_literals(
             typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
-        )
+        ) 
         if include_documentation:
-            lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
+            if hasattr(schema.__annotations__[k], "__metadata__"):
+                print("attribute exists")
+                if schema.__annotations__[k].__metadata__ is not None:
+                    lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="{schema.__annotations__[k].__metadata__[0]}")]\n'
+            else:
+                lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
         else:
             lines += f"    {k}: {typehint}\n"
 
