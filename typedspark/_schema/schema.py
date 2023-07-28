@@ -51,7 +51,7 @@ class MetaSchema(type):
 
     def __str__(cls, include_documentation=False) -> str:
         return cls.get_schema_definition_as_string(
-            include_documentation=include_documentation, add_subschemas=False
+            include_documentation=include_documentation, add_subschemas=False 
         )
 
     def __getattribute__(cls, name: str) -> Any:
