@@ -50,9 +50,7 @@ class MetaSchema(type):
         return f"\n{str(cls)}"
 
     def __str__(cls) -> str:
-        return cls.get_schema_definition_as_string(
-            add_subschemas=False
-        )
+        return cls.get_schema_definition_as_string(add_subschemas=False)
 
     def __getattribute__(cls, name: str) -> Any:
         """Python base function that gets attributes.
@@ -193,10 +191,7 @@ class Schema(metaclass=MetaSchema):
 
 
 new_schema = type("SomeModel", (Schema,), {})
-cols = {
-    "a": Annotated[Column[IntegerType], "Some column"], 
-    "b": Column[IntegerType]
-}
+cols = {"a": Annotated[Column[IntegerType], "Some column"], "b": Column[IntegerType]}
 new_schema.__annotations__ = cols
 new_schema.__doc__ = "This is a docstring for SomeModel."
 
