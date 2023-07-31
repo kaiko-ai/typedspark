@@ -71,10 +71,10 @@ def _build_schema_definition_string(
                         f"    {k}: Annotated[{typehint}, "
                         + f'ColumnMeta(comment="{schema.__annotations__[k].__metadata__[0]}")]\n'
                     )
+                else:
+                    lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
             else:
-                lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
-        else:
-            lines += f"    {k}: {typehint}\n"
+                lines += f"    {k}: {typehint}\n"
 
     if add_subschemas:
         lines += _add_subschemas(schema, add_subschemas, include_documentation)
