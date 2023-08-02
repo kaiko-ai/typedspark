@@ -49,9 +49,9 @@ def _build_schema_definition_string(
         else:
             lines += '    """Add documentation here."""\n\n'
 
-    for k, val in get_type_hints(schema).items():
+    for col_name, col in get_type_hints(schema).items():
         typehint = (
-            str(val)
+            str(col)
             .replace("typedspark._core.column.", "")
             .replace("typedspark._core.datatypes.", "")
             .replace("typedspark._schema.schema.", "")
@@ -62,19 +62,19 @@ def _build_schema_definition_string(
             typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
         )
         if include_documentation:
-            if k in schema.__annotations__:
+            if col_name in schema.__annotations__:
                 if (
-                    hasattr(schema.__annotations__[k], "__metadata__")
-                    and schema.__annotations__[k].__metadata__ is not None
+                    hasattr(schema.__annotations__[col_name], "__metadata__")
+                    and schema.__annotations__[col_name].__metadata__ is not None
                 ):
                     lines += (
-                        f"    {k}: Annotated[{typehint}, "
-                        + f'ColumnMeta(comment="{schema.__annotations__[k].__metadata__[0]}")]\n'
+                        f"    {col_name}: Annotated[{typehint}, "
+                        + f'ColumnMeta(comment="{schema.__annotations__[col_name].__metadata__[0]}")]\n'
                     )
                 else:
-                    lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
+                    lines += f'    {col_name}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
         else:
-            lines += f"    {k}: {typehint}\n"
+            lines += f"    {col_name}: {typehint}\n"
 
     if add_subschemas:
         lines += _add_subschemas(schema, add_subschemas, include_documentation)
