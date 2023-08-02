@@ -102,7 +102,7 @@ def _extract_comment(typehint: str) -> tuple[str, str]:
         if match is not None:
             typehint, comment = match.groups()
     return typehint, comment
-    
+
 
 def _replace_literals(
     typehint: str,
