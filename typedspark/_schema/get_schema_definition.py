@@ -81,8 +81,8 @@ def _extract_comment(typehint: str) -> tuple[str, str]:
     """Extract the comment from a typehint."""
     comment = ""
     if "Annotated" in typehint:
-        m = re.search(r"Annotated\[(.*), '(.*)'\]", typehint)
-        if m is not None:
+        match = re.search(r"Annotated\[(.*), '(.*)'\]", typehint)
+        if match is not None:
             typehint, comment = m.groups()
     return typehint, comment
 
