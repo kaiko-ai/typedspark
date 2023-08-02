@@ -35,6 +35,18 @@ def get_schema_definition_as_string(
     return imports + schema_string
 
 
+def _get_comment(schema: Type[Schema], col_name: str) -> str:
+    """Return the comment of a given column."""
+    if (
+        hasattr(schema.__annotations__[col_name], "__metadata__")
+        and schema.__annotations__[col_name].__metadata__ is not None
+    ):
+        comment = schema.__annotations__[col_name].__metadata__[0]
+    else:
+        comment = ""
+    return comment
+
+
 def _build_schema_definition_string(
     schema: Type[Schema],
     include_documentation: bool,
@@ -44,11 +56,14 @@ def _build_schema_definition_string(
     """Return the code for a given ``Schema`` as a string."""
     lines = f"class {class_name}(Schema):\n"
     if include_documentation:
-        lines += '    """Add documentation here."""\n\n'
+        if schema.get_docstring() is not None:
+            lines += f'    """{schema.get_docstring()}"""\n\n'
+        else:
+            lines += '    """Add documentation here."""\n\n'
 
-    for k, val in get_type_hints(schema).items():
+    for col_name, col_object in get_type_hints(schema).items():
         typehint = (
-            str(val)
+            str(col_object)
             .replace("typedspark._core.column.", "")
             .replace("typedspark._core.datatypes.", "")
             .replace("typedspark._schema.schema.", "")
@@ -59,9 +74,12 @@ def _build_schema_definition_string(
             typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
         )
         if include_documentation:
-            lines += f'    {k}: Annotated[{typehint}, ColumnMeta(comment="")]\n'
+            col_annotated_start = f"    {col_name}: Annotated[{typehint}, "
+            if col_name in schema.__annotations__:
+                comment = _get_comment(schema, col_name)
+                lines += f'{col_annotated_start}ColumnMeta(comment="{comment}")]\n'
         else:
-            lines += f"    {k}: {typehint}\n"
+            lines += f"    {col_name}: {typehint}\n"
 
     if add_subschemas:
         lines += _add_subschemas(schema, add_subschemas, include_documentation)
