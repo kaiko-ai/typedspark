@@ -4,8 +4,6 @@ from pyspark.sql.types import IntegerType, StringType
 
 from typedspark import Column, DayTimeIntervalType, IntervalType, Schema
 
-# from typedspark._core.datatypes import DayTimeIntervalType
-# from typedspark._core.literaltype import IntervalType
 from typedspark._schema.get_schema_definition import _replace_literal, _replace_literals
 
 
