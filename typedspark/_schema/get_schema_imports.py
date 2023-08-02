@@ -102,7 +102,7 @@ def _typing_imports(encountered_datatypes: set[Type[DataType]], include_document
 
     if len(imports) > 0:
         imports = sorted(imports)
-        imports_string = ", ".join(imports)  # typing: ignore
+        imports_string = ", ".join(imports)  # type: ignore
         return f"from typing import {imports_string}\n\n"
 
     return ""
