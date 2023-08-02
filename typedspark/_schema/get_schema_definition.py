@@ -77,16 +77,6 @@ def _add_lines_with_typehint(include_documentation, schema):
     return lines
 
 
-def _extract_comment(typehint: str) -> tuple[str, str]:
-    """Extract the comment from a typehint."""
-    comment = ""
-    if "Annotated" in typehint:
-        match = re.search(r"Annotated\[(.*), '(.*)'\]", typehint)
-        if match is not None:
-            typehint, comment = match.groups()
-    return typehint, comment
-
-
 def _create_typehint_and_comment(col_type) -> list[str]:
     """Create a typehint and comment for a given column."""
     typehint = (
@@ -103,6 +93,16 @@ def _create_typehint_and_comment(col_type) -> list[str]:
     )
     return [typehint, comment]
 
+
+def _extract_comment(typehint: str) -> tuple[str, str]:
+    """Extract the comment from a typehint."""
+    comment = ""
+    if "Annotated" in typehint:
+        match = re.search(r"Annotated\[(.*), '(.*)'\]", typehint)
+        if match is not None:
+            typehint, comment = match.groups()
+    return typehint, comment
+    
 
 def _replace_literals(
     typehint: str,
