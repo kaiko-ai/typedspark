@@ -68,7 +68,7 @@ def _add_lines_with_typehint(include_documentation, schema):
     """Add a line with the typehint for each column in the ``Schema``."""
     lines = ""
     for col_name, col_type in get_type_hints(schema, include_extras=True).items():
-        typehint, comment = _create_typehint_comment(col_type)
+        typehint, comment = _create_typehint_and_comment(col_type)
 
         if include_documentation:
             lines += f'    {col_name}: Annotated[{typehint}, ColumnMeta(comment="{comment}")]\n'
@@ -87,7 +87,7 @@ def _extract_comment(typehint: str) -> tuple[str, str]:
     return typehint, comment
 
 
-def _create_typehint_comment(col_type) -> list[str]:
+def _create_typehint_and_comment(col_type) -> list[str]:
     """Create a typehint and comment for a given column."""
     typehint = (
         str(col_type)
