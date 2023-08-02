@@ -77,7 +77,6 @@ def _add_lines_with_typehint(include_documentation, schema):
     return lines
 
 
-
 def _extract_comment(typehint: str) -> tuple[str, str]:
     """Extract the comment from a typehint."""
     comment = ""
@@ -103,7 +102,6 @@ def _create_typehint_comment(col_type) -> list[str]:
         typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
     )
     return [typehint, comment]
-
 
 
 def _replace_literals(
