@@ -35,55 +35,6 @@ def get_schema_definition_as_string(
     return imports + schema_string
 
 
-def _create_docstring(schema: Type[Schema]) -> str:
-    """Create the docstring for a given ``Schema``."""
-    if schema.get_docstring() is not None:
-        docstring = f'    """{schema.get_docstring()}"""\n\n'
-    else:
-        docstring = '    """Add documentation here."""\n\n'
-    return docstring
-
-
-def _extract_comment(typehint: str) -> tuple[str, str]:
-    """Extract the comment from a typehint."""
-    comment = ""
-    if "Annotated" in typehint:
-        typehint, comment = re.search(r"Annotated\[(.*), '(.*)'\]", typehint).groups()
-    return typehint, comment
-
-
-def _create_typehint_comment(col_type) -> list[str]:
-    """Create a typehint and comment for a given column."""
-    typehint = (
-        str(col_type)
-        .replace("typedspark._core.column.", "")
-        .replace("typedspark._core.datatypes.", "")
-        .replace("typedspark._schema.schema.", "")
-        .replace("pyspark.sql.types.", "")
-        .replace("typing.", "")
-        .replace("Annotated[Annotated", "Annotated")
-    )
-    typehint, comment = _extract_comment(typehint)
-    typehint = _replace_literals(
-        typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
-    )
-    return [typehint, comment]
-
-
-def _add_lines_with_typehint(include_documentation, schema):
-    """Add a line with the typehint for each column in the ``Schema``."""
-    lines = ""
-    for col_name, col_type in get_type_hints(schema, include_extras=True).items():
-        typehint, comment = _create_typehint_comment(col_type)
-
-        if include_documentation:
-            col_annotated_start = f"    {col_name}: Annotated[{typehint}, "
-            lines += f'{col_annotated_start}ColumnMeta(comment="{comment}")]\n'
-        else:
-            lines += f"    {col_name}: {typehint}\n"
-    return lines
-
-
 def _build_schema_definition_string(
     schema: Type[Schema],
     include_documentation: bool,
@@ -102,6 +53,57 @@ def _build_schema_definition_string(
         lines += _add_subschemas(schema, add_subschemas, include_documentation)
 
     return lines
+
+
+def _create_docstring(schema: Type[Schema]) -> str:
+    """Create the docstring for a given ``Schema``."""
+    if schema.get_docstring() is not None:
+        docstring = f'    """{schema.get_docstring()}"""\n\n'
+    else:
+        docstring = '    """Add documentation here."""\n\n'
+    return docstring
+
+
+def _add_lines_with_typehint(include_documentation, schema):
+    """Add a line with the typehint for each column in the ``Schema``."""
+    lines = ""
+    for col_name, col_type in get_type_hints(schema, include_extras=True).items():
+        typehint, comment = _create_typehint_comment(col_type)
+
+        if include_documentation:
+            lines += f'    {col_name}: Annotated[{typehint}, ColumnMeta(comment="{comment}")]\n'
+        else:
+            lines += f"    {col_name}: {typehint}\n"
+    return lines
+
+
+
+def _extract_comment(typehint: str) -> tuple[str, str]:
+    """Extract the comment from a typehint."""
+    comment = ""
+    if "Annotated" in typehint:
+        m = re.search(r"Annotated\[(.*), '(.*)'\]", typehint)
+        if m is not None:
+            typehint, comment = m.groups()
+    return typehint, comment
+
+
+def _create_typehint_comment(col_type) -> list[str]:
+    """Create a typehint and comment for a given column."""
+    typehint = (
+        str(col_type)
+        .replace("typedspark._core.column.", "")
+        .replace("typedspark._core.datatypes.", "")
+        .replace("typedspark._schema.schema.", "")
+        .replace("pyspark.sql.types.", "")
+        .replace("typing.", "")
+    )
+    typehint, comment = _extract_comment(typehint)
+    typehint = _replace_literals(
+        typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
+    )
+    return [typehint, comment]
+
 
 
 def _replace_literals(
