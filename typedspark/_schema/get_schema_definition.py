@@ -35,6 +35,17 @@ def get_schema_definition_as_string(
     return imports + schema_string
 
 
+def _get_comment(schema: Type[Schema], col_name: str) -> str:
+    if (
+        hasattr(schema.__annotations__[col_name], "__metadata__")
+        and schema.__annotations__[col_name].__metadata__ is not None
+    ):
+        comment = schema.__annotations__[col_name].__metadata__[0]
+    else:
+        comment = ""
+    return comment
+
+
 def _build_schema_definition_string(
     schema: Type[Schema],
     include_documentation: bool,
@@ -64,14 +75,7 @@ def _build_schema_definition_string(
         if include_documentation:
             col_annotated_start = f"    {col_name}: Annotated[{typehint}, "
             if col_name in schema.__annotations__:
-                if (
-                    hasattr(schema.__annotations__[col_name], "__metadata__")
-                    and schema.__annotations__[col_name].__metadata__ is not None
-                ):
-                    comment = schema.__annotations__[col_name].__metadata__[0]
-                else:
-                    comment = ""
-
+                comment = _get_comment(schema, col_name)
                 lines += f'{col_annotated_start}ColumnMeta(comment="{comment}")]\n'
         else:
             lines += f"    {col_name}: {typehint}\n"
