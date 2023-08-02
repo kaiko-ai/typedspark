@@ -3,7 +3,6 @@ from typing import Annotated
 from pyspark.sql.types import IntegerType, StringType
 
 from typedspark import Column, DayTimeIntervalType, IntervalType, Schema
-
 from typedspark._schema.get_schema_definition import _replace_literal, _replace_literals
 
 
