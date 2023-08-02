@@ -36,6 +36,7 @@ def get_schema_definition_as_string(
 
 
 def _get_comment(schema: Type[Schema], col_name: str) -> str:
+    """Return the comment of a given column."""
     if (
         hasattr(schema.__annotations__[col_name], "__metadata__")
         and schema.__annotations__[col_name].__metadata__ is not None
