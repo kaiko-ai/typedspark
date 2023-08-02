@@ -68,15 +68,15 @@ def _build_schema_definition_string(
                     hasattr(schema.__annotations__[col_name], "__metadata__")
                     and schema.__annotations__[col_name].__metadata__ is not None
                 ):
-                    lines += (
+                    comment == (
                         col_annotated_start
                         + f'ColumnMeta(comment="{schema.__annotations__[col_name].__metadata__[0]}")]\n'
                     )
                 else:
-                    lines += col_annotated_start + 'ColumnMeta(comment="")]\n'
+                    comment = col_annotated_start + 'ColumnMeta(comment="")]\n'
         else:
-            lines += f"    {col_name}: {typehint}\n"
-
+            comment = f"    {col_name}: {typehint}\n"
+        lines += comment
     if add_subschemas:
         lines += _add_subschemas(schema, add_subschemas, include_documentation)
 
