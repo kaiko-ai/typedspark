@@ -86,6 +86,11 @@ class DataSet(DataFrame, Generic[T]):
         for field in self._schema_annotations.get_structtype().fields:
             self.schema[field.name].metadata = field.metadata
 
+    @property
+    def typedspark_schema(self) -> T:
+        """Returns the ``Schema`` of the ``DataSet``."""
+        return self._schema_annotations  # type: ignore
+
     """The following functions are equivalent to their parents in ``DataFrame``, but since they
     don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
     such that the docstring from the parent will appear."""
