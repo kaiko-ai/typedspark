@@ -1,7 +1,7 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
 from logging import warn
-from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
+from typing import Generic, Optional, Type, TypeVar, Union, get_args, get_origin
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
@@ -80,7 +80,7 @@ class Column(SparkColumn, Generic[T]):
         return hash((self.str, self._curid))
 
     @property
-    def dtype(self) -> T:
+    def dtype(self) -> Type[T]:
         """Get the datatype of the column, e.g. Column[IntegerType] -> IntegerType."""
         dtype = self._dtype
         if get_origin(dtype) == StructType:
