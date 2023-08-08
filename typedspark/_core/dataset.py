@@ -87,7 +87,7 @@ class DataSet(DataFrame, Generic[T]):
             self.schema[field.name].metadata = field.metadata
 
     @property
-    def typedspark_schema(self) -> Schema:
+    def typedspark_schema(self) -> T:
         """Returns the ``Schema`` of the ``DataSet``."""
         return self._schema_annotations
 
