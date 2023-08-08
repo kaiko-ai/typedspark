@@ -89,7 +89,7 @@ class DataSet(DataFrame, Generic[T]):
     @property
     def typedspark_schema(self) -> T:
         """Returns the ``Schema`` of the ``DataSet``."""
-        return self._schema_annotations
+        return self._schema_annotations  # type: ignore
 
     """The following functions are equivalent to their parents in ``DataFrame``, but since they
     don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
