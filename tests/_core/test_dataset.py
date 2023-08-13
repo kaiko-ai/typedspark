@@ -83,3 +83,8 @@ def test_inherrited_functions_with_other_dataset(spark: SparkSession):
 
     df_a.join(df_b, A.a.str)
     df_a.unionByName(df_b)
+
+
+def test_schema_property_of_dataset(spark: SparkSession):
+    df = create_empty_dataset(spark, A)
+    assert df.typedspark_schema == A

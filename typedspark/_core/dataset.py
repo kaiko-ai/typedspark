@@ -92,6 +92,11 @@ class DataSet(PartialDataSet, Generic[T]):
         for field in self._schema_annotations.get_structtype().fields:
             self.schema[field.name].metadata = field.metadata
 
+    @property
+    def typedspark_schema(self) -> Type[T]:
+        """Returns the ``Schema`` of the ``DataSet``."""
+        return self._schema_annotations  # type: ignore
+
     """The following functions are equivalent to their parents in ``DataFrame``, but since they
     don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
     such that the docstring from the parent will appear."""
@@ -103,13 +108,24 @@ class DataSet(PartialDataSet, Generic[T]):
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
     @overload
+    def join(  # type: ignore
+        self,
+        other: DataFrame,
+        on: Optional[  # pylint: disable=C0103
+            Union[str, List[str], SparkColumn, List[SparkColumn]]
+        ] = ...,
+        how: None = ...,
+    ) -> DataFrame:
+        ...  # pragma: no cover
+
+    @overload
     def join(
         self,
         other: DataFrame,
         on: Optional[  # pylint: disable=C0103
             Union[str, List[str], SparkColumn, List[SparkColumn]]
-        ] = None,
-        how: Literal["semi"] = "semi",
+        ] = ...,
+        how: Literal["semi"] = ...,
     ) -> "DataSet[T]":
         ...  # pragma: no cover
 
@@ -119,8 +135,8 @@ class DataSet(PartialDataSet, Generic[T]):
         other: DataFrame,
         on: Optional[  # pylint: disable=C0103
             Union[str, List[str], SparkColumn, List[SparkColumn]]
-        ] = None,
-        how: Optional[str] = None,
+        ] = ...,
+        how: Optional[str] = ...,
     ) -> DataFrame:
         ...  # pragma: no cover
 
@@ -159,7 +175,7 @@ class DataSet(PartialDataSet, Generic[T]):
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
         self,
         other: "DataSet[T]",
-        allowMissingColumns: Literal[False] = False,  # noqa: N803
+        allowMissingColumns: Literal[False] = ...,  # noqa: N803
     ) -> "DataSet[T]":
         ...  # pragma: no cover
 
@@ -167,7 +183,7 @@ class DataSet(PartialDataSet, Generic[T]):
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
         self,
         other: DataFrame,
-        allowMissingColumns: bool = False,  # noqa: N803
+        allowMissingColumns: bool = ...,  # noqa: N803
     ) -> DataFrame:
         ...  # pragma: no cover
 

@@ -17,15 +17,16 @@ def remove_spark_warnings(cell):
     if "outputs" in cell.keys():
         outputs = []
         for output in cell.outputs:
-            if "text" not in output.keys():
-                continue
-            if 'Setting default log level to "WARN"' in output.text:
-                continue
-            if (
-                "WARN NativeCodeLoader: Unable to load native-hadoop library for your platform."
-                in output.text
-            ):
-                continue
+            if "text" in output.keys():
+                if 'Setting default log level to "WARN"' in output.text:
+                    continue
+                if (
+                    "WARN NativeCodeLoader: Unable to load native-hadoop library for your platform."
+                    in output.text
+                ):
+                    continue
+                if "WARN Utils: Service 'SparkUI' could not bind on port" in output.text:
+                    continue
             outputs.append(output)
 
         cell.outputs = outputs
@@ -41,9 +42,9 @@ if __name__ == "__main__":
     FILENAME = sys.argv[1]
     nb = nbformat.read(FILENAME, as_version=4)
 
-    for cell in nb["cells"]:
-        clear_metadata(cell)
-        remove_spark_warnings(cell)
+    for nb_cell in nb["cells"]:
+        clear_metadata(nb_cell)
+        remove_spark_warnings(nb_cell)
 
     remove_papermill_metadata(nb)
 
