@@ -32,9 +32,15 @@ _Implementation = TypeVar("_Implementation", bound=Schema, covariant=True)
 class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     """TODO."""
 
+    def __init__(self):
+        raise NotImplementedError("TODO")  # pragma: no cover
+
 
 class DataSetExtends(DataSetImplements[_Protocol, _Protocol], Generic[_Protocol]):
-    """ "TODO."""
+    """TODO."""
+
+    def __init__(self):
+        raise NotImplementedError("TODO")  # pragma: no cover
 
 
 class DataSet(DataSetExtends[_Schema]):
