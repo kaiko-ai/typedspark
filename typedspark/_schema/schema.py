@@ -12,7 +12,6 @@ from typing import (
     _ProtocolMeta,
     get_args,
     get_type_hints,
-    runtime_checkable,
 )
 
 from pyspark.sql import DataFrame
@@ -116,8 +115,8 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
         return list(get_type_hints(cls).keys())
 
     def all_column_names_except_for(cls, except_for: List[str]) -> List[str]:
-        """Returns all column names for a given schema except for the columns
-        specified in the ``except_for`` parameter."""
+        """Returns all column names for a given schema except for the columns specified
+        in the ``except_for`` parameter."""
         return list(name for name in get_type_hints(cls).keys() if name not in except_for)
 
     def get_snake_case(cls) -> str:
@@ -177,8 +176,7 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
         )
 
     def get_dlt_kwargs(cls, name: Optional[str] = None) -> DltKwargs:
-        """Creates a representation of the ``Schema`` to be used by Delta Live
-        Tables.
+        """Creates a representation of the ``Schema`` to be used by Delta Live Tables.
 
         .. code-block:: python
 
@@ -198,10 +196,9 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
 
 
 class Schema(Protocol, metaclass=MetaSchema):
-    # pylint: disable=missing-class-docstring
+    # pylint: disable=empty-docstring
     # Since docstrings are inherrited, and since we use docstrings to
     # annotate tables (see MetaSchema.get_dlt_kwargs()), we have chosen
     # to add an empty docstring to the Schema class (otherwise the Schema
     # docstring would be added to any schema without a docstring).
-    __doc__ = None
-    pass
+    """"""

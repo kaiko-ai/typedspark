@@ -106,7 +106,7 @@ def test_get_snake_case():
 
 
 def test_get_docstring():
-    assert A.get_docstring() is None
+    assert A.get_docstring() == ""
     assert PascalCase.get_docstring() == "Schema docstring."
 
 
@@ -125,7 +125,7 @@ def test_get_structtype():
 def test_get_dlt_kwargs():
     assert A.get_dlt_kwargs() == DltKwargs(
         name="a",
-        comment=None,
+        comment="",
         schema=StructType(
             [StructField("a", LongType(), True), StructField("b", StringType(), True)]
         ),

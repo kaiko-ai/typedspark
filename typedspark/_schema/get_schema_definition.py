@@ -1,5 +1,4 @@
-"""Module to output a string with the ``Schema`` definition of a given
-``DataFrame``."""
+"""Module to output a string with the ``Schema`` definition of a given ``DataFrame``."""
 from __future__ import annotations
 
 import re
@@ -57,7 +56,7 @@ def _build_schema_definition_string(
 
 def _create_docstring(schema: Type[Schema]) -> str:
     """Create the docstring for a given ``Schema``."""
-    if schema.get_docstring() is not None:
+    if schema.get_docstring() != "":
         docstring = f'    """{schema.get_docstring()}"""\n\n'
     else:
         docstring = '    """Add documentation here."""\n\n'
@@ -140,8 +139,8 @@ def _replace_literal(
 
 
 def _add_subschemas(schema: Type[Schema], add_subschemas: bool, include_documentation: bool) -> str:
-    """Identifies whether any ``Column`` are of the ``StructType`` type and
-    generates their schema recursively."""
+    """Identifies whether any ``Column`` are of the ``StructType`` type and generates
+    their schema recursively."""
     lines = ""
     for val in get_type_hints(schema).values():
         args = get_args(val)

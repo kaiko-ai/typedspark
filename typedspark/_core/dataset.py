@@ -21,18 +21,23 @@ from typing_extensions import Concatenate, ParamSpec
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 
-T = TypeVar("T", bound=Schema)
+_Schema = TypeVar("_Schema", bound=Schema)
 _ReturnType = TypeVar("_ReturnType", bound=DataFrame)  # pylint: disable=C0103
 P = ParamSpec("P")
 
-V = TypeVar("V", bound=Schema, covariant=True)
+_Protocol = TypeVar("_Protocol", bound=Schema, covariant=True)
+_Implementation = TypeVar("_Implementation", bound=Schema, covariant=True)
 
 
-class PartialDataSet(DataFrame, Generic[V]):
-    pass
+class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
+    """TODO."""
 
 
-class DataSet(PartialDataSet, Generic[T]):
+class DataSetExtends(DataSetImplements[_Protocol, _Protocol], Generic[_Protocol]):
+    """ "TODO."""
+
+
+class DataSet(DataSetExtends[_Schema]):
     """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same
     functionality, with in addition the possibility to define a schema.
 
@@ -47,7 +52,7 @@ class DataSet(PartialDataSet, Generic[T]):
             return df
     """
 
-    def __new__(cls, dataframe: DataFrame) -> "DataSet[T]":
+    def __new__(cls, dataframe: DataFrame) -> "DataSet[_Schema]":
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
         Here, we simply take the provided ``df`` and cast it to a
@@ -93,7 +98,7 @@ class DataSet(PartialDataSet, Generic[T]):
             self.schema[field.name].metadata = field.metadata
 
     @property
-    def typedspark_schema(self) -> Type[T]:
+    def typedspark_schema(self) -> Type[_Schema]:
         """Returns the ``Schema`` of the ``DataSet``."""
         return self._schema_annotations  # type: ignore
 
@@ -101,10 +106,10 @@ class DataSet(PartialDataSet, Generic[T]):
     don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
     such that the docstring from the parent will appear."""
 
-    def distinct(self) -> "DataSet[T]":  # pylint: disable=C0116
+    def distinct(self) -> "DataSet[_Schema]":  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
-    def filter(self, condition) -> "DataSet[T]":  # pylint: disable=C0116
+    def filter(self, condition) -> "DataSet[_Schema]":  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
     @overload
@@ -126,7 +131,7 @@ class DataSet(PartialDataSet, Generic[T]):
             Union[str, List[str], SparkColumn, List[SparkColumn]]
         ] = ...,
         how: Literal["semi"] = ...,
-    ) -> "DataSet[T]":
+    ) -> "DataSet[_Schema]":
         ...  # pragma: no cover
 
     @overload
@@ -150,13 +155,13 @@ class DataSet(PartialDataSet, Generic[T]):
     ) -> DataFrame:
         return super().join(other, on, how)  # type: ignore
 
-    def orderBy(self, *args, **kwargs) -> "DataSet[T]":  # type: ignore  # noqa: N802, E501  # pylint: disable=C0116, C0103
+    def orderBy(self, *args, **kwargs) -> "DataSet[_Schema]":  # type: ignore  # noqa: N802, E501  # pylint: disable=C0116, C0103
         return DataSet[self._schema_annotations](super().orderBy(*args, **kwargs))  # type: ignore
 
     @overload
     def transform(
         self,
-        func: Callable[Concatenate["DataSet[T]", P], _ReturnType],
+        func: Callable[Concatenate["DataSet[_Schema]", P], _ReturnType],
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> _ReturnType:
@@ -174,9 +179,9 @@ class DataSet(PartialDataSet, Generic[T]):
     @overload
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
         self,
-        other: "DataSet[T]",
+        other: "DataSet[_Schema]",
         allowMissingColumns: Literal[False] = ...,  # noqa: N803
-    ) -> "DataSet[T]":
+    ) -> "DataSet[_Schema]":
         ...  # pragma: no cover
 
     @overload
