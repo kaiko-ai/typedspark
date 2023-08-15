@@ -29,21 +29,21 @@ _Protocol = TypeVar("_Protocol", bound=Schema, covariant=True)
 _Implementation = TypeVar("_Implementation", bound=Schema, covariant=True)
 
 
-class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
+class DataSetExtends(DataFrame, Generic[_Protocol]):
     """TODO."""
 
     def __init__(self):
         raise NotImplementedError("TODO")  # pragma: no cover
 
 
-class DataSetExtends(DataSetImplements[_Protocol, _Protocol], Generic[_Protocol]):
+class DataSetImplements(DataSetExtends[_Protocol], Generic[_Protocol, _Implementation]):
     """TODO."""
 
     def __init__(self):
         raise NotImplementedError("TODO")  # pragma: no cover
 
 
-class DataSet(DataSetExtends[_Schema]):
+class DataSet(DataSetImplements[_Schema, _Schema]):
     """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same
     functionality, with in addition the possibility to define a schema.
 
