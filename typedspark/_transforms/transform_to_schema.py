@@ -13,15 +13,19 @@ from typedspark._transforms.utils import add_nulls_for_unspecified_columns, conv
 T = TypeVar("T", bound=Schema)
 
 
+def _duplicates(lst: list) -> set:
+    return {x for x in lst if lst.count(x) > 1}
+
+
 def transform_to_schema(
     dataframe: DataFrame,
     schema: Type[T],
     transformations: Optional[Dict[Column, SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
 ) -> DataSet[T]:
-    """On the provided DataFrame ``df``, it performs the ``transformations``
-    (if provided), and subsequently subsets the resulting DataFrame to the
-    columns specified in ``schema``.
+    """On the provided DataFrame ``df``, it performs the ``transformations`` (if
+    provided), and subsequently subsets the resulting DataFrame to the columns specified
+    in ``schema``.
 
     .. code-block:: python
 
@@ -43,10 +47,25 @@ def transform_to_schema(
             _transformations, schema, previously_existing_columns=dataframe.columns
         )
 
+    problematic_keys = _duplicates(dataframe.columns) & set(_transformations.keys())
+    problematic_key_mapping = {k: f"my_temporary_typedspark_{k}" for k in problematic_keys}
+    _transformations = {problematic_key_mapping.get(k, k): v for k, v in _transformations.items()}
+
     return DataSet[schema](  # type: ignore
         reduce(
             lambda acc, key: DataFrame.withColumn(acc, key, _transformations[key]),
             _transformations.keys(),
             dataframe,
-        ).select(*schema.all_column_names())
+        )
+        .drop(*problematic_key_mapping.keys())
+        .transform(
+            lambda df: reduce(
+                lambda acc, key: DataFrame.withColumnRenamed(
+                    acc, problematic_key_mapping[key], key
+                ),
+                problematic_key_mapping.keys(),
+                df,
+            )
+        )
+        .select(*schema.all_column_names())
     )
