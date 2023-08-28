@@ -14,7 +14,43 @@ T = TypeVar("T", bound=Schema)
 
 
 def _duplicates(lst: list) -> set:
+    """Returns a set of the duplicates in the provided list."""
     return {x for x in lst if lst.count(x) > 1}
+
+
+def _identify_problematic_keys(
+    dataframe_columns: list, transformations: Dict[str, SparkColumn]
+) -> Dict[str, str]:
+    """Identifies the problematic keys in the transformations dictionary."""
+    problematic_keys = _duplicates(dataframe_columns) & set(transformations.keys())
+    return {k: f"my_temporary_typedspark_{k}" for k in problematic_keys}
+
+
+def _rename_keys_to_temporary_keys(
+    transformations: Dict[str, SparkColumn], temporary_key_mapping: Dict[str, str]
+) -> Dict[str, SparkColumn]:
+    """Renames the keys in the transformations dictionary to temporary keys."""
+    return {temporary_key_mapping.get(k, k): v for k, v in transformations.items()}
+
+
+def _do_transformations(dataframe: DataFrame, transformations: Dict[str, SparkColumn]) -> DataFrame:
+    """Performs the transformations on the provided DataFrame."""
+    return reduce(
+        lambda acc, key: DataFrame.withColumn(acc, key, transformations[key]),
+        transformations.keys(),
+        dataframe,
+    )
+
+
+def _rename_temporary_keys_to_original_keys(
+    dataframe: DataFrame, problematic_key_mapping: Dict[str, str]
+) -> DataFrame:
+    """Renames the temporary keys back to the original keys."""
+    return reduce(
+        lambda acc, key: DataFrame.withColumnRenamed(acc, problematic_key_mapping[key], key),
+        problematic_key_mapping.keys(),
+        dataframe,
+    )
 
 
 def transform_to_schema(
@@ -47,25 +83,12 @@ def transform_to_schema(
             _transformations, schema, previously_existing_columns=dataframe.columns
         )
 
-    problematic_keys = _duplicates(dataframe.columns) & set(_transformations.keys())
-    problematic_key_mapping = {k: f"my_temporary_typedspark_{k}" for k in problematic_keys}
-    _transformations = {problematic_key_mapping.get(k, k): v for k, v in _transformations.items()}
+    temporary_key_mapping = _identify_problematic_keys(dataframe.columns, _transformations)
+    _transformations = _rename_keys_to_temporary_keys(_transformations, temporary_key_mapping)
 
     return DataSet[schema](  # type: ignore
-        reduce(
-            lambda acc, key: DataFrame.withColumn(acc, key, _transformations[key]),
-            _transformations.keys(),
-            dataframe,
-        )
-        .drop(*problematic_key_mapping.keys())
-        .transform(
-            lambda df: reduce(
-                lambda acc, key: DataFrame.withColumnRenamed(
-                    acc, problematic_key_mapping[key], key
-                ),
-                problematic_key_mapping.keys(),
-                df,
-            )
-        )
+        dataframe.transform(_do_transformations, _transformations)
+        .drop(*temporary_key_mapping.keys())
+        .transform(_rename_temporary_keys_to_original_keys, temporary_key_mapping)
         .select(*schema.all_column_names())
     )
