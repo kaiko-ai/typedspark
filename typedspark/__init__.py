@@ -2,7 +2,7 @@
 
 from typedspark._core.column import Column
 from typedspark._core.column_meta import ColumnMeta
-from typedspark._core.dataset import DataSet, DataSetExtends, DataSetImplements
+from typedspark._core.dataset import DataSet, DataSetImplements
 from typedspark._core.datatypes import (
     ArrayType,
     DayTimeIntervalType,
@@ -36,7 +36,6 @@ __all__ = [
     "IntervalType",
     "MapType",
     "MetaSchema",
-    "DataSetExtends",
     "DataSetImplements",
     "Schema",
     "StructType",

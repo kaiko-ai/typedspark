@@ -1,4 +1,5 @@
 """Module containing classes and functions related to TypedSpark DataSets."""
+from abc import abstractmethod
 from copy import deepcopy
 from typing import (
     Any,
@@ -29,17 +30,16 @@ _Protocol = TypeVar("_Protocol", bound=Schema, covariant=True)
 _Implementation = TypeVar("_Implementation", bound=Schema, covariant=True)
 
 
-class DataSetExtends(DataFrame, Generic[_Protocol]):
+class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     """TODO."""
 
     def __init__(self):
         raise NotImplementedError("TODO")  # pragma: no cover
 
-
-class DataSetImplements(DataSetExtends[_Protocol], Generic[_Protocol, _Implementation]):
-    """TODO."""
-
-    def __init__(self):
+    @property
+    @abstractmethod
+    def typedspark_schema(self) -> Type[_Implementation]:
+        """Returns the ``Schema`` of the ``DataSet``."""
         raise NotImplementedError("TODO")  # pragma: no cover
 
 
