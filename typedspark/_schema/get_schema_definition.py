@@ -85,6 +85,7 @@ def _create_typehint_and_comment(col_type) -> list[str]:
         .replace("typedspark._schema.schema.", "")
         .replace("pyspark.sql.types.", "")
         .replace("typing.", "")
+        .replace("abc.", "")
     )
     typehint, comment = _extract_comment(typehint)
     typehint = _replace_literals(
