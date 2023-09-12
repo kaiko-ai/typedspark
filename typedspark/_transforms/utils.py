@@ -37,8 +37,8 @@ def convert_keys_to_strings(
 
     if len(transformations) != len(_transformations):
         raise ValueError(
-            "The transformations dictionary requires columns with unique names as keys."
-            + "It is currently not possible to have ambiguous column names here,"
+            "The transformations dictionary requires columns with unique names as keys. "
+            + "It is currently not possible to have ambiguous column names here, "
             + "even when used in combination with register_schema_to_dataset()."
         )
 

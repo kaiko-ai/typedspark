@@ -55,12 +55,7 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
             )
     """
 
-    class LinkedSchema(schema):  # type: ignore
-        """TypedSpark LinkedSchema.
-
-        Contains the DataFrame that this Schema is linked to.
-        """
-
+    class LinkedSchema(schema):  # type: ignore  # pylint: disable=missing-class-docstring
         _parent = dataframe
         _current_id = _counter()
         _original_name = schema.get_schema_name()
