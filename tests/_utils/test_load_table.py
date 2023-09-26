@@ -121,13 +121,12 @@ def test_databases_with_temp_view(spark):
     df.createOrReplaceTempView("table_a")
 
     db = Databases(spark)
-    df_loaded, schema = db.default.table_a.load()  # type: ignore
-
-    assert_df_equality(df, df_loaded)
-    assert schema.get_structtype() == A.get_structtype()
-    assert schema.get_schema_name() == "TableA"
-    assert db.default.table_a.str == "table_a"  # type: ignore
-    assert db.default.str == "default"  # type: ignore
+    for df_loaded, schema in [db.default.table_a(), db.default.table_a.load()]:  # type: ignore
+        assert_df_equality(df, df_loaded)
+        assert schema.get_structtype() == A.get_structtype()
+        assert schema.get_schema_name() == "TableA"
+        assert db.default.table_a.str == "table_a"  # type: ignore
+        assert db.default.str == "default"  # type: ignore
 
 
 def _drop_table(spark: SparkSession, table_name: str) -> None:
@@ -140,7 +139,7 @@ def test_databases_with_table(spark):
 
     try:
         db = Databases(spark)
-        df_loaded, schema = db.default.table_b.load()  # type: ignore
+        df_loaded, schema = db.default.table_b()  # type: ignore
 
         assert_df_equality(df, df_loaded)
         assert schema.get_structtype() == A.get_structtype()
@@ -160,7 +159,7 @@ def test_catalogs(spark):
 
     try:
         db = Catalogs(spark)
-        df_loaded, schema = db.spark_catalog.default.table_b.load()  # type: ignore
+        df_loaded, schema = db.spark_catalog.default.table_b()  # type: ignore
 
         assert_df_equality(df, df_loaded)
         assert schema.get_structtype() == A.get_structtype()

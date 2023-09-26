@@ -2,7 +2,7 @@
 
 from abc import ABC
 from datetime import datetime
-from typing import Optional, Tuple, TypeVar
+from typing import Any, Optional, Tuple, TypeVar
 from warnings import warn
 
 from pyspark.sql import Row, SparkSession
@@ -93,6 +93,9 @@ class Table:
             self.str,
             to_camel_case(self._table_name),
         )
+
+    def __call__(self, *args: Any, **kwds: Any) -> Tuple[DataSet[T], T]:
+        return self.load()
 
 
 class Database:
