@@ -39,6 +39,19 @@ The advantages include:
 * Easier unit testing through the generation of empty ``DataSets`` based on their schemas
 * Improved documentation of tables
 
+Demos
+=====
+
+IDE demo
+--------
+
+..  youtube:: dQw4w9WgXcQ
+
+Jupyter / Databricks notebooks demo
+-----------------------------------
+
+..  youtube:: dQw4w9WgXcQ
+
 Installation
 ============
 
