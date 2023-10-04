@@ -58,13 +58,13 @@ pip install "typedspark[pyspark]"
 
 https://github.com/kaiko-ai/typedspark/assets/47976799/e6f7fa9c-6d14-4f68-baba-fe3c22f75b67
 
-You can find the corresponding code [here](https://github.com/kaiko-ai/docs/videos/ide.ipynb).
+You can find the corresponding code [here](docs/videos/ide.ipynb).
 
 ### Jupyter / Databricks notebooks demo
 
 https://github.com/kaiko-ai/typedspark/assets/47976799/39e157c3-6db0-436a-9e72-44b2062df808
 
-You can find the corresponding code [here](https://github.com/kaiko-ai/docs/videos/notebook.ipynb).
+You can find the corresponding code [here](docs/videos/notebook.ipynb).
 
 ## FAQ
 

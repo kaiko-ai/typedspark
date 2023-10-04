@@ -57,8 +57,8 @@ By default, ``typedspark`` does not list ``pyspark`` as a dependency, since many
 Demo videos
 ===========
 
-* IDE demo: `video <https://github.com/kaiko-ai/typedspark/assets/47976799/e6f7fa9c-6d14-4f68-baba-fe3c22f75b67>`_ and `code <https://github.com/kaiko-ai/docs/videos/ide.ipynb>`_.
-* Jupyter / Databricks Notebook demo: `video <https://github.com/kaiko-ai/typedspark/assets/47976799/39e157c3-6db0-436a-9e72-44b2062df808>`_ and `code <https://github.com/kaiko-ai/docs/videos/notebook.ipynb>`_.
+* IDE demo: `video <https://github.com/kaiko-ai/typedspark/assets/47976799/e6f7fa9c-6d14-4f68-baba-fe3c22f75b67>`_ and `code <https://github.com/kaiko-ai/blob/main/docs/videos/ide.ipynb>`_.
+* Jupyter / Databricks Notebook demo: `video <https://github.com/kaiko-ai/typedspark/assets/47976799/39e157c3-6db0-436a-9e72-44b2062df808>`_ and `code <https://github.com/kaiko-ai/blob/main/docs/videos/notebook.ipynb>`_.
 
 FAQ
 ===
