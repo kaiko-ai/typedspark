@@ -50,7 +50,6 @@ https://github.com/kaiko-ai/typedspark/assets/47976799/5ba89ef6-e79f-4a7b-bfe7-1
 
 You can find the corresponding code [here](docs/videos/notebook.ipynb).
 
-
 ## Installation
 
 You can install ``typedspark`` from [pypi](https://pypi.org/project/typedspark/) by running:
