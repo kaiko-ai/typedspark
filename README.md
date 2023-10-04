@@ -41,10 +41,11 @@ The advantages include:
 
 ### IDE demo
 
-
+https://github.com/kaiko-ai/typedspark/assets/47976799/986256c2-0438-430e-bfb0-72f117593d2c
 
 ### Jupyter / Databricks notebooks demo
 
+https://github.com/kaiko-ai/typedspark/assets/47976799/5ba89ef6-e79f-4a7b-bfe7-1da652ae5da8
 
 ## Installation
 
