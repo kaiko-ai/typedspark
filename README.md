@@ -36,6 +36,9 @@ The advantages include:
 * Easier unit testing through the generation of empty ``DataSets`` based on their schemas
 * Improved documentation of tables
 
+## Documentation
+Please see our documentation on [readthedocs](https://typedspark.readthedocs.io/en/latest/index.html).
+
 ## Demo videos
 
 ### IDE demo
@@ -62,9 +65,6 @@ By default, ``typedspark`` does not list ``pyspark`` as a dependency, since many
 ```bash
 pip install "typedspark[pyspark]"
 ```
-
-## Documentation
-Please see our documentation on [readthedocs](https://typedspark.readthedocs.io/en/latest/index.html).
 
 ## FAQ
 

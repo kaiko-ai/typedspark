@@ -54,11 +54,6 @@ By default, ``typedspark`` does not list ``pyspark`` as a dependency, since many
 
     pip install "typedspark[pyspark]"
 
-
-Documentation
-=================
-Please see our documentation on `readthedocs <https://typedspark.readthedocs.io/en/latest/index.html>`_.
-
 FAQ
 ===
 
