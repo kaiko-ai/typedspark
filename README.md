@@ -36,17 +36,6 @@ The advantages include:
 * Easier unit testing through the generation of empty ``DataSets`` based on their schemas
 * Improved documentation of tables
 
-## Demos
-
-
-### IDE demo
-
-https://github.com/kaiko-ai/typedspark/assets/47976799/986256c2-0438-430e-bfb0-72f117593d2c
-
-### Jupyter / Databricks notebooks demo
-
-https://github.com/kaiko-ai/typedspark/assets/47976799/5ba89ef6-e79f-4a7b-bfe7-1da652ae5da8
-
 ## Installation
 
 You can install ``typedspark`` from [pypi](https://pypi.org/project/typedspark/) by running:
@@ -62,6 +51,16 @@ pip install "typedspark[pyspark]"
 
 ## Documentation
 Please see our documentation on [readthedocs](https://typedspark.readthedocs.io/en/latest/index.html).
+
+## Demos
+
+### IDE demo
+
+https://github.com/kaiko-ai/typedspark/assets/47976799/986256c2-0438-430e-bfb0-72f117593d2c
+
+### Jupyter / Databricks notebooks demo
+
+https://github.com/kaiko-ai/typedspark/assets/47976799/5ba89ef6-e79f-4a7b-bfe7-1da652ae5da8
 
 ## FAQ
 
