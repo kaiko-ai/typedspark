@@ -39,6 +39,19 @@ The advantages include:
 ## Documentation
 Please see our documentation on [readthedocs](https://typedspark.readthedocs.io/en/latest/index.html).
 
+## Installation
+
+You can install ``typedspark`` from [pypi](https://pypi.org/project/typedspark/) by running:
+
+```bash
+pip install typedspark
+```
+By default, ``typedspark`` does not list ``pyspark`` as a dependency, since many platforms (e.g. Databricks) come with ``pyspark`` preinstalled.  If you want to install ``typedspark`` with ``pyspark``, you can run:
+
+```bash
+pip install "typedspark[pyspark]"
+```
+
 ## Demo videos
 
 ### IDE demo
@@ -52,19 +65,6 @@ You can find the corresponding code [here](docs/videos/ide.ipynb).
 https://github.com/kaiko-ai/typedspark/assets/47976799/39e157c3-6db0-436a-9e72-44b2062df808
 
 You can find the corresponding code [here](docs/videos/notebook.ipynb).
-
-## Installation
-
-You can install ``typedspark`` from [pypi](https://pypi.org/project/typedspark/) by running:
-
-```bash
-pip install typedspark
-```
-By default, ``typedspark`` does not list ``pyspark`` as a dependency, since many platforms (e.g. Databricks) come with ``pyspark`` preinstalled.  If you want to install ``typedspark`` with ``pyspark``, you can run:
-
-```bash
-pip install "typedspark[pyspark]"
-```
 
 ## FAQ
 
