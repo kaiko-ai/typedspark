@@ -31,7 +31,6 @@ repos:
     entry: black --check
     language: system
     files: \.(py|ipynb)$
-    # types: [python, ipynb]
   - id: isort
     name: isort
     entry: isort --check
