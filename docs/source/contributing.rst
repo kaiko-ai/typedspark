@@ -42,7 +42,7 @@ Since they rarely fail, this shouldn't be a problem. We recommend that you test 
 ---------
 Notebooks
 ---------
-If you make changes that affect the documentation, please rerun the documentation notebooks in ``docs/source/``. You can do so by running the following command in the root of the repository:
+If you make changes that affect the documentation, please rerun the documentation notebooks in ``docs/``. You can do so by running the following command in the root of the repository:
 
 .. code-block:: bash
 
