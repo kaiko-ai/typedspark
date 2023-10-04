@@ -6,3 +6,4 @@ Advanced Topics
    subclassing_schemas
    column_ambiguity
    advanced_linting_support
+   dataset_implements
