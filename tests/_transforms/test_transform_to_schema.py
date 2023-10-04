@@ -102,7 +102,7 @@ def test_transform_to_schema_with_column_disambiguation(spark: SparkSession):
     df_b = create_partially_filled_dataset(
         spark,
         PersonB,
-        {PersonB.name: ["John", "Jane", "Bob"], PersonB.age: [30, 40, 50]},
+        {PersonB.name: ["John", "Jane", "Bob"], PersonB.age: [31, 41, 51]},
     )
 
     person_a = register_schema_to_dataset(df_a, PersonA)
@@ -117,6 +117,30 @@ def test_transform_to_schema_with_column_disambiguation(spark: SparkSession):
                 person_b.age: person_b.age + 5,
             },
         )
+
+    with pytest.raises(ValueError):
+        transform_to_schema(
+            df_a.join(df_b, person_a.name == person_b.name),
+            PersonA,
+            {
+                PersonA.age: person_a.age,
+            },
+        )
+
+    res = transform_to_schema(
+        df_a.join(df_b, person_a.name == person_b.name),
+        PersonA,
+        {
+            PersonA.name: person_a.name,
+            PersonB.age: person_b.age,
+        },
+    )
+    expected = create_partially_filled_dataset(
+        spark,
+        PersonA,
+        {PersonA.name: ["John", "Jane", "Bob"], PersonA.age: [31, 41, 51]},
+    )
+    assert_df_equality(res, expected, ignore_row_order=True)
 
 
 def test_transform_to_schema_with_double_column(spark: SparkSession):
