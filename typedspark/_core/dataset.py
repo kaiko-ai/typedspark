@@ -186,7 +186,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         if name == "__orig_class__":
             orig_class_args = get_args(self.__orig_class__)
             if orig_class_args:
-                self._schema_annotations = orig_class_args[0]
+                self._schema_annotations: Type[_Schema] = orig_class_args[0]
                 validate_schema(
                     self._schema_annotations.get_structtype(),
                     deepcopy(self.schema),
