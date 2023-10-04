@@ -30,7 +30,7 @@ repos:
     name: black
     entry: black --check
     language: system
-    types: [python]
+    files: \.(py|ipynb)$
   - id: isort
     name: isort
     entry: isort --check
