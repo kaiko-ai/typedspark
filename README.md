@@ -40,13 +40,13 @@ The advantages include:
 
 ### IDE demo
 
-https://github.com/kaiko-ai/typedspark/assets/47976799/986256c2-0438-430e-bfb0-72f117593d2c
+https://github.com/kaiko-ai/typedspark/assets/47976799/e6f7fa9c-6d14-4f68-baba-fe3c22f75b67
 
 You can find the corresponding code [here](docs/videos/ide.ipynb).
 
 ### Jupyter / Databricks notebooks demo
 
-https://github.com/kaiko-ai/typedspark/assets/47976799/5ba89ef6-e79f-4a7b-bfe7-1da652ae5da8
+https://github.com/kaiko-ai/typedspark/assets/47976799/39e157c3-6db0-436a-9e72-44b2062df808
 
 You can find the corresponding code [here](docs/videos/notebook.ipynb).
 
