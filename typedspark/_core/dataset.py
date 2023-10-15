@@ -32,12 +32,32 @@ _ReturnType = TypeVar("_ReturnType", bound=DataFrame)  # pylint: disable=C0103
 
 
 class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
-    """TODO."""
+    """DataSetImplements allows us to define functions such as:
+
+    .. code-block:: python
+        class Age(Schema, Protocol):
+            age: Column[LongType]
+
+        def birthday(df: DataSetImplements[Age, T]) -> DataSet[T]:
+            return transform_to_schema(
+                df,
+                df.typedspark_schema,
+                {Age.age: Age.age + 1},
+            )
+
+    Such a function:
+    1. Takes as an input ``DataSetImplements[Age, T]``: a ``DataSet`` that implements the protocol
+       ``Age`` as ``T``.
+    2. Returns a ``DataSet[T]``: a ``DataSet`` of the same type as the one that was provided.
+
+    ``DataSetImplements`` should solely be used as a type annotation, it is never initialized."""
 
     _schema_annotations: Type[_Implementation]
 
     def __init__(self):
-        raise NotImplementedError("TODO")  # pragma: no cover
+        raise NotImplementedError(
+            "DataSetImplements should solely be used as a type annotation, it is never initialized."
+        )
 
     @property
     def typedspark_schema(self) -> Type[_Implementation]:
