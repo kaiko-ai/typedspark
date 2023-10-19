@@ -48,4 +48,8 @@ jobs:
           coverage report -m --fail-under 100
       - name: Run notebooks
         run: |
-          for FILE in docs/*/*.ipynb; do papermill $FILE output.json -k python3; done
+          for FILE in docs/*/*.ipynb; do
+            BASE=$(basename $FILE)
+            cp $FILE .
+            jupyter nbconvert --to notebook $BASE --execute
+          done

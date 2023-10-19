@@ -32,12 +32,6 @@ def remove_spark_warnings(cell):
         cell.outputs = outputs
 
 
-def remove_papermill_metadata(nb):
-    """Removes the papermill metadata from a notebook."""
-    if "papermill" in nb.metadata.keys():
-        nb.metadata.pop("papermill")
-
-
 if __name__ == "__main__":
     FILENAME = sys.argv[1]
     nb = nbformat.read(FILENAME, as_version=4)
@@ -45,7 +39,5 @@ if __name__ == "__main__":
     for nb_cell in nb["cells"]:
         clear_metadata(nb_cell)
         remove_spark_warnings(nb_cell)
-
-    remove_papermill_metadata(nb)
 
     nbformat.write(nb, FILENAME)
