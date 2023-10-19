@@ -8,7 +8,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
@@ -48,4 +48,8 @@ jobs:
           coverage report -m --fail-under 100
       - name: Run notebooks
         run: |
-          for FILE in docs/*/*.ipynb; do papermill $FILE output.json -k python3; done
+          for FILE in docs/*/*.ipynb; do
+            BASE=$(basename $FILE)
+            cp $FILE .
+            jupyter nbconvert --to notebook $BASE --execute
+          done
