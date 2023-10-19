@@ -27,6 +27,11 @@ def remove_spark_warnings(cell):
                     continue
                 if "WARN Utils: Service 'SparkUI' could not bind on port" in output.text:
                     continue
+                if (
+                    "FutureWarning: is_datetime64tz_dtype is deprecated and will be removed in a future version."  # noqa: E501
+                    in output.text
+                ):
+                    continue
             outputs.append(output)
 
         cell.outputs = outputs
