@@ -95,6 +95,9 @@ class DataSet(DataFrame, Generic[T]):
     don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
     such that the docstring from the parent will appear."""
 
+    def alias(self, alias: str) -> "DataSet[T]":
+        return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
+
     def distinct(self) -> "DataSet[T]":  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
