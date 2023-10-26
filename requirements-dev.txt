@@ -16,7 +16,7 @@ types-setuptools==68.2.0.0
 # testing
 pytest==7.4.3
 coverage==7.3.2
-pandas==2.1.1
+pandas==2.1.2
 setuptools==68.2.2
 chispa==0.9.4
 # notebooks
