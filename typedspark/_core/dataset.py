@@ -68,6 +68,9 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
     such that the docstring from the parent will appear."""
 
+    def alias(self, alias: str) -> DataSet[_Implementation]:
+        return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
+
     def distinct(self) -> DataSet[_Implementation]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 

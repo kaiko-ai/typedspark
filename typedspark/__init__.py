@@ -21,7 +21,10 @@ from typedspark._utils.create_dataset import (
 )
 from typedspark._utils.databases import Catalogs, Database, Databases
 from typedspark._utils.load_table import create_schema, load_table
-from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
+from typedspark._utils.register_schema_to_dataset import (
+    register_schema_to_dataset,
+    register_schema_to_dataset_with_alias,
+)
 
 __all__ = [
     "ArrayType",
@@ -45,6 +48,7 @@ __all__ = [
     "create_schema",
     "load_table",
     "register_schema_to_dataset",
+    "register_schema_to_dataset_with_alias",
     "structtype_column",
     "transform_to_schema",
 ]

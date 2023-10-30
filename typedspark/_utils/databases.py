@@ -62,6 +62,17 @@ db = Databases(spark, catalog_name=...)
 """
 
 
+def _get_spark_session(spark: Optional[SparkSession]) -> SparkSession:
+    if spark is not None:
+        return spark
+
+    spark = SparkSession.getActiveSession()
+    if spark is not None:
+        return spark
+
+    raise ValueError("No active SparkSession found.")  # pragma: no cover
+
+
 class Table:
     """Loads a table in a database."""
 
@@ -101,7 +112,14 @@ class Table:
 class Database:
     """Loads all tables in a database."""
 
-    def __init__(self, spark: SparkSession, db_name: str, catalog_name: Optional[str] = None):
+    def __init__(
+        self,
+        spark: Optional[SparkSession] = None,
+        db_name: str = "default",
+        catalog_name: Optional[str] = None,
+    ):
+        spark = _get_spark_session(spark)
+
         if catalog_name is None:
             self._db_name = db_name
         else:
@@ -125,8 +143,13 @@ class Databases:
     """Loads all databases and tables in a SparkSession."""
 
     def __init__(
-        self, spark: SparkSession, silent: bool = False, catalog_name: Optional[str] = None
+        self,
+        spark: Optional[SparkSession] = None,
+        silent: bool = False,
+        catalog_name: Optional[str] = None,
     ):
+        spark = _get_spark_session(spark)
+
         if catalog_name is None:
             query = "show databases"
         else:
@@ -156,7 +179,9 @@ class Databases:
 class Catalogs:
     """Loads all catalogs, databases and tables in a SparkSession."""
 
-    def __init__(self, spark: SparkSession, silent: bool = False):
+    def __init__(self, spark: Optional[SparkSession] = None, silent: bool = False):
+        spark = _get_spark_session(spark)
+
         catalogs = spark.sql("show catalogs").collect()
         timeout = CatalogsTimeout(silent, n=len(catalogs))
 

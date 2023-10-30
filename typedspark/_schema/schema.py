@@ -42,6 +42,7 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
     """
 
     _parent: Optional[Union[DataFrame, Column]] = None
+    _alias: Optional[str] = None
     _current_id: Optional[int] = None
     _original_name: Optional[str] = None
 
@@ -93,6 +94,7 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
                 dtype=cls._get_dtype(name),  # type: ignore
                 parent=cls._parent,
                 curid=cls._current_id,
+                alias=cls._alias,
             )
 
         raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")

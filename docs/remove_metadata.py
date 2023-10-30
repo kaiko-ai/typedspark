@@ -27,15 +27,14 @@ def remove_spark_warnings(cell):
                     continue
                 if "WARN Utils: Service 'SparkUI' could not bind on port" in output.text:
                     continue
+                if (
+                    "FutureWarning: is_datetime64tz_dtype is deprecated and will be removed in a future version."  # noqa: E501
+                    in output.text
+                ):
+                    continue
             outputs.append(output)
 
         cell.outputs = outputs
-
-
-def remove_papermill_metadata(nb):
-    """Removes the papermill metadata from a notebook."""
-    if "papermill" in nb.metadata.keys():
-        nb.metadata.pop("papermill")
 
 
 if __name__ == "__main__":
@@ -45,7 +44,5 @@ if __name__ == "__main__":
     for nb_cell in nb["cells"]:
         clear_metadata(nb_cell)
         remove_spark_warnings(nb_cell)
-
-    remove_papermill_metadata(nb)
 
     nbformat.write(nb, FILENAME)
