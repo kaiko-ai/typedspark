@@ -1,7 +1,9 @@
 """Module containing functions that are related to validating schema's at runtime."""
-from typing import Dict, Set
+from typing import Dict
 
 from pyspark.sql.types import ArrayType, DataType, MapType, StructField, StructType
+
+from typedspark._utils.create_dataset_from_structtype import create_schema_from_structtype
 
 
 def validate_schema(
@@ -11,7 +13,7 @@ def validate_schema(
     expected = unpack_schema(structtype_expected)
     observed = unpack_schema(structtype_observed)
 
-    check_names(set(expected.keys()), set(observed.keys()), schema_name)
+    check_names(expected, observed, schema_name)
     check_dtypes(expected, observed, schema_name)
 
 
@@ -31,15 +33,26 @@ def unpack_schema(schema: StructType) -> Dict[str, StructField]:
     return res
 
 
-def check_names(names_expected: Set[str], names_observed: Set[str], schema_name: str) -> None:
+def check_names(
+    expected: Dict[str, StructField], observed: Dict[str, StructField], schema_name: str
+) -> None:
     """Checks whether the observed and expected list of column names overlap.
 
     Is order insensitive.
     """
+    names_observed = set(observed.keys())
+    names_expected = set(expected.keys())
+
     diff = names_observed - names_expected
     if diff:
+        diff_schema = create_schema_from_structtype(
+            StructType([observed[colname] for colname in diff]), schema_name
+        )
         raise TypeError(
-            f"Data contains the following columns not present in schema {schema_name}: {diff}"
+            f"Data contains the following columns not present in schema {schema_name}: {diff}.\n\n"
+            "If you believe these columns should be part of the schema, consider adding the "
+            "following lines to it.\n\n"
+            f"{diff_schema.get_schema_definition_as_string(generate_imports=False)}"
         )
 
     diff = names_expected - names_observed
