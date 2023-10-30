@@ -31,6 +31,7 @@ class MetaSchema(type):
     """
 
     _parent: Optional[Union[DataFrame, Column]] = None
+    _alias: Optional[str] = None
     _current_id: Optional[int] = None
     _original_name: Optional[str] = None
 
@@ -78,6 +79,7 @@ class MetaSchema(type):
                 dtype=cls._get_dtype(name),  # type: ignore
                 parent=cls._parent,
                 curid=cls._current_id,
+                alias=cls._alias,
             )
 
         raise TypeError(f"Schema {cls.get_schema_name()} does not have attribute {name}.")
@@ -100,8 +102,8 @@ class MetaSchema(type):
         return list(get_type_hints(cls).keys())
 
     def all_column_names_except_for(cls, except_for: List[str]) -> List[str]:
-        """Returns all column names for a given schema except for the columns
-        specified in the ``except_for`` parameter."""
+        """Returns all column names for a given schema except for the columns specified
+        in the ``except_for`` parameter."""
         return list(name for name in get_type_hints(cls).keys() if name not in except_for)
 
     def get_snake_case(cls) -> str:
@@ -161,8 +163,7 @@ class MetaSchema(type):
         )
 
     def get_dlt_kwargs(cls, name: Optional[str] = None) -> DltKwargs:
-        """Creates a representation of the ``Schema`` to be used by Delta Live
-        Tables.
+        """Creates a representation of the ``Schema`` to be used by Delta Live Tables.
 
         .. code-block:: python
 

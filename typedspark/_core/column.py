@@ -37,6 +37,7 @@ class Column(SparkColumn, Generic[T]):
         curid: Optional[int] = None,
         dtype: Optional[T] = None,
         parent: Union[DataFrame, "Column", None] = None,
+        alias: Optional[str] = None,
     ):
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
@@ -55,10 +56,12 @@ class Column(SparkColumn, Generic[T]):
         column: SparkColumn
         if SparkSession.getActiveSession() is None:
             column = EmptyColumn()  # pragma: no cover
-        elif parent is None:
-            column = col(name)
-        else:
+        elif alias is not None:
+            column = col(f"{alias}.{name}")
+        elif parent is not None:
             column = parent[name]
+        else:
+            column = col(name)
 
         column.__class__ = Column
         return column
@@ -70,6 +73,7 @@ class Column(SparkColumn, Generic[T]):
         curid: Optional[int] = None,
         dtype: Optional[T] = None,
         parent: Union[DataFrame, "Column", None] = None,
+        alias: Optional[str] = None,
     ):
         # pylint: disable=unused-argument
         self.str = name
