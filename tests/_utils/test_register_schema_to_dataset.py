@@ -46,6 +46,7 @@ def test_register_schema_to_dataset(spark: SparkSession):
     job = register_schema_to_dataset(df_b, Job)
 
     assert person.get_schema_name() == "Person"
+    assert hash(person.a) != hash(Person.a)
 
     df_a.join(df_b, person.a == job.a)
 
