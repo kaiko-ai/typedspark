@@ -227,3 +227,106 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         """
         for field in self._schema_annotations.get_structtype().fields:
             self.schema[field.name].metadata = field.metadata
+
+    """The following functions are equivalent to their parents in ``DataSetImplements``. However,
+    to support functions like ``functools.reduce(DataSet.unionByName, datasets)``, we also add them
+    here. Unfortunately, this leads to some code redundancy, but we'll take that for granted."""
+
+    def alias(self, alias: str) -> DataSet[_Schema]:
+        return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
+
+    def distinct(self) -> DataSet[_Schema]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().distinct())  # type: ignore
+
+    def filter(self, condition) -> DataSet[_Schema]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
+
+    @overload
+    def join(  # type: ignore
+        self,
+        other: DataFrame,
+        on: Optional[  # pylint: disable=C0103
+            Union[str, List[str], SparkColumn, List[SparkColumn]]
+        ] = ...,
+        how: None = ...,
+    ) -> DataFrame:
+        ...  # pragma: no cover
+
+    @overload
+    def join(
+        self,
+        other: DataFrame,
+        on: Optional[  # pylint: disable=C0103
+            Union[str, List[str], SparkColumn, List[SparkColumn]]
+        ] = ...,
+        how: Literal["semi"] = ...,
+    ) -> DataSet[_Schema]:
+        ...  # pragma: no cover
+
+    @overload
+    def join(
+        self,
+        other: DataFrame,
+        on: Optional[  # pylint: disable=C0103
+            Union[str, List[str], SparkColumn, List[SparkColumn]]
+        ] = ...,
+        how: Optional[str] = ...,
+    ) -> DataFrame:
+        ...  # pragma: no cover
+
+    def join(  # pylint: disable=C0116
+        self,
+        other: DataFrame,
+        on: Optional[  # pylint: disable=C0103
+            Union[str, List[str], SparkColumn, List[SparkColumn]]
+        ] = None,
+        how: Optional[str] = None,
+    ) -> DataFrame:
+        return super().join(other, on, how)  # type: ignore
+
+    def orderBy(self, *args, **kwargs) -> DataSet[_Schema]:  # type: ignore  # noqa: N802, E501  # pylint: disable=C0116, C0103
+        return DataSet[self._schema_annotations](super().orderBy(*args, **kwargs))  # type: ignore
+
+    @overload
+    def transform(
+        self,
+        func: Callable[Concatenate[DataSet[_Schema], P], _ReturnType],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> _ReturnType:
+        ...  # pragma: no cover
+
+    @overload
+    def transform(self, func: Callable[..., DataFrame], *args: Any, **kwargs: Any) -> DataFrame:
+        ...  # pragma: no cover
+
+    def transform(  # pylint: disable=C0116
+        self, func: Callable[..., DataFrame], *args: Any, **kwargs: Any
+    ) -> DataFrame:
+        return super().transform(func, *args, **kwargs)
+
+    @overload
+    def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
+        self,
+        other: DataSet[_Schema],
+        allowMissingColumns: Literal[False] = ...,  # noqa: N803
+    ) -> DataSet[_Schema]:
+        ...  # pragma: no cover
+
+    @overload
+    def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
+        self,
+        other: DataFrame,
+        allowMissingColumns: bool = ...,  # noqa: N803
+    ) -> DataFrame:
+        ...  # pragma: no cover
+
+    def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
+        self,
+        other: DataFrame,
+        allowMissingColumns: bool = False,  # noqa: N803
+    ) -> DataFrame:
+        res = super().unionByName(other, allowMissingColumns)
+        if isinstance(other, DataSet) and other._schema_annotations == self._schema_annotations:
+            return DataSet[self._schema_annotations](res)  # type: ignore
+        return res  # pragma: no cover

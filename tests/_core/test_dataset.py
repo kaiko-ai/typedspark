@@ -1,3 +1,5 @@
+import functools
+
 import pandas as pd
 import pytest
 from pyspark.sql import SparkSession
@@ -94,3 +96,10 @@ def test_schema_property_of_dataset(spark: SparkSession):
 def test_initialize_dataset_implements(spark: SparkSession):
     with pytest.raises(NotImplementedError):
         DataSetImplements()
+
+
+def test_reduce(spark: SparkSession):
+    functools.reduce(
+        DataSet.unionByName,
+        [create_empty_dataset(spark, A), create_empty_dataset(spark, A)],
+    )
