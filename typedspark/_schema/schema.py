@@ -83,8 +83,9 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
         """
         if (
             name.startswith("__")
-            or name in ["_attributes", "_abc_impl", "_is_protocol", "_is_runtime_protocol"]
+            or name == "_attributes"
             or name in cls._attributes
+            or name in dir(Protocol)
         ):
             return object.__getattribute__(cls, name)
 
