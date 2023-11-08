@@ -65,8 +65,7 @@ def _replace_illegal_characters(column_name: str) -> str:
 
 
 def _create_schema(structtype: SparkStructType, schema_name: Optional[str] = None) -> Type[Schema]:
-    """Dynamically builds a ``Schema`` based on a ``DataFrame``'s
-    ``StructType``"""
+    """Dynamically builds a ``Schema`` based on a ``DataFrame``'s ``StructType``"""
     type_annotations = {}
     attributes: Dict[str, None] = {}
     for column in structtype:
@@ -85,9 +84,8 @@ def _create_schema(structtype: SparkStructType, schema_name: Optional[str] = Non
 
 
 def _extract_data_type(dtype: DataType, name: str) -> Type[DataType]:
-    """Given an instance of a ``DataType``, it extracts the corresponding
-    ``DataType`` class, potentially including annotations (e.g.
-    ``ArrayType[StringType]``)."""
+    """Given an instance of a ``DataType``, it extracts the corresponding ``DataType``
+    class, potentially including annotations (e.g. ``ArrayType[StringType]``)."""
     if isinstance(dtype, SparkArrayType):
         element_type = _extract_data_type(dtype.elementType, name)
         return ArrayType[element_type]  # type: ignore
@@ -117,7 +115,8 @@ def _extract_data_type(dtype: DataType, name: str) -> Type[DataType]:
 def create_schema(
     dataframe: DataFrame, schema_name: Optional[str] = None
 ) -> Tuple[DataSet[Schema], Type[Schema]]:
-    """This function inferres a ``Schema`` in a notebook based on a the provided ``DataFrame``.
+    """This function inferres a ``Schema`` in a notebook based on a the provided
+    ``DataFrame``.
 
     This allows for autocompletion on column names, amongst other
     things.
@@ -136,8 +135,8 @@ def create_schema(
 def load_table(
     spark: SparkSession, table_name: str, schema_name: Optional[str] = None
 ) -> Tuple[DataSet[Schema], Type[Schema]]:
-    """This function loads a ``DataSet``, along with its inferred ``Schema``,
-    in a notebook.
+    """This function loads a ``DataSet``, along with its inferred ``Schema``, in a
+    notebook.
 
     This allows for autocompletion on column names, amongst other
     things.
@@ -148,3 +147,6 @@ def load_table(
     """
     dataframe = spark.table(table_name)
     return create_schema(dataframe, schema_name)
+
+
+DataFrame.to_typedspark = create_schema  # type: ignore
