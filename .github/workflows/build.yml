@@ -49,9 +49,8 @@ jobs:
           coverage report -m --fail-under 100
       - name: Run notebooks
         run: |
-          find docs -path "docs/source/*.ipynb" -or -path "docs/videos/*.ipynb" | xargs -I{} -P 4 sh -c '
-            BASE=$(basename {})
-            cp {} .
-            jupyter nbconvert --to notebook $BASE --execute --inplace
-            rm $BASE
-          '
+          for FILE in docs/*/*.ipynb; do
+            BASE=$(basename $FILE)
+            cp $FILE .
+            jupyter nbconvert --to notebook $BASE --execute
+          done
