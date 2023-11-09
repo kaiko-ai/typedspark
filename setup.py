@@ -20,7 +20,7 @@ setup(
     description="Column-wise type annotations for pyspark DataFrames",
     keywords="pyspark spark typing type checking annotations",
     long_description=get_long_description(),
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     packages=find_packages(include=["typedspark", "typedspark.*"]),
     install_requires=get_requirements(),
     python_requires=">=3.9.0",

@@ -1,9 +1,12 @@
+import functools
+
 import pandas as pd
 import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import LongType, StringType
 
 from typedspark import Column, DataSet, Schema
+from typedspark._core.dataset import DataSetImplements
 from typedspark._utils.create_dataset import create_empty_dataset
 
 
@@ -88,3 +91,15 @@ def test_inherrited_functions_with_other_dataset(spark: SparkSession):
 def test_schema_property_of_dataset(spark: SparkSession):
     df = create_empty_dataset(spark, A)
     assert df.typedspark_schema == A
+
+
+def test_initialize_dataset_implements(spark: SparkSession):
+    with pytest.raises(NotImplementedError):
+        DataSetImplements()
+
+
+def test_reduce(spark: SparkSession):
+    functools.reduce(
+        DataSet.unionByName,
+        [create_empty_dataset(spark, A), create_empty_dataset(spark, A)],
+    )

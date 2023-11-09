@@ -11,8 +11,8 @@ T = TypeVar("T", bound=Schema)
 
 
 def create_empty_dataset(spark: SparkSession, schema: Type[T], n_rows: int = 3) -> DataSet[T]:
-    """Creates a ``DataSet`` with ``Schema`` schema, containing ``n_rows``
-    rows, filled with ``None`` values.
+    """Creates a ``DataSet`` with ``Schema`` schema, containing ``n_rows`` rows, filled
+    with ``None`` values.
 
     .. code-block:: python
 
@@ -85,8 +85,8 @@ def create_partially_filled_dataset(
 
 
 def create_structtype_row(schema: Type[T], data: Dict[Column, Any]) -> Row:
-    """Creates a ``Row`` with ``StructType`` schema, where ``data`` is a
-    mapping from column to data in the respective column."""
+    """Creates a ``Row`` with ``StructType`` schema, where ``data`` is a mapping from
+    column to data in the respective column."""
     data_with_string_index = {k.str: v for k, v in data.items()}
     data_converted = {
         k: data_with_string_index[k] if k in data_with_string_index else None

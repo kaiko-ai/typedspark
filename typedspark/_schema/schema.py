@@ -1,7 +1,18 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
 import inspect
 import re
-from typing import Any, Dict, List, Optional, Type, Union, get_args, get_type_hints
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Protocol,
+    Type,
+    Union,
+    _ProtocolMeta,
+    get_args,
+    get_type_hints,
+)
 
 from pyspark.sql import DataFrame
 from pyspark.sql.types import DataType, StructType
@@ -12,7 +23,7 @@ from typedspark._schema.get_schema_definition import get_schema_definition_as_st
 from typedspark._schema.structfield import get_structfield
 
 
-class MetaSchema(type):
+class MetaSchema(_ProtocolMeta):  # type: ignore
     """``MetaSchema`` is the metaclass of ``Schema``.
 
     It basically implements all functionality of ``Schema``. But since
@@ -45,7 +56,7 @@ class MetaSchema(type):
             extra = {attr: None for attr in dct["__annotations__"] if attr not in dct}
             dct = dict(dct, **extra)
 
-        return type.__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
     def __repr__(cls) -> str:
         return f"\n{str(cls)}"
@@ -70,7 +81,12 @@ class MetaSchema(type):
                 .select(A.a)
             )
         """
-        if name.startswith("__") or name == "_attributes" or name in cls._attributes:
+        if (
+            name.startswith("__")
+            or name == "_attributes"
+            or name in cls._attributes
+            or name in dir(Protocol)
+        ):
             return object.__getattribute__(cls, name)
 
         if name in get_type_hints(cls):
@@ -182,10 +198,10 @@ class MetaSchema(type):
         return cls._original_name if cls._original_name else cls.__name__
 
 
-class Schema(metaclass=MetaSchema):
-    # pylint: disable=missing-class-docstring
+class Schema(Protocol, metaclass=MetaSchema):
+    # pylint: disable=empty-docstring
     # Since docstrings are inherrited, and since we use docstrings to
     # annotate tables (see MetaSchema.get_dlt_kwargs()), we have chosen
-    # to not add a docstring to the Schema class (otherwise the Schema
+    # to add an empty docstring to the Schema class (otherwise the Schema
     # docstring would be added to any schema without a docstring).
-    pass
+    """"""
