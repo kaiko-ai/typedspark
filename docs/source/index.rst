@@ -1,7 +1,6 @@
 .. include:: README.rst
 
 .. toctree::
-   :hidden:
    
    README
    ide
