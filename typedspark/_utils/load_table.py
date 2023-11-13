@@ -85,3 +85,6 @@ def load_table(
     """
     dataframe = spark.table(table_name)
     return create_schema(dataframe, schema_name)
+
+
+DataFrame.to_typedspark = create_schema  # type: ignore
