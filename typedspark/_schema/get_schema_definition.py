@@ -142,9 +142,9 @@ def _replace_literal(
 
 
 def _add_subschemas(
-    schema: Type[Schema], 
-    add_subschemas: bool, 
-    include_docstring: bool, 
+    schema: Type[Schema],
+    add_subschemas: bool,
+    include_docstring: bool,
     include_documentation: bool
 ) -> str:
     """Identifies whether any ``Column`` are of the ``StructType`` type and generates
@@ -160,10 +160,10 @@ def _add_subschemas(
             lines += "\n\n"
             subschema: Type[Schema] = get_args(dtype)[0]
             lines += _build_schema_definition_string(
-                subschema, 
-                include_docstring, 
-                include_documentation, 
-                add_subschemas, 
+                subschema,
+                include_docstring,
+                include_documentation,
+                add_subschemas,
                 subschema.get_schema_name(),
             )
 
