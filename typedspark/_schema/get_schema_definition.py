@@ -14,6 +14,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 def get_schema_definition_as_string(
     schema: Type[Schema],
+    include_docstring: bool,
     include_documentation: bool,
     generate_imports: bool,
     add_subschemas: bool,
@@ -28,7 +29,7 @@ def get_schema_definition_as_string(
     """
     imports = get_schema_imports(schema, include_documentation) if generate_imports else ""
     schema_string = _build_schema_definition_string(
-        schema, include_documentation, add_subschemas, class_name
+        schema, include_docstring, include_documentation, add_subschemas, class_name
     )
 
     return imports + schema_string
@@ -36,6 +37,7 @@ def get_schema_definition_as_string(
 
 def _build_schema_definition_string(
     schema: Type[Schema],
+    include_docstring: bool,
     include_documentation: bool,
     add_subschemas: bool,
     class_name: str = "MyNewSchema",
@@ -43,13 +45,13 @@ def _build_schema_definition_string(
     """Return the code for a given ``Schema`` as a string."""
     lines = f"class {class_name}(Schema):\n"
 
-    if include_documentation:
+    if include_docstring:
         lines += _create_docstring(schema)
 
     lines += _add_lines_with_typehint(include_documentation, schema)
 
     if add_subschemas:
-        lines += _add_subschemas(schema, add_subschemas, include_documentation)
+        lines += _add_subschemas(schema, add_subschemas, include_docstring, include_documentation)
 
     return lines
 
@@ -139,7 +141,7 @@ def _replace_literal(
     )
 
 
-def _add_subschemas(schema: Type[Schema], add_subschemas: bool, include_documentation: bool) -> str:
+def _add_subschemas(schema: Type[Schema], add_subschemas: bool, include_docstring: bool, include_documentation: bool) -> str:
     """Identifies whether any ``Column`` are of the ``StructType`` type and generates
     their schema recursively."""
     lines = ""
@@ -153,7 +155,7 @@ def _add_subschemas(schema: Type[Schema], add_subschemas: bool, include_document
             lines += "\n\n"
             subschema: Type[Schema] = get_args(dtype)[0]
             lines += _build_schema_definition_string(
-                subschema, include_documentation, add_subschemas, subschema.get_schema_name()
+                subschema, include_docstring, include_documentation, add_subschemas, subschema.get_schema_name()
             )
 
     return lines

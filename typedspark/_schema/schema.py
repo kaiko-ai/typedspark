@@ -133,6 +133,7 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
     def get_schema_definition_as_string(
         cls,
         schema_name: Optional[str] = None,
+        include_docstring: bool = False,
         include_documentation: bool = False,
         generate_imports: bool = True,
         add_subschemas: bool = True,
@@ -142,6 +143,7 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
             schema_name = cls.get_schema_name()
         return get_schema_definition_as_string(
             cls,  # type: ignore
+            include_docstring,
             include_documentation,
             generate_imports,
             add_subschemas,
