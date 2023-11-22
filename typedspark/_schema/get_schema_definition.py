@@ -4,7 +4,11 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Type, get_args, get_origin, get_type_hints
 
-from typedspark._core.datatypes import DayTimeIntervalType, StructType, TypedSparkDataType
+from typedspark._core.datatypes import (
+    DayTimeIntervalType,
+    StructType,
+    TypedSparkDataType,
+)
 from typedspark._core.literaltype import IntervalType, LiteralType
 from typedspark._schema.get_schema_imports import get_schema_imports
 
@@ -27,7 +31,9 @@ def get_schema_definition_as_string(
     schema in your code base. When ``generate_imports`` is True, the
     required imports for the schema are included in the string.
     """
-    imports = get_schema_imports(schema, include_documentation) if generate_imports else ""
+    imports = (
+        get_schema_imports(schema, include_documentation) if generate_imports else ""
+    )
     schema_string = _build_schema_definition_string(
         schema, include_docstring, include_documentation, add_subschemas, class_name
     )
@@ -51,7 +57,9 @@ def _build_schema_definition_string(
     lines += _add_lines_with_typehint(include_documentation, schema)
 
     if add_subschemas:
-        lines += _add_subschemas(schema, add_subschemas, include_docstring, include_documentation)
+        lines += _add_subschemas(
+            schema, add_subschemas, include_docstring, include_documentation
+        )
 
     return lines
 
@@ -91,7 +99,9 @@ def _create_typehint_and_comment(col_type) -> list[str]:
     )
     typehint, comment = _extract_comment(typehint)
     typehint = _replace_literals(
-        typehint, replace_literals_in=DayTimeIntervalType, replace_literals_by=IntervalType
+        typehint,
+        replace_literals_in=DayTimeIntervalType,
+        replace_literals_by=IntervalType,
     )
     return [typehint, comment]
 
@@ -118,7 +128,9 @@ def _replace_literals(
     """
     mapping = replace_literals_by.get_inverse_dict()
     for original, replacement in mapping.items():
-        typehint = _replace_literal(typehint, replace_literals_in, original, replacement)
+        typehint = _replace_literal(
+            typehint, replace_literals_in, original, replacement
+        )
 
     return typehint
 
@@ -145,7 +157,7 @@ def _add_subschemas(
     schema: Type[Schema],
     add_subschemas: bool,
     include_docstring: bool,
-    include_documentation: bool
+    include_documentation: bool,
 ) -> str:
     """Identifies whether any ``Column`` are of the ``StructType`` type and generates
     their schema recursively."""
