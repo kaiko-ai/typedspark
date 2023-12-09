@@ -28,4 +28,4 @@ sphinx==7.2.6
 sphinx-rtd-theme==2.0.0
 nbsphinx==0.9.3
 # precommit hook
-pre-commit==3.5.0
+pre-commit==3.6.0
