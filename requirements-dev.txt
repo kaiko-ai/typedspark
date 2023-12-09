@@ -3,7 +3,7 @@ pyspark==3.5.0
 # linters
 flake8==6.1.0
 pylint==3.0.2
-bandit==1.7.5
+bandit==1.7.6
 black[jupyter]==23.11.0
 isort==5.12.0
 docformatter==1.7.5
