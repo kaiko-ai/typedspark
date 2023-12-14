@@ -123,23 +123,13 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     def orderBy(self, *args, **kwargs) -> DataSet[_Implementation]:  # type: ignore  # noqa: N802, E501  # pylint: disable=C0116, C0103
         return DataSet[self._schema_annotations](super().orderBy(*args, **kwargs))  # type: ignore
 
-    @overload
     def transform(
         self,
         func: Callable[Concatenate[DataSet[_Implementation], P], _ReturnType],
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> _ReturnType:
-        ...  # pragma: no cover
-
-    @overload
-    def transform(self, func: Callable[..., DataFrame], *args: Any, **kwargs: Any) -> DataFrame:
-        ...  # pragma: no cover
-
-    def transform(  # pylint: disable=C0116
-        self, func: Callable[..., DataFrame], *args: Any, **kwargs: Any
-    ) -> DataFrame:
-        return super().transform(func, *args, **kwargs)
+        return super().transform(func, *args, **kwargs)  # type: ignore
 
     @overload
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
@@ -287,23 +277,13 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
     def orderBy(self, *args, **kwargs) -> DataSet[_Schema]:  # type: ignore  # noqa: N802, E501  # pylint: disable=C0116, C0103
         return DataSet[self._schema_annotations](super().orderBy(*args, **kwargs))  # type: ignore
 
-    @overload
     def transform(
         self,
         func: Callable[Concatenate[DataSet[_Schema], P], _ReturnType],
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> _ReturnType:
-        ...  # pragma: no cover
-
-    @overload
-    def transform(self, func: Callable[..., DataFrame], *args: Any, **kwargs: Any) -> DataFrame:
-        ...  # pragma: no cover
-
-    def transform(  # pylint: disable=C0116
-        self, func: Callable[..., DataFrame], *args: Any, **kwargs: Any
-    ) -> DataFrame:
-        return super().transform(func, *args, **kwargs)
+        return super().transform(func, *args, **kwargs)  # type: ignore
 
     @overload
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
