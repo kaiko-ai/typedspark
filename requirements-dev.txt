@@ -14,7 +14,7 @@ autoflake==2.2.1
 pandas-stubs==2.1.4.231227
 types-setuptools==69.0.0.0
 # testing
-pytest==7.4.3
+pytest==7.4.4
 coverage==7.4.0
 pandas==2.1.4
 setuptools==69.0.3
