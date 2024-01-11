@@ -20,7 +20,7 @@ pandas==2.1.4
 setuptools==69.0.3
 chispa==0.9.4
 # notebooks
-nbconvert==7.14.0
+nbconvert==7.14.1
 jupyter==1.0.0
 nbformat==5.9.2
 # readthedocs
