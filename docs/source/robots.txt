@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /
+Allow: /en/stable/
+Allow: /en/latest/
+Sitemap: https://typedspark.readthedocs.io/sitemap.xml
