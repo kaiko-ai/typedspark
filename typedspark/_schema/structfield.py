@@ -47,8 +47,7 @@ def get_structfield(
 def get_structfield_meta(
     column: Union[Type[Column[_DataType]], Annotated[Type[Column[_DataType]], ColumnMeta]]
 ) -> ColumnMeta:
-    """Get the spark column metadata from the ``ColumnMeta`` data, when
-    available."""
+    """Get the spark column metadata from the ``ColumnMeta`` data, when available."""
     return next((x for x in get_args(column) if isinstance(x, ColumnMeta)), ColumnMeta())
 
 
@@ -73,8 +72,7 @@ def _get_column_from_annotation(
     column: Annotated[Type[Column[_DataType]], ColumnMeta],
     colname: str,
 ) -> Type[Column[_DataType]]:
-    """Takes an ``Annotation[Column[...], ...]`` and returns the
-    ``Column[...]``."""
+    """Takes an ``Annotation[Column[...], ...]`` and returns the ``Column[...]``."""
     column = get_args(column)[0]
     if get_origin(column) != Column:
         raise TypeError(f"Column {colname} needs to have a Column[] within Annotated[].")
@@ -108,8 +106,8 @@ def _get_dtype(dtype: Type[DataType], colname: str) -> DataType:
 
 
 def _extract_arraytype(arraytype: Type[DataType], colname: str) -> SparkArrayType:
-    """Takes e.g. an ``ArrayType[StringType]`` and creates an
-    ``ArrayType(StringType(), True)``."""
+    """Takes e.g. an ``ArrayType[StringType]`` and creates an ``ArrayType(StringType(),
+    True)``."""
     params = get_args(arraytype)
     element_type = _get_dtype(params[0], colname)
     return SparkArrayType(element_type)
@@ -126,8 +124,8 @@ def _extract_maptype(maptype: Type[DataType], colname: str) -> SparkMapType:
 
 def _extract_structtype(structtype: Type[DataType]) -> SparkStructType:
     """Takes a ``StructType[Schema]`` annotation and creates a
-    ``StructType(schema_list)``, where ``schema_list`` contains all
-    ``StructField()`` defined in the ``Schema``."""
+    ``StructType(schema_list)``, where ``schema_list`` contains all ``StructField()``
+    defined in the ``Schema``."""
     params = get_args(structtype)
     schema: Type[Schema] = params[0]
     return schema.get_structtype()
