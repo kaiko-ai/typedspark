@@ -1,5 +1,5 @@
-"""Here, we make our own definitions of ``MapType``, ``ArrayType`` and ``StructType`` in
-order to allow e.g. for ``ArrayType[StringType]``."""
+"""Here, we make our own definitions of ``MapType``, ``ArrayType`` and
+``StructType`` in order to allow e.g. for ``ArrayType[StringType]``."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
