@@ -1,5 +1,5 @@
-"""Here, we make our own definitions of ``MapType``, ``ArrayType`` and
-``StructType`` in order to allow e.g. for ``ArrayType[StringType]``."""
+"""Here, we make our own definitions of ``MapType``, ``ArrayType`` and ``StructType`` in
+order to allow e.g. for ``ArrayType[StringType]``."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
 from pyspark.sql.types import DataType
 
 if TYPE_CHECKING:  # pragma: no cover
+    from typedspark._core.column import Column
     from typedspark._schema.schema import Schema
 
     _Schema = TypeVar("_Schema", bound=Schema)
@@ -55,7 +56,13 @@ class StructType(Generic[_Schema], TypedSparkDataType, metaclass=StructTypeMeta)
             job: Column[StructType[Job]]
     """
 
-    schema: Type[_Schema]
+    def __init__(
+        self,
+        schema: Type[_Schema],
+        parent: Column,
+    ) -> None:
+        self.schema = schema
+        self.schema._parent = parent
 
 
 class MapType(Generic[_KeyType, _ValueType], TypedSparkDataType):
