@@ -89,7 +89,9 @@ class Column(SparkColumn, Generic[T]):
         dtype = self._dtype
 
         if get_origin(dtype) == StructType:
-            schema = get_args(dtype)[0]
-            return StructType(schema, self)  # type: ignore
+            return StructType(
+                schema=get_args(dtype)[0],
+                parent=self,
+            )  # type: ignore
 
         return dtype()  # type: ignore
