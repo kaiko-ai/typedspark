@@ -160,9 +160,11 @@ def test_get_schema(schema: Type[Schema], expected_schema_definition: str):
 
 
 def test_dtype_attributes(spark: SparkSession):
-    assert ComplexDatatypes.value.dtype == typedspark.StructType[Values]
+    assert isinstance(A.a.dtype, LongType)
+    assert isinstance(ComplexDatatypes.items.dtype, typedspark.ArrayType)
+    assert isinstance(ComplexDatatypes.value.dtype, typedspark.StructType)
     assert ComplexDatatypes.value.dtype.schema == Values
-    assert ComplexDatatypes.value.dtype.schema.b.dtype == StringType
+    assert isinstance(ComplexDatatypes.value.dtype.schema.b.dtype, StringType)
 
     df = create_partially_filled_dataset(
         spark,
