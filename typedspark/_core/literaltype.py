@@ -1,5 +1,9 @@
-"""Defines ``LiteralTypes``, e.g. ``IntervalType.DAY``, that map their class attribute to a
-``Literal`` integer. Can be used for example in ``DayTimeIntervalType``."""
+"""Defines ``LiteralTypes``, e.g. ``IntervalType.DAY``, that map their class attribute
+to a ``Literal`` integer.
+
+Can be used for example in ``DayTimeIntervalType``.
+"""
+
 from typing import Dict, Literal
 
 

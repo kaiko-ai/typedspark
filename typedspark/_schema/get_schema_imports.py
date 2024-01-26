@@ -1,4 +1,5 @@
 """Builds an import statement for everything imported by a given ``Schema``."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Type, get_args, get_origin, get_type_hints

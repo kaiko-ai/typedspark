@@ -1,4 +1,5 @@
 """Utility functions for creating a ``Schema`` from a ``StructType``"""
+
 from typing import Dict, Literal, Optional, Type
 
 from pyspark.sql.types import ArrayType as SparkArrayType

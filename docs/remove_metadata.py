@@ -2,6 +2,7 @@
 
 Also removes the spark warnings from cells where the sparksession is initialized.
 """
+
 import sys
 
 import nbformat

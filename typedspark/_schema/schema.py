@@ -1,4 +1,5 @@
 """Module containing classes and functions related to TypedSpark Schemas."""
+
 import inspect
 import re
 from typing import (

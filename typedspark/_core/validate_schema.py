@@ -1,4 +1,5 @@
 """Module containing functions that are related to validating schema's at runtime."""
+
 from typing import Dict
 
 from pyspark.sql.types import ArrayType, DataType, MapType, StructField, StructType

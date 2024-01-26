@@ -1,4 +1,5 @@
 """Module containing classes and functions related to TypedSpark DataSets."""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -85,8 +86,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             Union[str, List[str], SparkColumn, List[SparkColumn]]
         ] = ...,
         how: None = ...,
-    ) -> DataFrame:
-        ...  # pragma: no cover
+    ) -> DataFrame: ...  # pragma: no cover
 
     @overload
     def join(
@@ -96,8 +96,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             Union[str, List[str], SparkColumn, List[SparkColumn]]
         ] = ...,
         how: Literal["semi"] = ...,
-    ) -> DataSet[_Implementation]:
-        ...  # pragma: no cover
+    ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     @overload
     def join(
@@ -107,8 +106,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             Union[str, List[str], SparkColumn, List[SparkColumn]]
         ] = ...,
         how: Optional[str] = ...,
-    ) -> DataFrame:
-        ...  # pragma: no cover
+    ) -> DataFrame: ...  # pragma: no cover
 
     def join(  # pylint: disable=C0116
         self,
@@ -136,16 +134,14 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         self,
         other: DataSet[_Implementation],
         allowMissingColumns: Literal[False] = ...,  # noqa: N803
-    ) -> DataSet[_Implementation]:
-        ...  # pragma: no cover
+    ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     @overload
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
         self,
         other: DataFrame,
         allowMissingColumns: bool = ...,  # noqa: N803
-    ) -> DataFrame:
-        ...  # pragma: no cover
+    ) -> DataFrame: ...  # pragma: no cover
 
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
         self,
@@ -239,8 +235,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             Union[str, List[str], SparkColumn, List[SparkColumn]]
         ] = ...,
         how: None = ...,
-    ) -> DataFrame:
-        ...  # pragma: no cover
+    ) -> DataFrame: ...  # pragma: no cover
 
     @overload
     def join(
@@ -250,8 +245,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             Union[str, List[str], SparkColumn, List[SparkColumn]]
         ] = ...,
         how: Literal["semi"] = ...,
-    ) -> DataSet[_Schema]:
-        ...  # pragma: no cover
+    ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     @overload
     def join(
@@ -261,8 +255,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             Union[str, List[str], SparkColumn, List[SparkColumn]]
         ] = ...,
         how: Optional[str] = ...,
-    ) -> DataFrame:
-        ...  # pragma: no cover
+    ) -> DataFrame: ...  # pragma: no cover
 
     def join(  # pylint: disable=C0116
         self,
@@ -290,16 +283,14 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         self,
         other: DataSet[_Schema],
         allowMissingColumns: Literal[False] = ...,  # noqa: N803
-    ) -> DataSet[_Schema]:
-        ...  # pragma: no cover
+    ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     @overload
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
         self,
         other: DataFrame,
         allowMissingColumns: bool = ...,  # noqa: N803
-    ) -> DataFrame:
-        ...  # pragma: no cover
+    ) -> DataFrame: ...  # pragma: no cover
 
     def unionByName(  # noqa: N802  # pylint: disable=C0116, C0103
         self,
