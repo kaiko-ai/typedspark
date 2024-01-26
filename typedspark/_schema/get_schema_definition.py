@@ -1,4 +1,5 @@
 """Module to output a string with the ``Schema`` definition of a given ``DataFrame``."""
+
 from __future__ import annotations
 
 import re

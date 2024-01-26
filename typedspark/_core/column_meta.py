@@ -1,4 +1,5 @@
 """Metadata for ``Column`` objects that can be accessed during runtime."""
+
 from dataclasses import dataclass
 from typing import Dict, Optional
 
