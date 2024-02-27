@@ -153,6 +153,48 @@ def test_databases_with_table(spark: SparkSession):
     _drop_table(spark, "default.table_b")
 
 
+def test_databases_with_table_name_starting_with_underscore(spark: SparkSession):
+    df = create_empty_dataset(spark, A)
+    df.write.saveAsTable("default._table_b")
+
+    try:
+        db = Databases(spark)
+        df_loaded, _ = db.default.u_table_b()  # type: ignore
+        assert_df_equality(df, df_loaded)
+        assert db.default.u_table_b.str == "default._table_b"  # type: ignore
+    except Exception as exception:
+        _drop_table(spark, "default._table_b")
+        raise exception
+
+    _drop_table(spark, "default._table_b")
+
+
+def test_databases_with_table_name_starting_with_underscore_with_naming_conflict(
+    spark: SparkSession,
+):
+    df_a = create_empty_dataset(spark, A)
+    df_b = create_empty_dataset(spark, B)
+    df_a.write.saveAsTable("default._table_b")
+    df_b.write.saveAsTable("default.u_table_b")
+
+    try:
+        db = Databases(spark)
+        df_loaded, _ = db.default.u__table_b()  # type: ignore
+        assert_df_equality(df_a, df_loaded)
+        assert db.default.u__table_b.str == "default._table_b"  # type: ignore
+
+        df_loaded, _ = db.default.u_table_b()  # type: ignore
+        assert_df_equality(df_b, df_loaded)
+        assert db.default.u_table_b.str == "default.u_table_b"  # type: ignore
+    except Exception as exception:
+        _drop_table(spark, "default._table_b")
+        _drop_table(spark, "default.u_table_b")
+        raise exception
+
+    _drop_table(spark, "default._table_b")
+    _drop_table(spark, "default.u_table_b")
+
+
 def test_catalogs(spark: SparkSession):
     df = create_empty_dataset(spark, A)
     df.write.saveAsTable("spark_catalog.default.table_b")
