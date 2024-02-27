@@ -73,6 +73,34 @@ def _get_spark_session(spark: Optional[SparkSession]) -> SparkSession:
     raise ValueError("No active SparkSession found.")  # pragma: no cover
 
 
+def _resolve_names_starting_with_an_underscore(name: str, names: list[str]) -> str:
+    """Autocomplete is currently problematic when a name (of a table, database, or
+    catlog) starts with an underscore.
+
+    In this case, it's considered a private attribute and it doesn't show up in the
+    autocomplete options in your notebook. To combat this behaviour, we add a u as a
+    prefix, followed by as many underscores as needed (up to 100) to keep the name
+    unique.
+    """
+    if not name.startswith("_"):
+        return name
+
+    prefix = "u"
+    proposed_name = prefix + name
+    i = 0
+    while proposed_name in names:
+        prefix = prefix + "_"
+        proposed_name = prefix + name
+        i += 1
+        if i > 100:
+            raise Exception(
+                "Couldn't find a unique name, even when adding 100 underscores. This seems unlikely"
+                " behaviour, exiting to prevent an infinite loop."
+            )  # pragma: no cover
+
+    return proposed_name
+
+
 class Table:
     """Loads a table in a database."""
 
@@ -126,11 +154,13 @@ class Database:
             self._db_name = f"{catalog_name}.{db_name}"
 
         tables = spark.sql(f"show tables from {self._db_name}").collect()
+        table_names = [table.tableName for table in tables]
+
         for table in tables:
-            table_name = table.tableName
+            escaped_name = _resolve_names_starting_with_an_underscore(table.tableName, table_names)
             self.__setattr__(
-                table_name,
-                Table(spark, self._db_name, table_name, table.isTemporary),
+                escaped_name,
+                Table(spark, self._db_name, table.tableName, table.isTemporary),
             )
 
     @property
@@ -156,12 +186,16 @@ class Databases:
             query = f"show databases in {catalog_name}"
 
         databases = spark.sql(query).collect()
+        database_names = [self._extract_db_name(database) for database in databases]
         timeout = DatabasesTimeout(silent, n=len(databases))
 
-        for i, database in enumerate(databases):
+        for i, db_name in enumerate(database_names):
             timeout.check_for_warning(i)
-            db_name = self._extract_db_name(database)
-            self.__setattr__(db_name, Database(spark, db_name, catalog_name))
+            escaped_name = _resolve_names_starting_with_an_underscore(db_name, database_names)
+            self.__setattr__(
+                escaped_name,
+                Database(spark, db_name, catalog_name),
+            )
 
     def _extract_db_name(self, database: Row) -> str:
         """Extracts the database name from a Row.
@@ -183,12 +217,13 @@ class Catalogs:
         spark = _get_spark_session(spark)
 
         catalogs = spark.sql("show catalogs").collect()
+        catalog_names = [catalog.catalog for catalog in catalogs]
         timeout = CatalogsTimeout(silent, n=len(catalogs))
 
-        for i, catalog in enumerate(catalogs):
+        for i, catalog_name in enumerate(catalog_names):
+            escaped_name = _resolve_names_starting_with_an_underscore(catalog_name, catalog_names)
             timeout.check_for_warning(i)
-            catalog_name: str = catalog.catalog
             self.__setattr__(
-                catalog_name,
+                escaped_name,
                 Databases(spark, silent=True, catalog_name=catalog_name),
             )
