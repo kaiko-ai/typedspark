@@ -1,3 +1,5 @@
+"""This module contains a function to replace illegal column names in a DataFrame."""
+
 import re
 from typing import Dict
 

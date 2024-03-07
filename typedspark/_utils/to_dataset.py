@@ -1,3 +1,6 @@
+"""Contains the to_dataset function, which converts a DataFrame to a DataSet and
+registers the Schema to the DataSet."""
+
 from typing import Tuple, Type, TypeVar
 
 from pyspark.sql import DataFrame
