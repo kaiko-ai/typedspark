@@ -25,6 +25,7 @@ from typedspark._utils.register_schema_to_dataset import (
     register_schema_to_dataset,
     register_schema_to_dataset_with_alias,
 )
+from typedspark._utils.to_dataset import to_dataset
 
 __all__ = [
     "ArrayType",
@@ -47,6 +48,7 @@ __all__ = [
     "create_structtype_row",
     "create_schema",
     "load_table",
+    "to_dataset",
     "register_schema_to_dataset",
     "register_schema_to_dataset_with_alias",
     "structtype_column",
