@@ -163,7 +163,8 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         Here, we simply take the provided ``df`` and cast it to a
         ``DataSet``. This allows us to bypass the ``DataFrame``
         constuctor in ``__init__()``, which requires parameters that may
-        be difficult to access.
+        be difficult to access. Subsequently, we perform schema validation, if
+        the schema annotations are provided.
         """
         dataframe = cast(DataSet, dataframe)
         dataframe.__class__ = DataSet
@@ -172,14 +173,10 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         # passed DataFrame
         dataframe._schema_annotations = None  # type: ignore
 
-        # then we use the class' schema annotations to validate the schema
+        # then we use the class' schema annotations to validate the schema and add metadata
         if hasattr(cls, "_schema_annotations"):
             dataframe._schema_annotations = cls._schema_annotations  # type: ignore
-            validate_schema(
-                dataframe._schema_annotations.get_structtype(),
-                deepcopy(dataframe.schema),
-                dataframe._schema_annotations.get_schema_name(),
-            )
+            dataframe._validate_schema()
             dataframe._add_schema_metadata()
 
         return dataframe  # type: ignore
@@ -188,9 +185,22 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         pass
 
     def __class_getitem__(cls, item):
+        """Allows us to define a schema for the ``DataSet``.
+
+        To make sure that the DataSet._schema_annotations variable isn't reused globally, we
+        generate a subclass of the ``DataSet`` with the schema annotations as a class variable.
+        """
         subclass_name = f"{cls.__name__}[{item.__name__}]"
         subclass = type(subclass_name, (cls,), {"_schema_annotations": item})
         return subclass
+
+    def _validate_schema(self) -> None:
+        """Validates the schema of the ``DataSet`` against the schema annotations."""
+        validate_schema(
+            self._schema_annotations.get_structtype(),
+            deepcopy(self.schema),
+            self._schema_annotations.get_schema_name(),
+        )
 
     def _add_schema_metadata(self) -> None:
         """Adds the ``ColumnMeta`` comments as metadata to the ``DataSet``.
