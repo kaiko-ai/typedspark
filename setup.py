@@ -1,5 +1,5 @@
 from setuptools import find_packages, setup
-import setuptools_scm
+import setuptools_scm  # type: ignore
 
 
 def get_requirements():
