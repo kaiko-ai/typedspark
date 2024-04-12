@@ -29,7 +29,7 @@ def foo(df: DataSet[Person]) -> DataSet[Person]:
 ```
 The advantages include:
 
-* Improved readibility of the code
+* Improved readability of the code
 * Typechecking, both during runtime and linting
 * Auto-complete of column names
 * Easy refactoring of column names
