@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+import setuptools_scm
 
 
 def get_requirements():
@@ -25,8 +26,7 @@ setup(
     install_requires=get_requirements(),
     python_requires=">=3.9.0",
     classifiers=["Programming Language :: Python", "Typing :: Typed"],
-    version_config=True,
-    setup_requires=["setuptools-git-versioning"],
+    version=setuptools_scm.get_version(),
     package_data={"typedspark": ["py.typed"]},
     extras_require={
         "pyspark": ["pyspark"],
