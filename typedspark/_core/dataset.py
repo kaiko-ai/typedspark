@@ -3,19 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import (
-    Any,
-    Callable,
-    Generic,
-    List,
-    Literal,
-    Optional,
-    Type,
-    TypeVar,
-    Union,
-    get_args,
-    overload,
-)
+from typing import Callable, Generic, List, Literal, Optional, Type, TypeVar, Union, cast, overload
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
@@ -177,31 +165,32 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         constuctor in ``__init__()``, which requires parameters that may
         be difficult to access.
         """
+        dataframe = cast(DataSet, dataframe)
         dataframe.__class__ = DataSet
+
+        # first we reset the schema annotations to None, in case they are inherrited through the
+        # passed DataFrame
+        dataframe._schema_annotations = None  # type: ignore
+
+        # then we use the class' schema annotations to validate the schema
+        if hasattr(cls, "_schema_annotations"):
+            dataframe._schema_annotations = cls._schema_annotations  # type: ignore
+            validate_schema(
+                dataframe._schema_annotations.get_structtype(),
+                deepcopy(dataframe.schema),
+                dataframe._schema_annotations.get_schema_name(),
+            )
+            dataframe._add_schema_metadata()
+
         return dataframe  # type: ignore
 
     def __init__(self, dataframe: DataFrame):
         pass
 
-    def __setattr__(self, name: str, value: Any) -> None:
-        """Python base function that sets attributes.
-
-        We listen here for the setting of ``__orig_class__``, which
-        contains the ``Schema`` of the ``DataSet``. Note that this gets
-        set after ``__new__()`` and ``__init__()`` are finished.
-        """
-        object.__setattr__(self, name, value)
-
-        if name == "__orig_class__":
-            orig_class_args = get_args(self.__orig_class__)
-            if orig_class_args:
-                self._schema_annotations: Type[_Schema] = orig_class_args[0]
-                validate_schema(
-                    self._schema_annotations.get_structtype(),
-                    deepcopy(self.schema),
-                    self._schema_annotations.get_schema_name(),
-                )
-                self._add_schema_metadata()
+    def __class_getitem__(cls, item):
+        subclass_name = f"{cls.__name__}[{item.__name__}]"
+        subclass = type(subclass_name, (cls,), {"_schema_annotations": item})
+        return subclass
 
     def _add_schema_metadata(self) -> None:
         """Adds the ``ColumnMeta`` comments as metadata to the ``DataSet``.
