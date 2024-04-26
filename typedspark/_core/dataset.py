@@ -60,6 +60,9 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     def alias(self, alias: str) -> DataSet[_Implementation]:
         return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
 
+    def cache(self) -> DataSet[_Implementation]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().cache())  # type: ignore
+
     def distinct(self) -> DataSet[_Implementation]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
@@ -219,6 +222,9 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
 
     def alias(self, alias: str) -> DataSet[_Schema]:
         return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
+
+    def cache(self) -> DataSet[_Schema]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().cache())  # type: ignore
 
     def distinct(self) -> DataSet[_Schema]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore

@@ -80,6 +80,7 @@ def test_inherrited_functions(spark: SparkSession):
     df = create_empty_dataset(spark, A)
 
     df.distinct()
+    df.cache()
     df.filter(A.a == 1)
     df.orderBy(A.a)
     df.transform(lambda df: df)
