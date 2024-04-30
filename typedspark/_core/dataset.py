@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Callable, Generic, List, Literal, Optional, Type, TypeVar, Union, cast, overload
 
+from pyspark import StorageLevel
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
 from typing_extensions import Concatenate, ParamSpec
@@ -59,6 +60,18 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
     def alias(self, alias: str) -> DataSet[_Implementation]:
         return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
+
+    def cache(self) -> DataSet[_Implementation]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().cache())  # type: ignore
+
+    def persist(
+        self,
+        storageLevel: StorageLevel = (StorageLevel.MEMORY_AND_DISK_DESER),
+    ) -> DataSet[_Implementation]:
+        return DataSet[self._schema_annotations](super().persist(storageLevel))  # type: ignore
+
+    def unpersist(self, blocking: bool = False) -> DataSet[_Implementation]:
+        return DataSet[self._schema_annotations](super().unpersist(blocking))  # type: ignore
 
     def distinct(self) -> DataSet[_Implementation]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
@@ -219,6 +232,18 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
 
     def alias(self, alias: str) -> DataSet[_Schema]:
         return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
+
+    def cache(self) -> DataSet[_Schema]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().cache())  # type: ignore
+
+    def persist(
+        self,
+        storageLevel: StorageLevel = (StorageLevel.MEMORY_AND_DISK_DESER),
+    ) -> DataSet[_Schema]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().persist(storageLevel))  # type: ignore
+
+    def unpersist(self, blocking: bool = False) -> DataSet[_Schema]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().unpersist(blocking))  # type: ignore
 
     def distinct(self) -> DataSet[_Schema]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore

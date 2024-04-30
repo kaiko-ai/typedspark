@@ -2,6 +2,7 @@ import functools
 
 import pandas as pd
 import pytest
+from pyspark import StorageLevel
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import LongType, StringType
 
@@ -80,9 +81,14 @@ def test_inherrited_functions(spark: SparkSession):
     df = create_empty_dataset(spark, A)
 
     df.distinct()
+    cached1: DataSet[A] = df.cache()
+    cached2: DataSet[A] = df.persist(StorageLevel.MEMORY_AND_DISK)
     df.filter(A.a == 1)
     df.orderBy(A.a)
     df.transform(lambda df: df)
+
+    cached1.unpersist(True)
+    cached2.unpersist(True)
 
 
 def test_inherrited_functions_with_other_dataset(spark: SparkSession):
