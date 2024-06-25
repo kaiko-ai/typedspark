@@ -2,6 +2,7 @@ import functools
 
 import pandas as pd
 import pytest
+from chispa import assert_df_equality  # type: ignore
 from pyspark import StorageLevel
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import LongType, StringType
@@ -138,3 +139,12 @@ def test_resetting_of_schema_annotations(spark: SparkSession):
     # and then to None again
     a = DataSet(df)
     assert a._schema_annotations is None
+
+
+def test_from_dataframe(spark: SparkSession):
+    df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
+    ds, schema = DataSet[A].from_dataframe(df)
+
+    assert isinstance(ds, DataSet)
+    assert issubclass(schema, A)
+    assert_df_equality(ds, df)
