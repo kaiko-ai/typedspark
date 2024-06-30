@@ -3,7 +3,19 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Callable, Generic, List, Literal, Optional, Type, TypeVar, Union, cast, overload
+from typing import (
+    Callable,
+    Generic,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 from pyspark import StorageLevel
 from pyspark.sql import Column as SparkColumn
@@ -12,6 +24,9 @@ from typing_extensions import Concatenate, ParamSpec
 
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
+from typedspark._transforms.transform_to_schema import transform_to_schema
+from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
+from typedspark._utils.replace_illegal_column_names import replace_illegal_column_names
 
 _Schema = TypeVar("_Schema", bound=Schema)
 _Protocol = TypeVar("_Protocol", bound=Schema, covariant=True)
@@ -54,9 +69,31 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         """Returns the ``Schema`` of the ``DataSet``."""
         return self._schema_annotations
 
-    """The following functions are equivalent to their parents in ``DataFrame``, but since they
-    don't affect the ``Schema``, we can add type annotations here. We're omitting docstrings,
-    such that the docstring from the parent will appear."""
+    @classmethod
+    def from_dataframe(
+        cls, df: DataFrame
+    ) -> Tuple[DataSet[_Implementation], Type[_Implementation]]:
+        """Converts a DataFrame to a DataSet and registers the Schema to the DataSet.
+
+        Also replaces "illegal" characters in the DataFrame's colnames (.e.g "test-result"
+        -> "test_result"), so they're compatible with the Schema (after all, Python doesn't allow
+        for characters such as dashes in attribute names).
+        """
+        if not hasattr(cls, "_schema_annotations"):  # pragma: no cover
+            raise SyntaxError("Please define a schema, e.g. `DataSet[Person].from_dataset(df)`.")
+
+        schema = cls._schema_annotations  # type: ignore
+
+        df = replace_illegal_column_names(df)
+        ds = transform_to_schema(df, schema)
+        schema = register_schema_to_dataset(ds, schema)
+        return ds, schema
+
+    """The following functions are equivalent to their parents in ``DataFrame``, but
+    since they don't affect the ``Schema``, we can add type annotations here.
+
+    We're omitting docstrings, such that the docstring from the parent will appear.
+    """
 
     def alias(self, alias: str) -> DataSet[_Implementation]:
         return DataSet[self._schema_annotations](super().alias(alias))  # type: ignore
