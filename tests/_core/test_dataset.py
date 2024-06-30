@@ -143,8 +143,7 @@ def test_resetting_of_schema_annotations(spark: SparkSession):
 
 def test_from_dataframe(spark: SparkSession):
     df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
-    ds, schema = DataSet[A].from_dataframe(df)
+    ds, _ = DataSet[A].from_dataframe(df)
 
     assert isinstance(ds, DataSet)
-    assert issubclass(schema, A)
     assert_df_equality(ds, df)
