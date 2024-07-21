@@ -25,6 +25,7 @@ from typing_extensions import Concatenate, ParamSpec
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 from typedspark._transforms.transform_to_schema import transform_to_schema
+from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
 _Schema = TypeVar("_Schema", bound=Schema)
 _Protocol = TypeVar("_Protocol", bound=Schema, covariant=True)
@@ -68,13 +69,9 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         return self._schema_annotations
 
     @classmethod
-    def from_dataframe(cls, df: DataFrame) -> Union[
-        DataSet[_Implementation],
-        Tuple[
-            DataSet[_Implementation],
-            Type[_Implementation],
-        ],
-    ]:
+    def from_dataframe(
+        cls, df: DataFrame
+    ) -> Tuple[DataSet[_Implementation], Type[_Implementation]]:
         """Converts a DataFrame to a DataSet and registers the Schema to the DataSet.
         Also renames the columns to their internal names, for example to deal with
         characters that are not allowed in class attribute names.
@@ -86,7 +83,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
                 age: Column[LongType]
 
             df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["first-name", "age"])
-            ds = DataSet[Person].from_dataframe(df)
+            ds, schema = DataSet[Person].from_dataframe(df)
         """
         if not hasattr(cls, "_schema_annotations"):  # pragma: no cover
             raise SyntaxError("Please define a schema, e.g. `DataSet[Person].from_dataset(df)`.")
@@ -98,8 +95,9 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
                 df = df.withColumnRenamed(
                     column.metadata.get("external_name", column.name), column.name
                 )
-
-        return transform_to_schema(df, schema)
+        df = transform_to_schema(df, schema)
+        schema = register_schema_to_dataset(df, schema)
+        return df, schema
 
     def to_dataframe(self) -> DataFrame:
         """Converts a DataSet to a DataFrame. Also renames the columns to their external
@@ -112,7 +110,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
                 age: Column[LongType]
 
             df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["name", "age"])
-            ds = DataSet[Person].from_dataframe(df)
+            ds, schema = DataSet[Person].from_dataframe(df)
             df = ds.to_dataframe()
         """
         df = cast(DataFrame, self)

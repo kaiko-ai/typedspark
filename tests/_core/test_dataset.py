@@ -145,7 +145,7 @@ def test_resetting_of_schema_annotations(spark: SparkSession):
 
 def test_from_dataframe(spark: SparkSession):
     df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
-    ds = DataSet[A].from_dataframe(df)
+    ds, _ = DataSet[A].from_dataframe(df)
 
     assert isinstance(ds, DataSet)
     assert_df_equality(ds, df)
@@ -163,7 +163,7 @@ class Person(Schema):
 
 def test_from_dataframe_with_external_name(spark: SparkSession):
     df = spark.createDataFrame([("Alice", 1), ("Bob", 2)], ["first-name", "age"])
-    ds = DataSet[Person].from_dataframe(df)
+    ds, _ = DataSet[Person].from_dataframe(df)
 
     assert isinstance(ds, DataSet)
     assert ds.columns == ["name", "age"]
