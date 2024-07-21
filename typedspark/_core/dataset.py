@@ -25,8 +25,6 @@ from typing_extensions import Concatenate, ParamSpec
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 from typedspark._transforms.transform_to_schema import transform_to_schema
-from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
-from typedspark._utils.replace_illegal_column_names import replace_illegal_column_names
 
 _Schema = TypeVar("_Schema", bound=Schema)
 _Protocol = TypeVar("_Protocol", bound=Schema, covariant=True)
@@ -70,24 +68,63 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         return self._schema_annotations
 
     @classmethod
-    def from_dataframe(
-        cls, df: DataFrame
-    ) -> Tuple[DataSet[_Implementation], Type[_Implementation]]:
+    def from_dataframe(cls, df: DataFrame) -> Union[
+        DataSet[_Implementation],
+        Tuple[
+            DataSet[_Implementation],
+            Type[_Implementation],
+        ],
+    ]:
         """Converts a DataFrame to a DataSet and registers the Schema to the DataSet.
+        Also renames the columns to their internal names, for example to deal with
+        characters that are not allowed in class attribute names.
 
-        Also replaces "illegal" characters in the DataFrame's colnames (.e.g "test-result"
-        -> "test_result"), so they're compatible with the Schema (after all, Python doesn't allow
-        for characters such as dashes in attribute names).
+        .. code-block:: python
+
+            class Person(Schema):
+                name: Annotation[Column[StringType], ColumnMeta(external_name="full-name")]
+                age: Column[LongType]
+
+            df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["first-name", "age"])
+            ds = DataSet[Person].from_dataframe(df)
         """
         if not hasattr(cls, "_schema_annotations"):  # pragma: no cover
             raise SyntaxError("Please define a schema, e.g. `DataSet[Person].from_dataset(df)`.")
 
         schema = cls._schema_annotations  # type: ignore
 
-        df = replace_illegal_column_names(df)
-        ds = transform_to_schema(df, schema)
-        schema = register_schema_to_dataset(ds, schema)
-        return ds, schema
+        for column in schema.get_structtype().fields:
+            if column.metadata:
+                df = df.withColumnRenamed(
+                    column.metadata.get("external_name", column.name), column.name
+                )
+
+        return transform_to_schema(df, schema)
+
+    def to_dataframe(self) -> DataFrame:
+        """Converts a DataSet to a DataFrame. Also renames the columns to their external
+        names.
+
+        .. code-block:: python
+
+            class Person(Schema):
+                name: Annotated[Column[StringType], ColumnMeta(external_name="full-name")]
+                age: Column[LongType]
+
+            df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["name", "age"])
+            ds = DataSet[Person].from_dataframe(df)
+            df = ds.to_dataframe()
+        """
+        df = cast(DataFrame, self)
+        df.__class__ = DataFrame
+
+        for column in self._schema_annotations.get_structtype().fields:
+            if column.metadata:
+                df = df.withColumnRenamed(
+                    column.name, column.metadata.get("external_name", column.name)
+                )
+
+        return df
 
     """The following functions are equivalent to their parents in ``DataFrame``, but
     since they don't affect the ``Schema``, we can add type annotations here.
