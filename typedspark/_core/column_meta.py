@@ -1,6 +1,6 @@
 """Metadata for ``Column`` objects that can be accessed during runtime."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Dict, Optional
 
 
@@ -23,4 +23,5 @@ class ColumnMeta:
 
     def get_metadata(self) -> Optional[Dict[str, str]]:
         """Returns the metadata of this column."""
-        return {"comment": self.comment} if self.comment else None
+        res = {k: v for k, v in asdict(self).items() if v is not None}
+        return res if len(res) > 0 else None
