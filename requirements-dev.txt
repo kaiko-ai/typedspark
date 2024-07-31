@@ -18,7 +18,7 @@ pytest==8.3.2
 coverage==7.6.0
 pandas==2.2.2
 setuptools==72.1.0
-chispa==0.10.0
+chispa==0.10.1
 # notebooks
 nbconvert==7.16.4
 jupyter==1.0.0
