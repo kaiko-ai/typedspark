@@ -20,7 +20,14 @@ class ColumnMeta:
     """
 
     comment: Optional[str] = None
+    external_name: Optional[str] = None
 
     def get_metadata(self) -> Optional[Dict[str, str]]:
         """Returns the metadata of this column."""
-        return {"comment": self.comment} if self.comment else None
+        res = {}
+        if self.comment:
+            res["comment"] = self.comment
+        if self.external_name:
+            res["external_name"] = self.external_name
+
+        return res if res else None
