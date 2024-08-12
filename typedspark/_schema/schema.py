@@ -198,6 +198,10 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
         """Returns the name with which the schema was initialized."""
         return cls._original_name if cls._original_name else cls.__name__
 
+    def get_metadata(cls) -> dict[str, dict[str, Any]]:
+        """Returns the metadata of each of the columns in the schema."""
+        return {field.name: field.metadata for field in cls.get_structtype().fields}
+
 
 class Schema(Protocol, metaclass=MetaSchema):
     # pylint: disable=empty-docstring
