@@ -1,10 +1,13 @@
+from dataclasses import dataclass
+from typing import Annotated
+
 import pandas as pd
 import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
 from pyspark.sql.types import LongType, StringType
 
-from typedspark import Column, Schema
+from typedspark import Column, ColumnMeta, Schema
 from typedspark._utils.create_dataset import create_partially_filled_dataset
 
 
@@ -41,3 +44,27 @@ def test_column_reference_without_spark_session():
 def test_column_with_deprecated_dataframe_param(spark: SparkSession):
     df = create_partially_filled_dataset(spark, A, {A.a: [1, 2, 3]})
     Column("a", dataframe=df)
+
+
+@dataclass
+class MyColumnMeta(ColumnMeta):
+    primary_key: bool = False
+
+
+class Persons(Schema):
+    id: Annotated[
+        Column[LongType],
+        MyColumnMeta(
+            comment="Identifies the person",
+            primary_key=True,
+        ),
+    ]
+    name: Column[StringType]
+    age: Column[LongType]
+
+
+def test_get_metadata():
+    assert Persons.get_metadata()["id"] == {
+        "comment": "Identifies the person",
+        "primary_key": True,
+    }
