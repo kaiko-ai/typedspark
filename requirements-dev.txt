@@ -8,7 +8,7 @@ black[jupyter]==24.8.0
 isort==5.13.2
 docformatter==1.7.5
 mypy==1.11.1
-pyright==1.1.375
+pyright==1.1.376
 autoflake==2.3.1
 # stubs
 pandas-stubs==2.2.2.240807
