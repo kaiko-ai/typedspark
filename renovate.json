@@ -4,5 +4,5 @@
     "config:base"
   ],
   "autoApprove": true,
-  "automerge": true,
+  "automerge": true
 }
