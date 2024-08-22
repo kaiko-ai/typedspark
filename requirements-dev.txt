@@ -12,7 +12,7 @@ pyright==1.1.377
 autoflake==2.3.1
 # stubs
 pandas-stubs==2.2.2.240807
-types-setuptools==72.2.0.20240821
+types-setuptools==73.0.0.20240822
 # testing
 pytest==8.3.2
 coverage==7.6.1
