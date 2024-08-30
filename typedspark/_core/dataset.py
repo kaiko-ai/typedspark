@@ -79,7 +79,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         .. code-block:: python
 
             class Person(Schema):
-                name: Annotation[Column[StringType], ColumnMeta(external_name="full-name")]
+                name: Annotation[Column[StringType], ColumnMeta(external_name="first-name")]
                 age: Column[LongType]
 
             df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["first-name", "age"])
