@@ -7,7 +7,6 @@ from pyspark.sql import DataFrame, SparkSession
 from typedspark._core.dataset import DataSet
 from typedspark._schema.schema import Schema
 from typedspark._utils.create_dataset_from_structtype import create_schema_from_structtype
-from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
 
 def create_schema(
@@ -24,9 +23,7 @@ def create_schema(
         df, Person = create_schema(df)
     """
     schema = create_schema_from_structtype(dataframe.schema, schema_name)
-    dataset = DataSet[schema](dataframe)  # type: ignore
-    schema = register_schema_to_dataset(dataset, schema)
-    return dataset, schema
+    return DataSet[schema].from_dataframe(dataframe)  # type: ignore
 
 
 def load_table(

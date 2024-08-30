@@ -1,13 +1,14 @@
 """Utility functions for creating a ``Schema`` from a ``StructType``"""
 
 import re
-from typing import Annotated, Dict, Literal, Optional, Type
+from typing import Annotated, Any, Dict, Literal, Optional, Tuple, Type
 
 from pyspark.sql.types import ArrayType as SparkArrayType
 from pyspark.sql.types import DataType
 from pyspark.sql.types import DayTimeIntervalType as SparkDayTimeIntervalType
 from pyspark.sql.types import DecimalType as SparkDecimalType
 from pyspark.sql.types import MapType as SparkMapType
+from pyspark.sql.types import StructField
 from pyspark.sql.types import StructType as SparkStructType
 
 from typedspark._core.column import Column
@@ -32,18 +33,9 @@ def create_schema_from_structtype(
     column_name_mapping = _create_column_name_mapping(structtype)
 
     for column in structtype:
-        name = column.name
-        data_type = _extract_data_type(column.dataType, name)
-
-        mapped_name = column_name_mapping[name]
-        if mapped_name == name:
-            type_annotations[name] = Column[data_type]  # type: ignore
-        else:
-            type_annotations[mapped_name] = Annotated[
-                Column[data_type], ColumnMeta(external_name=name)
-            ]
-
-        attributes[name] = None
+        column_name, column_class = _create_column(column, column_name_mapping)
+        type_annotations[column_name] = column_class
+        attributes[column_name] = None
 
     if not schema_name:
         schema_name = "DynamicallyLoadedSchema"
@@ -55,7 +47,7 @@ def create_schema_from_structtype(
 
 
 def _create_column_name_mapping(structtype: SparkStructType) -> Dict[str, str]:
-    """Checks if there are duplicate columns after replacing illegal characters."""
+    """Creates a mapping from the original column names to the renamed column names."""
     mapping = {column: _replace_illegal_characters(column) for column in structtype.names}
 
     renamed_columns = list(mapping.values())
@@ -81,6 +73,20 @@ def _create_column_name_mapping(structtype: SparkStructType) -> Dict[str, str]:
 def _replace_illegal_characters(column_name: str) -> str:
     """Replaces illegal characters in a column name with an underscore."""
     return re.sub("[^A-Za-z0-9]", "_", column_name)
+
+
+def _create_column(column: StructField, column_name_mapping: Dict[str, str]) -> Tuple[str, Any]:
+    """Creates a column object, optionally with an `external_name` if the mapped_name is
+    different from the original name (due to illegal characters, such as `-` in the
+    original name)."""
+    name = column.name
+    mapped_name = column_name_mapping[name]
+    data_type = _extract_data_type(column.dataType, name)
+
+    if mapped_name == name:
+        return name, Column[data_type]  # type: ignore
+
+    return mapped_name, Annotated[Column[data_type], ColumnMeta(external_name=name)]  # type: ignore
 
 
 def _extract_data_type(dtype: DataType, name: str) -> Type[DataType]:
