@@ -2,7 +2,7 @@ from typing import Literal
 
 import pytest
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
-from pyspark.sql import SparkSession
+from pyspark.sql import Row, SparkSession
 from pyspark.sql.functions import first
 from pyspark.sql.types import IntegerType, StringType
 
@@ -225,3 +225,76 @@ def test_get_spark_session_without_spark_session():
     if SparkSession.getActiveSession() is None:
         with pytest.raises(ValueError):
             _get_spark_session(None)
+
+
+def test_create_schema_with_invalid_column_name(spark: SparkSession):
+    df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["first-name", "age"])
+    ds, schema = create_schema(df)
+
+
+def test_create_schema_with_invalid_column_name_in_a_structtype(spark: SparkSession):
+    data = [
+        Row(
+            **{
+                "full-name": Row(
+                    **{
+                        "first-name": "Alice",
+                        "last-name": "Smith",
+                    },
+                ),
+                "age": 24,
+            }
+        ),
+        Row(
+            **{
+                "full-name": Row(
+                    **{
+                        "first-name": "Bob",
+                        "last-name": "Brown",
+                    },
+                ),
+                "age": 25,
+            },
+        ),
+    ]
+
+    df = spark.createDataFrame(data)
+    ds, schema = create_schema(df)
+
+
+def test_create_schema_with_invalid_column_name_in_a_nested_structtype(spark: SparkSession):
+    data = [
+        Row(
+            **{
+                "details": Row(
+                    **{
+                        "full-name": Row(
+                            **{
+                                "first-name": "Alice",
+                                "last-name": "Smith",
+                            }
+                        ),
+                        "age": 24,
+                    }
+                )
+            }
+        ),
+        Row(
+            **{
+                "details": Row(
+                    **{
+                        "full-name": Row(
+                            **{
+                                "first-name": "Bob",
+                                "last-name": "Brown",
+                            }
+                        ),
+                        "age": 25,
+                    }
+                )
+            }
+        ),
+    ]
+
+    df = spark.createDataFrame(data)
+    ds, schema = create_schema(df)
