@@ -22,6 +22,7 @@ from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
 from typing_extensions import Concatenate, ParamSpec
 
+from typedspark._core.rename_columns import rename_columns
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 from typedspark._transforms.transform_to_schema import transform_to_schema
@@ -70,7 +71,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
     @classmethod
     def from_dataframe(
-        cls, df: DataFrame
+        cls, df: DataFrame, register_to_schema: bool = True
     ) -> Tuple[DataSet[_Implementation], Type[_Implementation]]:
         """Converts a DataFrame to a DataSet and registers the Schema to the DataSet.
         Also renames the columns to their internal names, for example to deal with
@@ -90,13 +91,10 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
         schema = cls._schema_annotations  # type: ignore
 
-        for column in schema.get_structtype().fields:
-            if column.metadata:
-                df = df.withColumnRenamed(
-                    column.metadata.get("external_name", column.name), column.name
-                )
+        df = rename_columns(df, schema.get_structtype())
         df = transform_to_schema(df, schema)
-        schema = register_schema_to_dataset(df, schema)
+        if register_to_schema:
+            schema = register_schema_to_dataset(df, schema)
         return df, schema
 
     def to_dataframe(self) -> DataFrame:
