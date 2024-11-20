@@ -17,7 +17,7 @@ types-setuptools==75.5.0.20241122
 pytest==8.3.3
 coverage==7.6.7
 pandas==2.2.3
-setuptools==75.5.0
+setuptools==75.6.0
 chispa==0.10.1
 # notebooks
 nbconvert==7.16.4
