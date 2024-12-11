@@ -1,0 +1,16 @@
+services:
+  spark-connect:
+    image: apache/spark:3.5.3-scala2.12-java11-ubuntu
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+    ports:
+      - '4040:4040'
+      - '15002:15002'
+    command: >
+      /opt/spark/sbin/start-connect-server.sh
+      --conf spark.sql.ui.explainMode=extended
+      --conf spark.jars.ivy=/opt/spark/jars/
+      --conf spark.serializer=org.apache.spark.serializer.KryoSerializer
+      --conf spark.kryo.referenceTracking=false
+      --packages org.apache.spark:spark-connect_2.12:3.5.3
+      --driver-memory 512m
