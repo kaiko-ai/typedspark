@@ -1,34 +1,37 @@
-import pytest
-from chispa.dataframe_comparer import assert_df_equality  # type: ignore
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType
+import pytest
 
-from typedspark import (
-    Column,
-    Schema,
-    create_empty_dataset,
-    transform_to_schema,
-)
+from typedspark import Column, Schema, transform_to_schema
 
 
-class Person(Schema):
+class A(Schema):
     a: Column[IntegerType]
     b: Column[IntegerType]
     c: Column[IntegerType]
 
 
-class PersonLessData(Schema):
+class B(Schema):
     a: Column[IntegerType]
     b: Column[IntegerType]
 
 
-def test_spark_connect_session_works(sparkConnect: SparkSession):
+def test_regular_spark_works(spark: SparkSession):
+    df = spark.createDataFrame([(14, "Tom"), (23, "Alice"), (16, "Bob")], ["age", "name"])
+    assert df.count() == 3
+    assert type(df).__module__ == "pyspark.sql.dataframe"
+
+
+def test_spark_connect_works(sparkConnect: SparkSession):
     df = sparkConnect.createDataFrame([(14, "Tom"), (23, "Alice"), (16, "Bob")], ["age", "name"])
     assert df.count() == 3
-
-    # notice it isn't regular dataframe but ide doesn't know that
     assert type(df).__module__ == "pyspark.sql.connect.dataframe"
 
 
-def test_typedspark_does_not_work(sparkConnect: SparkSession):
-    df = sparkConnect.createDataFrame([(14, "Tom"), (23, "Alice"), (16, "Bob")], ["age", "name"])
+@pytest.mark.skip(reason="in development")
+def test_transform_to_schema_works(sparkConnect: SparkSession):
+    # this test is getting stuck currently,
+    # cuz of mismatch DataFrame types spark.sql.DataFrame and spark.connect.dataframe.DataFrame
+    df = sparkConnect.createDataFrame([(14, 23, 16)], ["a", "b", "c"])
+    typed_df = transform_to_schema(df, A)
+    assert typed_df.count() == 1

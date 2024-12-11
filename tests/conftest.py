@@ -20,6 +20,11 @@ def spark():
 def sparkConnect():
     """Fixture for creating a spark session."""
 
-    spark = SparkSession.Builder().remote("sc://localhost:15002").getOrCreate()
+    spark = (
+        SparkSession.Builder()
+        .config("spark.jars.packages", "org.apache.spark:spark-connect_2.12:3.5.3")
+        .remote('local')
+        .getOrCreate()
+    )
     yield spark
     spark.stop()
