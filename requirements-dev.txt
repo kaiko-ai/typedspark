@@ -2,11 +2,6 @@
 pyspark==3.5.3
 # pyspark-connect
 pyspark[connect]==3.5.3
-# pyarrow>=18.0.0
-# grpcio>=1.48,<1.57
-# grpcio-status>=1.48,<1.57
-# googleapis-common-protos==1.56.4
-numpy>=1.15
 # linters
 flake8==7.1.1
 pylint==3.3.2
