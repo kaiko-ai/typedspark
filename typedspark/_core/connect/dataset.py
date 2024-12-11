@@ -6,12 +6,10 @@ from copy import deepcopy
 from typing import Callable, Generic, List, Literal, Optional, Type, TypeVar, Union, cast, overload
 
 from pyspark import StorageLevel
-from pyspark.sql import Column as SparkColumn
-from pyspark.sql import DataFrame
-from pyspark.sql.connect.dataframe import DataFrame as SparkConnectDataFrame
+from pyspark.sql.connect.column import Column as SparkColumn
+from pyspark.sql.connect.dataframe import DataFrame
 from typing_extensions import Concatenate, ParamSpec
 
-from typedspark._core.connect.dataset import DataSet as SparkConnectDataSet
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 
@@ -182,10 +180,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         the schema annotations are provided.
         """
         dataframe = cast(DataSet, dataframe)
-        if isinstance(dataframe, SparkConnectDataFrame):
-            dataframe.__class__ = SparkConnectDataSet
-        else:
-            dataframe.__class__ = DataSet
+        dataframe.__class__ = DataSet
 
         # first we reset the schema annotations to None, in case they are inherrited through the
         # passed DataFrame
