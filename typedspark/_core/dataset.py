@@ -76,10 +76,12 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     def distinct(self) -> DataSet[_Implementation]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
-    def filter(self, condition) -> DataSet[_Implementation]:  # pylint: disable=C0116
+    def filter(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
+        """Filters rows using the given condition"""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
-    def where(self, condition) -> DataSet[_Implementation]:  # pylint: disable=C0116
+    def where(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
+        """Filters rows using the given condition"""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
     @overload
@@ -251,10 +253,12 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
     def distinct(self) -> DataSet[_Schema]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
-    def filter(self, condition) -> DataSet[_Schema]:  # pylint: disable=C0116
+    def filter(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
+        """Filters rows using the given condition"""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
-    def where(self, condition) -> DataSet[_Schema]:  # pylint: disable=C0116
+    def where(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
+        """Filters rows using the given condition"""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
     @overload
