@@ -83,7 +83,8 @@ def test_inherrited_functions(spark: SparkSession):
     df.distinct()
     cached1: DataSet[A] = df.cache()
     cached2: DataSet[A] = df.persist(StorageLevel.MEMORY_AND_DISK)
-    df.filter(A.a == 1)
+    assert isinstance(df.filter(A.a == 1), DataSet)
+    assert isinstance(df.where(A.a == 1), DataSet)
     df.orderBy(A.a)
     df.transform(lambda df: df)
 

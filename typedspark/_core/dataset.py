@@ -79,6 +79,9 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     def filter(self, condition) -> DataSet[_Implementation]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
+    def where(self, condition) -> DataSet[_Implementation]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
+
     @overload
     def join(  # type: ignore
         self,
@@ -250,6 +253,9 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
 
     def filter(self, condition) -> DataSet[_Schema]:  # pylint: disable=C0116
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
+
+    def where(self, condition) -> DataSet[_Schema]:  # pylint: disable=C0116
+        return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
     @overload
     def join(  # type: ignore
