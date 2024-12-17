@@ -14,3 +14,17 @@ def spark():
     spark = SparkSession.Builder().getOrCreate()
     yield spark
     spark.stop()
+
+
+@pytest.fixture(scope="session")
+def sparkConnect():
+    """Fixture for creating a spark session."""
+
+    spark = (
+        SparkSession.Builder()
+        .config("spark.jars.packages", "org.apache.spark:spark-connect_2.12:3.5.3")
+        .remote('local')
+        .getOrCreate()
+    )
+    yield spark
+    spark.stop()
