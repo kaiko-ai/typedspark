@@ -63,7 +63,7 @@ class Column(SparkColumn, Generic[T]):
         else:
             column = col(name)
 
-        column.__class__ = Column
+        column.__class__ = Column  # type: ignore
         return column
 
     def __init__(
