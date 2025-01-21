@@ -1,3 +1,7 @@
+# from typedspark import configure  # isort:skip
+
+# configure(spark_connect=True)
+
 from dataclasses import dataclass
 from typing import Annotated
 

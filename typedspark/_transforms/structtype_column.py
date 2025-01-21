@@ -2,10 +2,10 @@
 
 from typing import Dict, Optional, Type
 
-from pyspark.sql import Column as SparkColumn
 from pyspark.sql.functions import struct
 
 from typedspark._core.column import Column
+from typedspark._core.spark_imports import Column as SparkColumn
 from typedspark._schema.schema import Schema
 from typedspark._transforms.utils import add_nulls_for_unspecified_columns, convert_keys_to_strings
 

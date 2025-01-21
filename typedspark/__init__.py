@@ -1,5 +1,7 @@
 """Typedspark: column-wise type annotations for pyspark DataFrames."""
 
+# from typedspark._core.spark_imports import configure  # noqa: F401  # isort:skip
+
 from typedspark._core.column import Column
 from typedspark._core.column_meta import ColumnMeta
 from typedspark._core.dataset import DataSet, DataSetImplements

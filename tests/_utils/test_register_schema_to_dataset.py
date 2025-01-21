@@ -1,6 +1,5 @@
 import pytest
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
-from pyspark.errors import AnalysisException
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, StringType
 
@@ -11,6 +10,7 @@ from typedspark import (
     create_partially_filled_dataset,
     register_schema_to_dataset,
 )
+from typedspark._core.spark_imports import SPARK_CONNECT, AnalysisException
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset_with_alias
 
 
@@ -40,7 +40,7 @@ def test_register_schema_to_dataset(spark: SparkSession):
     df_b = create_partially_filled_dataset(spark, Job, {Job.a: [1, 2, 3]})
 
     with pytest.raises(AnalysisException):
-        df_a.join(df_b, Person.a == Job.a)
+        df_a.join(df_b, Person.a == Job.a).show()
 
     person = register_schema_to_dataset(df_a, Person)
     job = register_schema_to_dataset(df_b, Job)
@@ -69,13 +69,21 @@ def test_register_schema_to_dataset_with_alias(spark: SparkSession):
         },
     )
 
-    with pytest.raises(AnalysisException):
+    def self_join_without_register_schema_to_dataset_with_alias():
         df_a = df.alias("a")
         df_b = df.alias("b")
         schema_a = register_schema_to_dataset(df_a, Person)
         schema_b = register_schema_to_dataset(df_b, Person)
-        df_a.join(df_b, schema_a.a == schema_b.b)
+        df_a.join(df_b, schema_a.a == schema_b.b).show()
 
+    # there seems to be a discrepancy between spark and spark connect here
+    if SPARK_CONNECT:
+        self_join_without_register_schema_to_dataset_with_alias()
+    else:
+        with pytest.raises(AnalysisException):
+            self_join_without_register_schema_to_dataset_with_alias()
+
+    # the following is the way it works with regular spark
     df_a, schema_a = register_schema_to_dataset_with_alias(df, Person, "a")
     df_b, schema_b = register_schema_to_dataset_with_alias(df, Person, "b")
     joined = df_a.join(df_b, schema_a.a == schema_b.b)

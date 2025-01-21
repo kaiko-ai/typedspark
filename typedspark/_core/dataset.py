@@ -6,10 +6,10 @@ from copy import deepcopy
 from typing import Callable, Generic, List, Literal, Optional, Type, TypeVar, Union, cast, overload
 
 from pyspark import StorageLevel
-from pyspark.sql import Column as SparkColumn
-from pyspark.sql import DataFrame
 from typing_extensions import Concatenate, ParamSpec
 
+from typedspark._core.spark_imports import Column as SparkColumn
+from typedspark._core.spark_imports import DataFrame
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 

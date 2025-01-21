@@ -5,8 +5,7 @@ the transformations dictionary."""
 from typing import Dict, Final, Type
 from uuid import uuid4
 
-from pyspark.sql import Column as SparkColumn
-
+from typedspark._core.spark_imports import Column as SparkColumn
 from typedspark._schema.schema import Schema
 
 ERROR_MSG: Final[

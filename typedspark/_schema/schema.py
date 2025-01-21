@@ -15,10 +15,10 @@ from typing import (
     get_type_hints,
 )
 
-from pyspark.sql import DataFrame
 from pyspark.sql.types import DataType, StructType
 
 from typedspark._core.column import Column
+from typedspark._core.spark_imports import DataFrame
 from typedspark._schema.dlt_kwargs import DltKwargs
 from typedspark._schema.get_schema_definition import get_schema_definition_as_string
 from typedspark._schema.structfield import get_structfield

@@ -3,11 +3,12 @@ import functools
 import pandas as pd
 import pytest
 from pyspark import StorageLevel
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import SparkSession
 from pyspark.sql.types import LongType, StringType
 
 from typedspark import Column, DataSet, Schema
 from typedspark._core.dataset import DataSetImplements
+from typedspark._core.spark_imports import DataFrame
 from typedspark._utils.create_dataset import create_empty_dataset
 
 

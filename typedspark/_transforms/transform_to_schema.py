@@ -3,11 +3,10 @@
 from functools import reduce
 from typing import Dict, Optional, Type, TypeVar, Union
 
-from pyspark.sql import Column as SparkColumn
-from pyspark.sql import DataFrame
-
 from typedspark._core.column import Column
 from typedspark._core.dataset import DataSet
+from typedspark._core.spark_imports import Column as SparkColumn
+from typedspark._core.spark_imports import DataFrame
 from typedspark._schema.schema import Schema
 from typedspark._transforms.rename_duplicate_columns import RenameDuplicateColumns
 from typedspark._transforms.utils import add_nulls_for_unspecified_columns, convert_keys_to_strings

@@ -3,9 +3,10 @@
 import re
 from typing import Dict, Optional, Tuple, Type
 
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import SparkSession
 
 from typedspark._core.dataset import DataSet
+from typedspark._core.spark_imports import DataFrame
 from typedspark._schema.schema import Schema
 from typedspark._utils.create_dataset_from_structtype import create_schema_from_structtype
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
