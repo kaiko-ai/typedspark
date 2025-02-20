@@ -28,7 +28,7 @@ def add_nulls_for_unspecified_columns(
 
 
 def convert_keys_to_strings(
-    transformations: Optional[Dict[Column, SparkColumn]]
+    transformations: Optional[Dict[Column, SparkColumn]],
 ) -> Dict[str, SparkColumn]:
     """Takes the Column keys in transformations and converts them to strings."""
     if transformations is None:

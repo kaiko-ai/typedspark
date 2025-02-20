@@ -46,7 +46,7 @@ def get_structfield(
 
 
 def get_structfield_meta(
-    column: Union[Type[Column[_DataType]], Annotated[Type[Column[_DataType]], ColumnMeta]]
+    column: Union[Type[Column[_DataType]], Annotated[Type[Column[_DataType]], ColumnMeta]],
 ) -> ColumnMeta:
     """Get the spark column metadata from the ``ColumnMeta`` data, when available."""
     return next((x for x in get_args(column) if isinstance(x, ColumnMeta)), ColumnMeta())
