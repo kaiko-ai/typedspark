@@ -1,12 +1,15 @@
 import functools
+from typing import Annotated
 
 import pandas as pd
 import pytest
+from chispa import assert_df_equality  # type: ignore
 from pyspark import StorageLevel
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import LongType, StringType
 
 from typedspark import Column, DataSet, Schema
+from typedspark._core.column_meta import ColumnMeta
 from typedspark._core.dataset import DataSetImplements
 from typedspark._utils.create_dataset import create_empty_dataset
 
@@ -139,3 +142,34 @@ def test_resetting_of_schema_annotations(spark: SparkSession):
     # and then to None again
     a = DataSet(df)
     assert a._schema_annotations is None
+
+
+def test_from_dataframe(spark: SparkSession):
+    df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
+    ds, _ = DataSet[A].from_dataframe(df)
+
+    assert isinstance(ds, DataSet)
+    assert_df_equality(ds, df)
+
+    df_2 = ds.to_dataframe()
+
+    assert isinstance(df_2, DataFrame)
+    assert_df_equality(df_2, df)
+
+
+class Person(Schema):
+    name: Annotated[Column[StringType], ColumnMeta(external_name="first-name")]
+    age: Column[LongType]
+
+
+def test_from_dataframe_with_external_name(spark: SparkSession):
+    df = spark.createDataFrame([("Alice", 1), ("Bob", 2)], ["first-name", "age"])
+    ds, _ = DataSet[Person].from_dataframe(df)
+
+    assert isinstance(ds, DataSet)
+    assert ds.columns == ["name", "age"]
+
+    df_2 = ds.to_dataframe()
+    assert isinstance(df_2, DataFrame)
+    assert df_2.columns == ["first-name", "age"]
+    assert_df_equality(df_2, df)
