@@ -17,11 +17,7 @@ T = TypeVar("T", bound=Schema)
 
 def _do_transformations(dataframe: DataFrame, transformations: Dict[str, SparkColumn]) -> DataFrame:
     """Performs the transformations on the provided DataFrame."""
-    return reduce(
-        lambda acc, key: DataFrame.withColumn(acc, key, transformations[key]),
-        transformations.keys(),
-        dataframe,
-    )
+    return DataFrame.withColumns(dataframe, transformations)
 
 
 def _rename_temporary_keys_to_original_keys(
