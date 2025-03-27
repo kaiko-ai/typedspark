@@ -176,7 +176,7 @@ def test_transform_to_schema_sequential(spark: SparkSession):
     assert_df_equality(observed, expected)
 
 
-def test_transform_to_schema_with_with_columns(spark: SparkSession):
+def test_transform_to_schema_parallel(spark: SparkSession):
     df = create_partially_filled_dataset(spark, Person, {Person.a: [1, 2, 3], Person.b: [1, 2, 3]})
 
     observed = transform_to_schema(
@@ -186,7 +186,7 @@ def test_transform_to_schema_with_with_columns(spark: SparkSession):
             Person.a: Person.a + 3,
             Person.b: Person.a + 5,
         },
-        use_with_columns=True,
+        run_sequentially=False,
     )
 
     expected = create_partially_filled_dataset(

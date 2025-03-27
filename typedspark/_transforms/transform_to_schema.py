@@ -16,10 +16,10 @@ T = TypeVar("T", bound=Schema)
 
 
 def _do_transformations(
-    dataframe: DataFrame, transformations: Dict[str, SparkColumn], use_with_columns: bool = False
+    dataframe: DataFrame, transformations: Dict[str, SparkColumn], run_sequentially: bool = False
 ) -> DataFrame:
     """Performs the transformations on the provided DataFrame."""
-    if use_with_columns:
+    if run_sequentially:
         return DataFrame.withColumns(dataframe, transformations)
     return reduce(
         lambda acc, key: DataFrame.withColumn(acc, key, transformations[key]),
@@ -44,7 +44,7 @@ def transform_to_schema(
     schema: Type[T],
     transformations: Optional[Dict[Column, SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
-    use_with_columns: bool = False,
+    run_sequentially: bool = True,
 ) -> DataSet[T]:
     """On the provided DataFrame ``df``, it performs the ``transformations`` (if
     provided), and subsequently subsets the resulting DataFrame to the columns specified
@@ -72,7 +72,7 @@ def transform_to_schema(
     transform = RenameDuplicateColumns(transform, schema, dataframe.columns)
 
     return DataSet[schema](  # type: ignore
-        dataframe.transform(_do_transformations, transform.transformations, use_with_columns)
+        dataframe.transform(_do_transformations, transform.transformations, run_sequentially)
         .drop(*transform.temporary_key_mapping.keys())
         .transform(_rename_temporary_keys_to_original_keys, transform.temporary_key_mapping)
         .select(*schema.all_column_names())
