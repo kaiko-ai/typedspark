@@ -16,16 +16,16 @@ T = TypeVar("T", bound=Schema)
 
 
 def _do_transformations(
-    dataframe: DataFrame, transformations: Dict[str, SparkColumn], run_sequentially: bool = False
+    dataframe: DataFrame, transformations: Dict[str, SparkColumn], run_sequentially: bool = True
 ) -> DataFrame:
     """Performs the transformations on the provided DataFrame."""
     if run_sequentially:
-        return DataFrame.withColumns(dataframe, transformations)
-    return reduce(
-        lambda acc, key: DataFrame.withColumn(acc, key, transformations[key]),
-        transformations.keys(),
-        dataframe,
-    )
+        return reduce(
+            lambda acc, key: DataFrame.withColumn(acc, key, transformations[key]),
+            transformations.keys(),
+            dataframe,
+        )
+    return DataFrame.withColumns(dataframe, transformations)
 
 
 def _rename_temporary_keys_to_original_keys(
