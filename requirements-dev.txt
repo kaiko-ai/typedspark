@@ -1,7 +1,7 @@
 # pyspark
 pyspark==3.5.5
 # linters
-flake8==7.1.2
+flake8==7.2.0
 pylint==3.3.6
 black[jupyter]<=25.1.0
 bandit==1.8.3
