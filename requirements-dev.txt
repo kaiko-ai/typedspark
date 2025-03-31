@@ -1,7 +1,7 @@
 # pyspark
 pyspark==3.5.5
 # linters
-flake8==7.1.2
+flake8==7.2.0
 pylint==3.3.6
 black[jupyter]<=25.1.0
 bandit==1.8.3
@@ -12,10 +12,10 @@ pyright<=1.1.398
 autoflake==2.3.1
 # stubs
 pandas-stubs<=2.2.3.250308
-types-setuptools==76.0.0.20250313
+types-setuptools==78.1.0.20250329
 # testing
 pytest==8.3.5
-coverage==7.7.1
+coverage==7.8.0
 pandas==2.2.3
 setuptools==78.1.0
 chispa==0.10.1
