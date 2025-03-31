@@ -15,13 +15,17 @@ from typedspark._transforms.utils import add_nulls_for_unspecified_columns, conv
 T = TypeVar("T", bound=Schema)
 
 
-def _do_transformations(dataframe: DataFrame, transformations: Dict[str, SparkColumn]) -> DataFrame:
+def _do_transformations(
+    dataframe: DataFrame, transformations: Dict[str, SparkColumn], run_sequentially: bool = True
+) -> DataFrame:
     """Performs the transformations on the provided DataFrame."""
-    return reduce(
-        lambda acc, key: DataFrame.withColumn(acc, key, transformations[key]),
-        transformations.keys(),
-        dataframe,
-    )
+    if run_sequentially:
+        return reduce(
+            lambda acc, key: DataFrame.withColumn(acc, key, transformations[key]),
+            transformations.keys(),
+            dataframe,
+        )
+    return DataFrame.withColumns(dataframe, transformations)
 
 
 def _rename_temporary_keys_to_original_keys(
@@ -40,6 +44,7 @@ def transform_to_schema(
     schema: Type[T],
     transformations: Optional[Dict[Column, SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
+    run_sequentially: bool = True,
 ) -> DataSet[T]:
     """On the provided DataFrame ``df``, it performs the ``transformations`` (if
     provided), and subsequently subsets the resulting DataFrame to the columns specified
@@ -67,7 +72,7 @@ def transform_to_schema(
     transform = RenameDuplicateColumns(transform, schema, dataframe.columns)
 
     return DataSet[schema](  # type: ignore
-        dataframe.transform(_do_transformations, transform.transformations)
+        dataframe.transform(_do_transformations, transform.transformations, run_sequentially)
         .drop(*transform.temporary_key_mapping.keys())
         .transform(_rename_temporary_keys_to_original_keys, transform.temporary_key_mapping)
         .select(*schema.all_column_names())
