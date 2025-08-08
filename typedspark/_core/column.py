@@ -76,12 +76,43 @@ class Column(SparkColumn, Generic[T]):
         alias: Optional[str] = None,
     ):
         # pylint: disable=unused-argument
-        self.str = name
+        self._name = name
         self._dtype = dtype if dtype is not None else DataType
         self._curid = curid
+        self._parent = parent
 
     def __hash__(self) -> int:
         return hash((self.str, self._curid))
+
+    @property
+    def str(self) -> str:
+        """Column name as string."""
+        return self._name
+
+    @property
+    def full_path(self) -> str:
+        """Full path of the column including parent structure.
+        Example:
+        .. code-block:: python
+            from pyspark.sql.types import IntegerType, StringType
+            from typedspark import DataSet, StructType, Schema, Column
+
+            class Values(Schema):
+                name: Column[StringType]
+                severity: Column[IntegerType]
+
+
+            class Actions(Schema):
+                consequeces: Column[StructType[Values]]
+
+        `Actions.consequences.dtype.schema.severity.full_path` will yield the name
+        of the field `severity` including the full path: `consequeces.severity`
+
+        """
+        if isinstance(self._parent, Column):
+            return f"{self._parent.str}.{self.str}"
+        else:
+            return self.str
 
     @property
     def dtype(self) -> T:
