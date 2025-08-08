@@ -7,7 +7,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
 from pyspark.sql.types import IntegerType, LongType, StringType
 
-from typedspark import Column, ColumnMeta, DataSet, Schema, StructType
+from typedspark import Column, ColumnMeta, Schema, StructType
 from typedspark._utils.create_dataset import create_partially_filled_dataset
 
 
