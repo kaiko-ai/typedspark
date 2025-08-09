@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import Callable, Generic, List, Literal, Optional, Type, TypeVar, Union, cast, overload
 
 from pyspark import StorageLevel
@@ -216,7 +215,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         """Validates the schema of the ``DataSet`` against the schema annotations."""
         validate_schema(
             self._schema_annotations.get_structtype(),
-            deepcopy(self.schema),
+            self.schema,
             self._schema_annotations.get_schema_name(),
         )
 
