@@ -185,7 +185,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         the schema annotations are provided.
         """
         try:
-            schema_snapshot: StructType = StructType.fromJson(dataframe.schema.jsonValue())
+            schema_snapshot: StructType = StructType.fromJson(dataframe.schema.jsonValue())  # type: ignore
         except Exception:
             # last-ditch: still try the property
             schema_snapshot = dataframe.schema  # type: ignore[assignment]
