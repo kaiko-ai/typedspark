@@ -110,7 +110,6 @@ def test_initialize_dataset_implements(spark: SparkSession):
         DataSetImplements()  # noqa
 
 
-
 def test_reduce(spark: SparkSession):
     functools.reduce(
         DataSet.unionByName,
