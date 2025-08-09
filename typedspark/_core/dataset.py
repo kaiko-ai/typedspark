@@ -185,7 +185,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         the schema annotations are provided.
         """
         try:
-            schema_snapshot: StructType = StructType.fromJson(dataframe.schema.jsonValue())  # type: ignore
+            schema_snapshot: StructType = StructType.fromJson(dataframe.schema.jsonValue())
         except Exception:
             # last-ditch: still try the property
             schema_snapshot = dataframe.schema  # type: ignore[assignment]
@@ -224,7 +224,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         """Validates the schema of the ``DataSet`` against the schema annotations."""
         validate_schema(
             self._schema_annotations.get_structtype(),
-            self._schema_snapshot,
+            self._schema_snapshot,  # type: ignore
             self._schema_annotations.get_schema_name(),
         )
 
