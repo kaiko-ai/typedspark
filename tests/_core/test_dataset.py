@@ -107,7 +107,7 @@ def test_schema_property_of_dataset(spark: SparkSession):
 
 def test_initialize_dataset_implements(spark: SparkSession):
     with pytest.raises(NotImplementedError):
-        DataSetImplements()  # noqa
+        DataSetImplements()  # type: ignore
 
 
 def test_reduce(spark: SparkSession):
