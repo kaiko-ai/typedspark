@@ -95,7 +95,3 @@ class Column(SparkColumn, Generic[T]):
             )  # type: ignore
 
         return dtype()  # type: ignore
-
-    def __getitem__(self, key):
-        # for structs/arrays/maps
-        return self._spark().getItem(key)
