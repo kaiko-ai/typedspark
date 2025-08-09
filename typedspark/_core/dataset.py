@@ -7,6 +7,7 @@ from typing import Callable, Generic, List, Literal, Optional, Type, TypeVar, Un
 from pyspark import StorageLevel
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
+from pyspark.sql.types import StructType
 from typing_extensions import Concatenate, ParamSpec
 
 from typedspark._core.validate_schema import validate_schema
@@ -199,7 +200,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         # then we use the class' schema annotations to validate the schema and add metadata
         if hasattr(cls, "_schema_annotations"):
             dataframe._schema_annotations = cls._schema_annotations  # type: ignore
-            df._schema_snapshot = schema_snapshot  # type: ignore[attr-defined]
+            dataframe._schema_snapshot = schema_snapshot  # type: ignore[attr-defined]
 
             dataframe._validate_schema()
             dataframe._add_schema_metadata()
