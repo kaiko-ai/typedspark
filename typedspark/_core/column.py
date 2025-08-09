@@ -51,9 +51,7 @@ class Column(SparkColumn, Generic[T]):
 
         if dataframe is not None and parent is None:
             parent = dataframe
-            warn(
-                "The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead."
-            )
+            warn("The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead.")
 
         column: SparkColumn
         if SparkSession.getActiveSession() is None:
@@ -78,18 +76,13 @@ class Column(SparkColumn, Generic[T]):
         alias: Optional[str] = None,
     ):
         # pylint: disable=unused-argument
-        self._name = name
+        self.str = name
         self._dtype = dtype if dtype is not None else DataType
         self._curid = curid
         self._parent = parent
 
     def __hash__(self) -> int:
         return hash((self.str, self._curid))
-
-    @property
-    def str(self) -> str:
-        """Column name as string."""
-        return self._name
 
     @property
     def full_path(self) -> str:
