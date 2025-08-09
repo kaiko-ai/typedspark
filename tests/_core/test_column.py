@@ -5,9 +5,9 @@ import pandas as pd
 import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
-from pyspark.sql.types import LongType, StringType
+from pyspark.sql.types import IntegerType, LongType, StringType
 
-from typedspark import Column, ColumnMeta, Schema
+from typedspark import Column, ColumnMeta, Schema, StructType
 from typedspark._utils.create_dataset import create_partially_filled_dataset
 
 
@@ -68,3 +68,32 @@ def test_get_metadata():
         "comment": "Identifies the person",
         "primary_key": True,
     }
+
+
+class Cause(Schema):
+    source: Column[StringType]
+
+
+class Values(Schema):
+    name: Column[StringType]
+    severity: Column[IntegerType]
+    cause: Column[StructType[Cause]]
+
+
+class Actions(Schema):
+    consequences: Column[StructType[Values]]
+
+
+def test_full_path_1():
+    assert Actions.consequences.full_path == "consequences"
+
+
+def test_full_path_2():
+    assert Actions.consequences.dtype.schema.severity.full_path == "consequences.severity"
+
+
+def test_full_path_3():
+    assert (
+        Actions.consequences.dtype.schema.cause.dtype.schema.source.full_path
+        == "consequences.cause.source"
+    )
