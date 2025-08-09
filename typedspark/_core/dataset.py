@@ -183,6 +183,12 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         be difficult to access. Subsequently, we perform schema validation, if
         the schema annotations are provided.
         """
+        try:
+            schema_snapshot: StructType = StructType.fromJson(dataframe.schema.jsonValue())
+        except Exception:
+            # last-ditch: still try the property
+            schema_snapshot = dataframe.schema  # type: ignore[assignment]
+
         dataframe = cast(DataSet, dataframe)
         dataframe.__class__ = DataSet
 
@@ -193,6 +199,8 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         # then we use the class' schema annotations to validate the schema and add metadata
         if hasattr(cls, "_schema_annotations"):
             dataframe._schema_annotations = cls._schema_annotations  # type: ignore
+            df._schema_snapshot = schema_snapshot  # type: ignore[attr-defined]
+
             dataframe._validate_schema()
             dataframe._add_schema_metadata()
 
@@ -215,7 +223,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         """Validates the schema of the ``DataSet`` against the schema annotations."""
         validate_schema(
             self._schema_annotations.get_structtype(),
-            self.schema,
+            self._schema_snapshot,
             self._schema_annotations.get_schema_name(),
         )
 
