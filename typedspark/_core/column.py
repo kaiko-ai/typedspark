@@ -51,7 +51,9 @@ class Column(SparkColumn, Generic[T]):
 
         if dataframe is not None and parent is None:
             parent = dataframe
-            warn("The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead.")
+            warn(
+                "The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead."
+            )
 
         column: SparkColumn
         if SparkSession.getActiveSession() is None:
@@ -103,16 +105,15 @@ class Column(SparkColumn, Generic[T]):
 
 
             class Actions(Schema):
-                consequeces: Column[StructType[Values]]
+                consequences: Column[StructType[Values]]
 
         `Actions.consequences.dtype.schema.severity.full_path` will yield the name
-        of the field `severity` including the full path: `consequeces.severity`
+        of the field `severity` including the full path: `consequences.severity`
 
         """
         if isinstance(self._parent, Column):
-            return f"{self._parent.str}.{self.str}"
-        else:
-            return self.str
+            return f"{self._parent.full_path}.{self.str}"
+        return self.str
 
     @property
     def dtype(self) -> T:

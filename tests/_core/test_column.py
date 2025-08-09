@@ -70,14 +70,30 @@ def test_get_metadata():
     }
 
 
+class Cause(Schema):
+    source: Column[StringType]
+
+
 class Values(Schema):
     name: Column[StringType]
     severity: Column[IntegerType]
+    cause: Column[StructType[Cause]]
 
 
 class Actions(Schema):
-    consequeces: Column[StructType[Values]]
+    consequences: Column[StructType[Values]]
 
 
-def test_full_path():
-    assert Actions.consequences.dtype.schema.severity.full_path == "consequeces.severity"
+def test_full_path_1():
+    assert Actions.consequences.full_path == "consequences"
+
+
+def test_full_path_2():
+    assert Actions.consequences.dtype.schema.severity.full_path == "consequences.severity"
+
+
+def test_full_path_3():
+    assert (
+        Actions.consequences.dtype.schema.cause.dtype.schema.source.full_path
+        == "consequences.cause.source"
+    )
