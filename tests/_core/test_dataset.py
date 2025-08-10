@@ -32,10 +32,7 @@ def test_dataset(spark: SparkSession):
     )
     df = create_dataframe(spark, d)
     df_class_module = df.__class__.__module__
-    assert not df_class_module.startswith("pyspark.sql.connect"), (
-        f"Spark Connect DataFrame detected ({df_class_module}); "
-        f"use classic Spark for tests."
-    )
+    assert not df_class_module.startswith("pyspark.sql.connect")
     DataSet[A](df)
 
 
