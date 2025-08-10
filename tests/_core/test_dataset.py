@@ -31,14 +31,12 @@ def test_dataset(spark: SparkSession):
         b=["a", "b", "c"],
     )
     df = create_dataframe(spark, d)
-    
     DataSet[A](df)
 
 
 def test_dataset_allow_underscored_columns_not_in_schema(spark: SparkSession):
     d = {"a": [1, 2, 3], "b": ["a", "b", "c"], "__c": [1, 2, 3]}
     df = create_dataframe(spark, d)
-    assert df.schema is not None
     DataSet[A](df)
 
 
