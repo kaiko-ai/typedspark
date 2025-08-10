@@ -206,6 +206,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         return dataframe  # type: ignore
 
     def __init__(self, dataframe: DataFrame):
+        # pylint: disable=unused-argument
         self._add_schema_metadata()
 
     def __class_getitem__(cls, item):
