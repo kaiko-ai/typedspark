@@ -31,6 +31,11 @@ def test_dataset(spark: SparkSession):
         b=["a", "b", "c"],
     )
     df = create_dataframe(spark, d)
+    df_class_module = df.__class__.__module__
+    assert not df_class_module.startswith("pyspark.sql.connect"), (
+        f"Spark Connect DataFrame detected ({df_class_module}); "
+        f"use classic Spark for tests."
+    )
     DataSet[A](df)
 
 
