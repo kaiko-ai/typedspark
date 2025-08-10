@@ -188,7 +188,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             schema_snapshot: StructType = StructType.fromJson(dataframe.schema.jsonValue())
         except Exception:
             # last-ditch: still try the property
-            schema_snapshot = 5  # type: ignore
+            schema_snapshot = dataframe.schema  # type: ignore
 
         dataframe = cast(DataSet, dataframe)
         dataframe.__class__ = DataSet
@@ -201,14 +201,12 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         if hasattr(cls, "_schema_annotations"):
             dataframe._schema_annotations = cls._schema_annotations  # type: ignore
             dataframe._schema_snapshot = schema_snapshot  # type: ignore[attr-defined]
-
             dataframe._validate_schema()
-            dataframe._add_schema_metadata()
 
         return dataframe  # type: ignore
 
     def __init__(self, dataframe: DataFrame):
-        pass
+        self._add_schema_metadata()
 
     def __class_getitem__(cls, item):
         """Allows us to define a schema for the ``DataSet``.
