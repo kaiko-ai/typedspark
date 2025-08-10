@@ -188,7 +188,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             schema_snapshot: StructType = StructType.fromJson(dataframe.schema.jsonValue())
         except Exception:
             # last-ditch: still try the property
-            schema_snapshot = dataframe.schema  # type: ignore[assignment]
+            schema_snapshot = 5  # type: ignore
 
         dataframe = cast(DataSet, dataframe)
         dataframe.__class__ = DataSet
