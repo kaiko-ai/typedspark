@@ -31,8 +31,6 @@ def test_dataset(spark: SparkSession):
         b=["a", "b", "c"],
     )
     df = create_dataframe(spark, d)
-    df_class_module = df.__class__.__module__
-    assert not df_class_module.startswith("pyspark.sql.connect")
     DataSet[A](df)
 
 
@@ -81,7 +79,9 @@ def test_wrong_type(spark: SparkSession):
 
 def test_inherrited_functions(spark: SparkSession):
     df = create_empty_dataset(spark, A)
-
+    df_class_module = df.__class__.__module__
+    assert not df_class_module.startswith("pyspark.sql.connect")
+    
     df.distinct()
     cached1: DataSet[A] = df.cache()
     cached2: DataSet[A] = df.persist(StorageLevel.MEMORY_AND_DISK)
