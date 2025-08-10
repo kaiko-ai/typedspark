@@ -11,6 +11,6 @@ def spark():
     os.environ["PYSPARK_PYTHON"] = sys.executable
     os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
 
-    spark = SparkSession.Builder().getOrCreate()
+    spark = SparkSession.Builder().master("local[2]").getOrCreate()
     yield spark
     spark.stop()
