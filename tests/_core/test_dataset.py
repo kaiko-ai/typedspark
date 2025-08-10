@@ -78,10 +78,8 @@ def test_wrong_type(spark: SparkSession):
 
 
 def test_inherrited_functions(spark: SparkSession):
-    test_df = spark.range(1)
-    assert hasattr(test_df, "_jdf")
     df = create_empty_dataset(spark, A)
-
+    assert hasattr(df, "_jdf")
     df.distinct()
     cached1: DataSet[A] = df.cache()
     cached2: DataSet[A] = df.persist(StorageLevel.MEMORY_AND_DISK)
