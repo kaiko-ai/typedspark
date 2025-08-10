@@ -44,6 +44,11 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
     _schema_annotations: Type[_Implementation]
 
+    def __new__(cls, *args, **kwargs):
+        raise NotImplementedError(
+            "DataSetImplements should solely be used as a type annotation; it is never initialized."
+        )
+
     def __init__(self):
         raise NotImplementedError(
             "DataSetImplements should solely be used as a type annotation, it is never initialized."
