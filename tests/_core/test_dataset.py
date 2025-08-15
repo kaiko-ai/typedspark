@@ -79,7 +79,7 @@ def test_wrong_type(spark: SparkSession):
 
 def test_inherrited_functions(spark: SparkSession):
     df = create_empty_dataset(spark, A)
-
+    assert hasattr(df, "_jdf")
     df.distinct()
     cached1: DataSet[A] = df.cache()
     cached2: DataSet[A] = df.persist(StorageLevel.MEMORY_AND_DISK)
@@ -107,7 +107,7 @@ def test_schema_property_of_dataset(spark: SparkSession):
 
 def test_initialize_dataset_implements(spark: SparkSession):
     with pytest.raises(NotImplementedError):
-        DataSetImplements()
+        DataSetImplements()  # type: ignore
 
 
 def test_reduce(spark: SparkSession):
