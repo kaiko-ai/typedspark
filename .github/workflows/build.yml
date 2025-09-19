@@ -1,6 +1,8 @@
 name: Python package
-
 on: [pull_request]
+
+env:
+  SPARK_DIR: ${{ runner.temp }}/spark
 
 jobs:
   build:
@@ -12,24 +14,67 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+
       - uses: actions/setup-java@v5
         with:
-            distribution: 'temurin'
-            java-version: 21
-      - uses: vemonet/setup-spark@v1
-        with:
-          spark-version: '3.5.3'
-          hadoop-version: '3'
+          distribution: temurin
+          java-version: 17   # Spark 3.5.x is built for Java 17
+
       - name: Set up Python ${{ matrix.python-version }}
+        id: py
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: pip
+
+      # Make Spark use the matrix Python
+      - name: Point PySpark to this Python
+        run: |
+          echo "PYSPARK_PYTHON=$pythonLocation/bin/python" >> $GITHUB_ENV
+          echo "PYSPARK_DRIVER_PYTHON=$pythonLocation/bin/python" >> $GITHUB_ENV
+
+      - name: Cache Spark
+        id: cache-spark
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.SPARK_DIR }}/spark-3.5.3-bin-hadoop3-scala2.13
+          key: spark-${{ runner.os }}-3.5.3-hadoop3-scala2.13
+          restore-keys: |
+            spark-${{ runner.os }}-3.5.3-
+            spark-${{ runner.os }}-
+
+      - name: Setup Spark
+        if: steps.cache-spark.outputs.cache-hit != 'true'
+        uses: vemonet/setup-spark@v1
+        with:
+          spark-version: '3.5.3'
+          hadoop-version: '3'
+          scala-version: '2.13'
+          spark-url: 'https://archive.apache.org/dist/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3-scala2.13.tgz'
+          install-folder: ${{ env.SPARK_DIR }}
+          xms: '1024M'
+          xmx: '2048M'
+          log-level: 'debug'
+
+      # Always export SPARK_HOME/PATH, even on cache hit
+      - name: Export SPARK_HOME & PATH
+        run: |
+          echo "SPARK_HOME=${SPARK_DIR}/spark-3.5.3-bin-hadoop3-scala2.13" >> $GITHUB_ENV
+          echo "${SPARK_DIR}/spark-3.5.3-bin-hadoop3-scala2.13/bin" >> $GITHUB_PATH
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+
+      - name: Sanity check Spark & Python
+        run: |
+          which python
+          python -V
+          spark-submit --version
+          python -c "import pyspark; print('PySpark:', pyspark.__version__)"
+
       - name: Linting
         run: |
           flake8
@@ -40,17 +85,17 @@ jobs:
           black --check .
           isort --check .
           docformatter --black -c **/*.py
+
       - name: Testing
         run: |
-          # we run this test seperately, to ensure that it is run without an active Spark session
           python -m pytest -m no_spark_session
-          
           coverage run -m pytest
           coverage report -m --fail-under 100
+
       - name: Run notebooks
         run: |
           for FILE in docs/*/*.ipynb; do
-            BASE=$(basename $FILE)
-            cp $FILE .
-            jupyter nbconvert --to notebook $BASE --execute
+            BASE=$(basename "$FILE")
+            cp "$FILE" .
+            jupyter nbconvert --to notebook "$BASE" --execute
           done
