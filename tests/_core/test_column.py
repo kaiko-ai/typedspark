@@ -70,6 +70,15 @@ def test_get_metadata():
     }
 
 
+@pytest.mark.no_spark_session
+def test_column_repr_no_spark_session():
+    spark = SparkSession.getActiveSession()
+    if spark is None:
+        assert repr(A.a) == "Column<'a'> (no active Spark session)"
+    else:
+        assert repr(A.a) == "Column<'a'>"
+
+
 class Cause(Schema):
     source: Column[StringType]
 
