@@ -120,3 +120,10 @@ class Column(SparkColumn, Generic[T]):
             )  # type: ignore
 
         return dtype()  # type: ignore
+
+    def __repr__(self) -> str:
+        spark = SparkSession.getActiveSession()
+        if spark is None:  # pragma: no cover
+            return f"Column<'{self.str}'> (no active Spark session)"
+
+        return super().__repr__()
