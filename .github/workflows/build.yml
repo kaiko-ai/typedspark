@@ -5,6 +5,8 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: bitnami/spark:3.5.3
     timeout-minutes: 20
     strategy:
       matrix:
@@ -16,10 +18,6 @@ jobs:
         with:
             distribution: 'temurin'
             java-version: 21
-      - uses: vemonet/setup-spark@v1
-        with:
-          spark-version: '3.5.3'
-          hadoop-version: '3'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
