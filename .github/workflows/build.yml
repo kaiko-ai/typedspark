@@ -16,10 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install lsb-release (needed by setup-python)
+      # Required so setup-python's CPython can actually run inside this minimal image
+      - name: Install CPython runtime deps
         run: |
           apt-get update
-          apt-get install -y lsb-release
+          apt-get install -y --no-install-recommends \
+            lsb-release ca-certificates curl xz-utils tar \
+            libgcc-s1 libstdc++6 libc6 \
+            libssl3 libbz2-1.0 libsqlite3-0 libffi8 zlib1g \
+            libncursesw6 libreadline8 liblzma5 libgdbm6 libnss3 libuuid1
+          rm -rf /var/lib/apt/lists/*
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
