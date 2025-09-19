@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: bitnami/spark:3.5.3
+      options: --user root
     timeout-minutes: 20
     strategy:
       matrix:
@@ -14,20 +15,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
-        with:
-            distribution: 'temurin'
-            java-version: 21
+
+      - name: Install lsb-release (needed by setup-python)
+        run: |
+          apt-get update
+          apt-get install -y lsb-release
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+
       - name: Linting
         run: |
           flake8
@@ -38,13 +43,14 @@ jobs:
           black --check .
           isort --check .
           docformatter --black -c **/*.py
+
       - name: Testing
         run: |
           # we run this test seperately, to ensure that it is run without an active Spark session
           python -m pytest -m no_spark_session
-          
           coverage run -m pytest
           coverage report -m --fail-under 100
+
       - name: Run notebooks
         run: |
           for FILE in docs/*/*.ipynb; do
