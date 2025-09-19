@@ -79,9 +79,34 @@ class Column(SparkColumn, Generic[T]):
         self.str = name
         self._dtype = dtype if dtype is not None else DataType
         self._curid = curid
+        self._parent = parent
 
     def __hash__(self) -> int:
         return hash((self.str, self._curid))
+
+    @property
+    def full_path(self) -> str:
+        """Full path of the column including parent structure.
+        Example:
+        .. code-block:: python
+            from pyspark.sql.types import IntegerType, StringType
+            from typedspark import DataSet, StructType, Schema, Column
+
+            class Values(Schema):
+                name: Column[StringType]
+                severity: Column[IntegerType]
+
+
+            class Actions(Schema):
+                consequences: Column[StructType[Values]]
+
+        `Actions.consequences.dtype.schema.severity.full_path` will yield the name
+        of the field `severity` including the full path: `consequences.severity`
+
+        """
+        if isinstance(self._parent, Column):
+            return f"{self._parent.full_path}.{self.str}"
+        return self.str
 
     @property
     def dtype(self) -> T:
