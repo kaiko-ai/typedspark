@@ -5,10 +5,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: bitnami/spark:3.5.3
-      options: --user root
-    timeout-minutes: 20
+    timeout-minutes: 200
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
@@ -16,16 +13,30 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Required so setup-python's CPython can actually run inside this minimal image
-      - name: Install CPython runtime deps
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 21   # (Spark 3.5.x is happiest on 17; keep 21 if it works for you)
+
+      # REPLACE setup-spark with a cache + install from Apache CDN
+      - name: Cache Spark 3.5.3 (Hadoop 3)
+        id: cache-spark
+        uses: actions/cache@v4
+        with:
+          path: /opt/spark-3.5.3-bin-hadoop3
+          key: spark-3.5.3-hadoop3-linux
+
+      - name: Install Spark (if cache miss)
+        if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
-          apt-get update
-          apt-get install -y --no-install-recommends \
-            lsb-release ca-certificates curl xz-utils tar \
-            libgcc-s1 libstdc++6 libc6 \
-            libssl3 libbz2-1.0 libsqlite3-0 libffi8 zlib1g \
-            libncursesw6 libreadline8 liblzma5 libgdbm6 libnss3 libuuid1
-          rm -rf /var/lib/apt/lists/*
+          curl -fsSL https://dlcdn.apache.org/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz -o /tmp/spark.tgz
+          sudo mkdir -p /opt
+          sudo tar -xzf /tmp/spark.tgz -C /opt
+
+      - name: Set SPARK_HOME and PATH
+        run: |
+          echo "SPARK_HOME=/opt/spark-3.5.3-bin-hadoop3" >> $GITHUB_ENV
+          echo "/opt/spark-3.5.3-bin-hadoop3/bin" >> $GITHUB_PATH
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
