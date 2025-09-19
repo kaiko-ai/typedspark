@@ -28,8 +28,17 @@ jobs:
 
       - name: Install Spark (if cache miss)
         if: steps.cache-spark.outputs.cache-hit != 'true'
+        shell: bash
         run: |
-          curl -fsSL https://dlcdn.apache.org/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz -o /tmp/spark.tgz
+          set -euo pipefail
+          VER=3.5.3
+          PKG="spark-${VER}-bin-hadoop3"
+          URL_PRIMARY="https://downloads.apache.org/spark/spark-${VER}/${PKG}.tgz"
+          URL_FALLBACK="https://archive.apache.org/dist/spark/spark-${VER}/${PKG}.tgz"
+      
+          echo "Downloading ${PKG}…"
+          curl -fL "$URL_PRIMARY" -o /tmp/spark.tgz || curl -fL "$URL_FALLBACK" -o /tmp/spark.tgz
+      
           sudo mkdir -p /opt
           sudo tar -xzf /tmp/spark.tgz -C /opt
 
