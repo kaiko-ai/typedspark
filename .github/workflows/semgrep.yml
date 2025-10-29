@@ -12,12 +12,16 @@ name: Semgrep
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '42 3 * * 1'
+    - cron: "42 3 * * 1"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -33,6 +37,8 @@ jobs:
     steps:
       # Checkout project source
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       # Scan code using project's configuration on https://semgrep.dev/manage
       - uses: returntocorp/semgrep-action@713efdd345f3035192eaa63f56867b88e63e4e5d
