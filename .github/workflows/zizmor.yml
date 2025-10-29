@@ -1,0 +1,32 @@
+name: GitHub Actions Security Analysis
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  zizmor:
+    name: Run zizmor 🌈
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # to upload security alerts
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor 🌈
+        uses: zizmorcore/zizmor-action@e673c3917a1aef3c65c972347ed84ccd013ecda4 # v0.2.0
+        with:
+          min-severity: low
+          persona: pedantic
+          version: latest
