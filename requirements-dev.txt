@@ -4,7 +4,7 @@ pyspark==4.0.1
 flake8==7.3.0
 pylint<=4.0.3
 black[jupyter]<=25.11.0
-bandit<=1.9.1
+bandit<=1.9.2
 isort<=7.0.0
 docformatter==1.7.7
 mypy==1.18.2
