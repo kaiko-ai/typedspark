@@ -10,7 +10,11 @@ from typedspark._core.column import Column
 from typedspark._core.dataset import DataSet
 from typedspark._schema.schema import Schema
 from typedspark._transforms.rename_duplicate_columns import RenameDuplicateColumns
-from typedspark._transforms.utils import add_nulls_for_unspecified_columns, convert_keys_to_strings
+from typedspark._transforms.utils import (
+    add_nulls_for_unspecified_columns,
+    convert_keys_to_strings,
+    add_nulls_for_unspecified_nested_fields,
+)
 
 T = TypeVar("T", bound=Schema)
 
@@ -44,6 +48,7 @@ def transform_to_schema(
     schema: Type[T],
     transformations: Optional[Dict[Column, SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
+    fill_unspecified_inner_fields_with_nulls: bool = False,
     run_sequentially: bool = True,
 ) -> DataSet[T]:
     """On the provided DataFrame ``df``, it performs the ``transformations`` (if
@@ -68,6 +73,9 @@ def transform_to_schema(
 
     if fill_unspecified_columns_with_nulls:
         transform = add_nulls_for_unspecified_columns(transform, schema, dataframe.columns)
+
+    if fill_unspecified_inner_fields_with_nulls:
+        transform.update(add_nulls_for_unspecified_nested_fields(schema.get_structtype(), dataframe.schema, transform))
 
     transform = RenameDuplicateColumns(transform, schema, dataframe.columns)
 

@@ -4,8 +4,11 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, StringType
 
 from typedspark import (
+    ArrayType,
     Column,
+    MapType,
     Schema,
+    StructType,
     create_empty_dataset,
     register_schema_to_dataset,
     transform_to_schema,
@@ -193,4 +196,175 @@ def test_transform_to_schema_parallel(spark: SparkSession):
         spark, Person, {Person.a: [4, 5, 6], Person.b: [6, 7, 8]}
     )
 
+    assert_df_equality(observed, expected)
+
+# Schemas shared across multiple fill_unspecified_inner_fields tests
+
+class InnerFull(Schema):
+    x: Column[IntegerType]
+    y: Column[IntegerType]
+
+
+class InnerPartial(Schema):
+    x: Column[IntegerType]
+
+
+class TopStructPartial(Schema):
+    id: Column[IntegerType]
+    inner: Column[StructType[InnerPartial]]
+
+
+def test_fill_unspecified_inner_fields_simple_missing_field(spark: SparkSession):
+    class TopStructFull(Schema):
+        id: Column[IntegerType]
+        inner: Column[StructType[InnerFull]]
+
+    ds = create_partially_filled_dataset(
+        spark,
+        TopStructPartial,
+        {TopStructPartial.id: [1, 2], TopStructPartial.inner: [{"x": 10}, {"x": 20}]},
+    )
+    observed = transform_to_schema(ds, TopStructFull, {}, fill_unspecified_inner_fields_with_nulls=True)
+    expected = create_partially_filled_dataset(
+        spark,
+        TopStructFull,
+        {TopStructFull.id: [1, 2], TopStructFull.inner: [{"x": 10, "y": None}, {"x": 20, "y": None}]},
+    )
+    assert_df_equality(observed, expected)
+
+
+def test_fill_unspecified_inner_fields_deeply_nested(spark: SparkSession):
+    class WrapperFull(Schema):
+        n: Column[IntegerType]
+        leaf: Column[StructType[InnerFull]]
+
+    class WrapperPartial(Schema):
+        n: Column[IntegerType]
+        leaf: Column[StructType[InnerPartial]]
+
+    class TopStructDeepFull(Schema):
+        id: Column[IntegerType]
+        wrapper: Column[StructType[WrapperFull]]
+
+    class TopStructDeepPartial(Schema):
+        id: Column[IntegerType]
+        wrapper: Column[StructType[WrapperPartial]]
+
+    ds = create_partially_filled_dataset(
+        spark,
+        TopStructDeepPartial,
+        {
+            TopStructDeepPartial.id: [1, 2],
+            TopStructDeepPartial.wrapper: [
+                {"n": 1, "leaf": {"x": 10}},
+                {"n": 2, "leaf": {"x": 20}},
+            ],
+        },
+    )
+    observed = transform_to_schema(
+        ds, TopStructDeepFull, {}, fill_unspecified_inner_fields_with_nulls=True
+    )
+    expected = create_partially_filled_dataset(
+        spark,
+        TopStructDeepFull,
+        {
+            TopStructDeepFull.id: [1, 2],
+            TopStructDeepFull.wrapper: [
+                {"n": 1, "leaf": {"x": 10, "y": None}},
+                {"n": 2, "leaf": {"x": 20, "y": None}},
+            ],
+        },
+    )
+    assert_df_equality(observed, expected)
+
+
+def test_fill_unspecified_inner_fields_missing_sub_struct(spark: SparkSession):
+    class Sub(Schema):
+        p: Column[IntegerType]
+
+    class InnerWithSub(Schema):
+        x: Column[IntegerType]
+        sub: Column[StructType[Sub]]
+
+    class TopStructSubFull(Schema):
+        id: Column[IntegerType]
+        inner: Column[StructType[InnerWithSub]]
+
+    ds = create_partially_filled_dataset(
+        spark,
+        TopStructPartial,
+        {TopStructPartial.id: [1, 2], TopStructPartial.inner: [{"x": 10}, {"x": 20}]},
+    )
+    observed = transform_to_schema(
+        ds, TopStructSubFull, {}, fill_unspecified_inner_fields_with_nulls=True
+    )
+    expected = create_partially_filled_dataset(
+        spark,
+        TopStructSubFull,
+        {
+            TopStructSubFull.id: [1, 2],
+            TopStructSubFull.inner: [{"x": 10, "sub": None}, {"x": 20, "sub": None}],
+        },
+    )
+    assert_df_equality(observed, expected)
+
+
+def test_fill_unspecified_inner_fields_in_array(spark: SparkSession):
+    class TopArrayFull(Schema):
+        id: Column[IntegerType]
+        items: Column[ArrayType[StructType[InnerFull]]]
+
+    class TopArrayPartial(Schema):
+        id: Column[IntegerType]
+        items: Column[ArrayType[StructType[InnerPartial]]]
+
+    ds = create_partially_filled_dataset(
+        spark,
+        TopArrayPartial,
+        {
+            TopArrayPartial.id: [1, 2],
+            TopArrayPartial.items: [[{"x": 10}, {"x": 11}], [{"x": 20}]],
+        },
+    )
+    observed = transform_to_schema(ds, TopArrayFull, {}, fill_unspecified_inner_fields_with_nulls=True)
+    expected = create_partially_filled_dataset(
+        spark,
+        TopArrayFull,
+        {
+            TopArrayFull.id: [1, 2],
+            TopArrayFull.items: [
+                [{"x": 10, "y": None}, {"x": 11, "y": None}],
+                [{"x": 20, "y": None}],
+            ],
+        },
+    )
+    assert_df_equality(observed, expected)
+
+
+def test_fill_unspecified_inner_fields_in_map(spark: SparkSession):
+    class TopMapFull(Schema):
+        id: Column[IntegerType]
+        mapping: Column[MapType[StringType, StructType[InnerFull]]]
+
+    class TopMapPartial(Schema):
+        id: Column[IntegerType]
+        mapping: Column[MapType[StringType, StructType[InnerPartial]]]
+
+    ds = create_partially_filled_dataset(
+        spark,
+        TopMapPartial,
+        {
+            TopMapPartial.id: [1, 2],
+            TopMapPartial.mapping: [{"a": {"x": 10}}, {"b": {"x": 20}}],
+        },
+    )
+    observed = transform_to_schema(ds, TopMapFull, {}, fill_unspecified_inner_fields_with_nulls=True)
+    expected = create_partially_filled_dataset(
+        spark,
+        TopMapFull,
+        {
+            TopMapFull.id: [1, 2],
+            TopMapFull.mapping: [{"a": {"x": 10, "y": None}}, {"b": {"x": 20, "y": None}}],
+        },
+    )
     assert_df_equality(observed, expected)
