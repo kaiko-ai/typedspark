@@ -11,7 +11,7 @@ mypy==1.19.1
 pyright<=1.1.407
 autoflake==2.3.1
 # stubs
-pandas-stubs<=2.3.3.251201
+pandas-stubs<=2.3.3.251219
 types-setuptools==80.9.0.20250822
 # testing
 pytest<=9.0.2
