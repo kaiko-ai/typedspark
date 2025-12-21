@@ -9,6 +9,7 @@ from pyspark.sql.functions import col
 from pyspark.sql.types import DataType
 
 from typedspark._core.datatypes import StructType
+from typedspark._utils.pyspark_compat import attach_mixin
 
 T = TypeVar("T", bound=DataType)
 
@@ -63,7 +64,7 @@ class Column(SparkColumn, Generic[T]):
         else:
             column = col(name)
 
-        column.__class__ = Column  # type: ignore
+        attach_mixin(column, cls)
         return column
 
     def __init__(
