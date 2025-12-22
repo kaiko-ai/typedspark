@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        pyspark-version: ["3.5.4", "4.0.1"]
+        pyspark-version: ["3.5.4", "4.1.0"]
 
     steps:
       - uses: actions/checkout@v6
@@ -42,7 +42,7 @@ jobs:
           pip install -r requirements-dev.txt
           pip install pyspark==${{ matrix.pyspark-version }}
       - name: Linting
-        if: ${{ matrix.pyspark-version == '4.0.1' }}
+        if: ${{ matrix.pyspark-version == '4.1.0' }}
         run: |
           flake8
           pylint typedspark
@@ -60,7 +60,7 @@ jobs:
           coverage run -m pytest
           coverage report -m --fail-under 100
       - name: Run notebooks
-        if: ${{ matrix.pyspark-version == '4.0.1' }}
+        if: ${{ matrix.pyspark-version == '4.1.0' }}
         run: |
           for FILE in docs/*/*.ipynb; do
             BASE=$(basename $FILE)
