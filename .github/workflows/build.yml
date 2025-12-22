@@ -16,6 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        pyspark-version: ["3.5.4", "4.0.1"]
 
     steps:
       - uses: actions/checkout@v6
@@ -27,7 +28,7 @@ jobs:
           java-version: 21
       - uses: vemonet/setup-spark@a3f00c89c1cb4e08f82b9f91c2d67201f02aa898 # v1.2.2
         with:
-          spark-version: "3.5.3"
+          spark-version: ${{ matrix.pyspark-version }}
           hadoop-version: "3"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
@@ -39,7 +40,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          pip install pyspark==${{ matrix.pyspark-version }}
       - name: Linting
+        if: ${{ matrix.pyspark-version == '4.0.1' }}
         run: |
           flake8
           pylint typedspark
@@ -57,6 +60,7 @@ jobs:
           coverage run -m pytest
           coverage report -m --fail-under 100
       - name: Run notebooks
+        if: ${{ matrix.pyspark-version == '4.0.1' }}
         run: |
           for FILE in docs/*/*.ipynb; do
             BASE=$(basename $FILE)
