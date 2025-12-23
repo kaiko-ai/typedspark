@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, cast, Dict, Tuple, TypeVar
+from typing import Any, Dict, Tuple, TypeVar, cast
 
 _T = TypeVar("_T")
 
