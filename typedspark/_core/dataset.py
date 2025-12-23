@@ -50,7 +50,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             "DataSetImplements should solely be used as a type annotation, it is never initialized."
         )
 
-    def __init__(self):
+    def __init__(self):  # pragma: no cover - DataSetImplements is never instantiated.
         raise NotImplementedError(
             "DataSetImplements should solely be used as a type annotation, it is never initialized."
         )
