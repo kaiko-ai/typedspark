@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Tuple, TypeVar
+from typing import Any, cast, Dict, Tuple, TypeVar
 
 _T = TypeVar("_T")
 
@@ -29,5 +29,6 @@ def attach_mixin(instance: _T, mixin_cls: type) -> _T:
         new_cls = type(name, (mixin_cls, base_type), {})
         _CLASS_CACHE[key] = new_cls
 
-    instance.__class__ = new_cls
+    # Pyright disallows __class__ assignment on typed objects; cast to Any to be explicit.
+    cast(Any, instance).__class__ = new_cls
     return instance

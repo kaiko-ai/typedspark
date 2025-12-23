@@ -1,4 +1,5 @@
 import os
+from typing import Optional, Tuple, Type
 
 import pytest
 from pyspark.sql import SparkSession
@@ -7,7 +8,7 @@ from pyspark.sql.types import LongType
 from typedspark import Column, Schema, create_empty_dataset
 
 
-def _get_classic_classes():
+def _get_classic_classes() -> Optional[Tuple[Type[object], Type[object]]]:
     try:
         from pyspark.sql.classic.column import Column as ClassicColumn
         from pyspark.sql.classic.dataframe import DataFrame as ClassicDataFrame
@@ -17,7 +18,7 @@ def _get_classic_classes():
     return ClassicDataFrame, ClassicColumn
 
 
-def _get_connect_classes():
+def _get_connect_classes() -> Optional[Tuple[Type[object], Type[object]]]:
     try:
         from pyspark.sql.connect.column import Column as ConnectColumn
         from pyspark.sql.connect.dataframe import DataFrame as ConnectDataFrame
@@ -35,6 +36,7 @@ def test_dataset_preserves_classic_dataframe(spark):
     classic = _get_classic_classes()
     if classic is None:
         pytest.skip("PySpark classic classes not available")
+        return
     classic_df, _classic_col = classic
 
     df = create_empty_dataset(spark, A, 1)
@@ -45,6 +47,7 @@ def test_column_preserves_classic_column(spark):
     classic = _get_classic_classes()
     if classic is None:
         pytest.skip("PySpark classic classes not available")
+        return
     _classic_df, classic_col = classic
 
     _ = spark  # ensure active session for column creation
@@ -55,6 +58,7 @@ def test_dataset_preserves_connect_dataframe():
     connect = _get_connect_classes()
     if connect is None:
         pytest.skip("PySpark connect classes not available")
+        return
 
     connect_url = os.environ.get("SPARK_CONNECT_URL")
     if not connect_url:

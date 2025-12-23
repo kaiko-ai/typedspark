@@ -83,11 +83,11 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
     def filter(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
     def where(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
     @overload
@@ -260,11 +260,11 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
     def filter(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
     def where(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
     @overload
