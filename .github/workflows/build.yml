@@ -29,7 +29,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: 21
-      - uses: vemonet/setup-spark@v1
+      - uses: vemonet/setup-spark@a3f00c89c1cb4e08f82b9f91c2d67201f02aa898 # v1.2.2
         with:
           spark-version: ${{ matrix.pyspark-version }}
           hadoop-version: "3"
