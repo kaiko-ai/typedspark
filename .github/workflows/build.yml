@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        pyspark-version: ["3.5.4", "4.1.0"]
+        pyspark-version: ["3.5.7", "4.1.0"]
         exclude:
           - python-version: "3.9"
             pyspark-version: "4.1.0"
