@@ -52,6 +52,11 @@ By default, ``typedspark`` does not list ``pyspark`` as a dependency, since many
 pip install "typedspark[pyspark]"
 ```
 
+## Compatibility
+
+Typedspark is tested in CI with PySpark 3.5.4 and 4.1.0. Spark Connect is supported when using
+PySpark 4.x, and the Connect-specific test runs if ``SPARK_CONNECT_URL`` is set.
+
 ## Demo videos
 
 ### IDE demo

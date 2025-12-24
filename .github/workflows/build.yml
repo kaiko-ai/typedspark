@@ -16,6 +16,10 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        pyspark-version: ["3.5.7", "4.1.0"]
+        exclude:
+          - python-version: "3.9"
+            pyspark-version: "4.1.0"
 
     steps:
       - uses: actions/checkout@v6
@@ -27,7 +31,7 @@ jobs:
           java-version: 21
       - uses: vemonet/setup-spark@a3f00c89c1cb4e08f82b9f91c2d67201f02aa898 # v1.2.2
         with:
-          spark-version: "3.5.3"
+          spark-version: ${{ matrix.pyspark-version }}
           hadoop-version: "3"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
@@ -39,7 +43,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          pip install pyspark==${{ matrix.pyspark-version }}
+      - name: Start Spark Connect
+        if: ${{ matrix.pyspark-version == '4.1.0' }}
+        run: |
+          "${SPARK_HOME}/sbin/start-connect-server.sh" \
+            --conf spark.ui.enabled=false \
+            --conf spark.ui.showConsoleProgress=false
+          python - <<'PY'
+          import socket
+          import time
+
+          for _ in range(30):
+              try:
+                  with socket.create_connection(("127.0.0.1", 15002), timeout=1):
+                      break
+              except OSError:
+                  time.sleep(1)
+          else:
+              raise SystemExit("Spark Connect server did not start on port 15002")
+          PY
       - name: Linting
+        if: ${{ matrix.pyspark-version == '4.1.0' }}
         run: |
           flake8
           pylint typedspark
@@ -50,6 +75,8 @@ jobs:
           isort --check .
           docformatter --black -c **/*.py
       - name: Testing
+        env:
+          SPARK_CONNECT_URL: ${{ matrix.pyspark-version == '4.1.0' && 'sc://localhost:15002' || '' }}
         run: |
           # we run this test seperately, to ensure that it is run without an active Spark session
           python -m pytest -m no_spark_session
@@ -57,6 +84,7 @@ jobs:
           coverage run -m pytest
           coverage report -m --fail-under 100
       - name: Run notebooks
+        if: ${{ matrix.pyspark-version == '4.1.0' }}
         run: |
           for FILE in docs/*/*.ipynb; do
             BASE=$(basename $FILE)

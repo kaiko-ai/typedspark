@@ -12,6 +12,7 @@ from typing_extensions import Concatenate, ParamSpec
 
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
+from typedspark._utils.pyspark_compat import attach_mixin
 
 _Schema = TypeVar("_Schema", bound=Schema)
 _Protocol = TypeVar("_Protocol", bound=Schema, covariant=True)
@@ -44,7 +45,12 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
     _schema_annotations: Type[_Implementation]
 
-    def __init__(self):
+    def __new__(cls, *args, **kwargs):
+        raise NotImplementedError(
+            "DataSetImplements should solely be used as a type annotation, it is never initialized."
+        )
+
+    def __init__(self):  # pragma: no cover - DataSetImplements is never instantiated.
         raise NotImplementedError(
             "DataSetImplements should solely be used as a type annotation, it is never initialized."
         )
@@ -77,11 +83,11 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
     def filter(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
     def where(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
     @overload
@@ -185,7 +191,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         the schema annotations are provided.
         """
         dataframe = cast(DataSet, dataframe)
-        dataframe.__class__ = DataSet
+        attach_mixin(dataframe, cls)
 
         # first we reset the schema annotations to None, in case they are inherrited through the
         # passed DataFrame
@@ -254,11 +260,11 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         return DataSet[self._schema_annotations](super().distinct())  # type: ignore
 
     def filter(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
     def where(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
-        """Filters rows using the given condition"""
+        """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
     @overload
