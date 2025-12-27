@@ -1,6 +1,6 @@
 """Module containing classes and functions related to TypedSpark Columns."""
 
-from logging import warn
+from logging import warning
 from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
 
 from pyspark.sql import Column as SparkColumn
@@ -52,7 +52,9 @@ class Column(SparkColumn, Generic[T]):
 
         if dataframe is not None and parent is None:
             parent = dataframe
-            warn("The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead.")
+            warning(
+                "The use of Column(dataframe=...) is deprecated, use Column(parent=...) instead."
+            )
 
         column: SparkColumn
         if SparkSession.getActiveSession() is None:
