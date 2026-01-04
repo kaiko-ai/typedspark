@@ -76,7 +76,7 @@ def test_column_active_raises_no_session(monkeypatch: pytest.MonkeyPatch):
 @pytest.mark.no_spark_session
 def test_column_active_reraises_other_errors(monkeypatch: pytest.MonkeyPatch):
     def raise_unexpected(cls):
-        raise _make_pyspark_runtime_error("NO_ACTIVE_EXCEPTION")
+        raise _make_pyspark_runtime_error("NO_ACTIVE_SESSION")
 
     monkeypatch.setattr(SparkSession, "active", classmethod(raise_unexpected))
 
