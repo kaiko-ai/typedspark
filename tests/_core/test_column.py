@@ -76,11 +76,7 @@ def test_column_with_deprecated_dataframe_param(spark: SparkSession):
     Column("a", dataframe=df)
 
 
-def test_column_comparison_in_thread_without_active_session(
-    spark: SparkSession, monkeypatch: pytest.MonkeyPatch
-):
-    monkeypatch.setattr(SparkSession, "getActiveSession", classmethod(lambda cls: None))
-
+def test_column_comparison_in_thread_without_active_session(spark: SparkSession):
     result: dict[str, SparkColumn] = {}
     error: dict[str, BaseException] = {}
 
