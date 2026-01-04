@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from threading import Thread
-from typing import Annotated
+from typing import Annotated, Any, cast
 
 import pandas as pd
 import pytest
@@ -22,14 +22,15 @@ class A(Schema):
 def _make_pyspark_runtime_error(error_class: str) -> PySparkRuntimeError:
     import inspect
 
+    constructor = cast(Any, PySparkRuntimeError)
     params = inspect.signature(PySparkRuntimeError).parameters
     if "error_class" in params:
-        return PySparkRuntimeError(
+        return constructor(
             error_class=error_class,
             message_parameters={},
         )
     if "errorClass" in params:
-        return PySparkRuntimeError(
+        return constructor(
             errorClass=error_class,
             messageParameters={},
         )
