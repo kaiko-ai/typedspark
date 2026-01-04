@@ -19,6 +19,24 @@ class A(Schema):
     b: Column[StringType]
 
 
+def _make_pyspark_runtime_error(error_class: str) -> PySparkRuntimeError:
+    import inspect
+
+    params = inspect.signature(PySparkRuntimeError).parameters
+    if "error_class" in params:
+        return PySparkRuntimeError(
+            error_class=error_class,
+            message_parameters={},
+        )
+    if "errorClass" in params:
+        return PySparkRuntimeError(
+            errorClass=error_class,
+            messageParameters={},
+        )
+
+    return PySparkRuntimeError(error_class)
+
+
 def test_column(spark: SparkSession):
     (
         spark.createDataFrame(
@@ -47,10 +65,7 @@ def test_column_reference_without_spark_session():
 @pytest.mark.no_spark_session
 def test_column_active_raises_no_session(monkeypatch: pytest.MonkeyPatch):
     def raise_no_session(cls):
-        raise PySparkRuntimeError(
-            errorClass="NO_ACTIVE_OR_DEFAULT_SESSION",
-            messageParameters={},
-        )
+        raise _make_pyspark_runtime_error("NO_ACTIVE_OR_DEFAULT_SESSION")
 
     monkeypatch.setattr(SparkSession, "active", classmethod(raise_no_session))
 
@@ -60,10 +75,7 @@ def test_column_active_raises_no_session(monkeypatch: pytest.MonkeyPatch):
 @pytest.mark.no_spark_session
 def test_column_active_reraises_other_errors(monkeypatch: pytest.MonkeyPatch):
     def raise_unexpected(cls):
-        raise PySparkRuntimeError(
-            errorClass="NO_ACTIVE_EXCEPTION",
-            messageParameters={},
-        )
+        raise _make_pyspark_runtime_error("NO_ACTIVE_EXCEPTION")
 
     monkeypatch.setattr(SparkSession, "active", classmethod(raise_unexpected))
 
