@@ -22,6 +22,8 @@ class A(Schema):
 def _make_pyspark_runtime_error(error_class: str) -> PySparkRuntimeError:
     import inspect
 
+    # PySpark changed the constructor kwargs from error_class/message_parameters (3.x)
+    # to errorClass/messageParameters (4.x), so we select based on signature.
     constructor = cast(Any, PySparkRuntimeError)
     params = inspect.signature(PySparkRuntimeError).parameters
     if "error_class" in params:
