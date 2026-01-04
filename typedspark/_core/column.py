@@ -23,7 +23,8 @@ class EmptyColumn(SparkColumn):
 
 
 def _get_active_or_default_session() -> Optional[SparkSession]:
-    """Return the active Spark session, falling back to the default/instantiated session."""
+    """Return the active Spark session, falling back to the default/instantiated
+    session."""
     # SparkSession.active() relies on getActiveSession(), falls back to _instantiatedSession,
     # and raises PySparkRuntimeError("NO_ACTIVE_OR_DEFAULT_SESSION") when neither exists.
     try:

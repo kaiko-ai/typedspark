@@ -4,6 +4,7 @@ from typing import Annotated
 
 import pandas as pd
 import pytest
+from pyspark.errors import PySparkRuntimeError
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
@@ -41,6 +42,33 @@ def test_column_doesnt_exist():
 def test_column_reference_without_spark_session():
     a = A.a
     assert a.str == "a"
+
+
+@pytest.mark.no_spark_session
+def test_column_active_raises_no_session(monkeypatch: pytest.MonkeyPatch):
+    def raise_no_session(cls):
+        raise PySparkRuntimeError(
+            errorClass="NO_ACTIVE_OR_DEFAULT_SESSION",
+            messageParameters={},
+        )
+
+    monkeypatch.setattr(SparkSession, "active", classmethod(raise_no_session))
+
+    assert repr(A.a) == "Column<'a'> (no active Spark session)"
+
+
+@pytest.mark.no_spark_session
+def test_column_active_reraises_other_errors(monkeypatch: pytest.MonkeyPatch):
+    def raise_unexpected(cls):
+        raise PySparkRuntimeError(
+            errorClass="NO_ACTIVE_EXCEPTION",
+            messageParameters={},
+        )
+
+    monkeypatch.setattr(SparkSession, "active", classmethod(raise_unexpected))
+
+    with pytest.raises(PySparkRuntimeError):
+        _ = A.a
 
 
 def test_column_with_deprecated_dataframe_param(spark: SparkSession):
