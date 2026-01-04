@@ -7,6 +7,7 @@ from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
 from pyspark.sql.types import DataType
+from pyspark.errors import PySparkRuntimeError
 
 from typedspark._core.datatypes import StructType
 from typedspark._utils.pyspark_compat import attach_mixin
@@ -19,6 +20,19 @@ class EmptyColumn(SparkColumn):
 
     def __init__(self, *args, **kwargs) -> None:  # pragma: no cover
         pass
+
+
+def _get_active_or_default_session() -> Optional[SparkSession]:
+    """Return the active Spark session, falling back to the default/instantiated session."""
+    # SparkSession.active() relies on getActiveSession(), falls back to _instantiatedSession,
+    # and raises PySparkRuntimeError("NO_ACTIVE_OR_DEFAULT_SESSION") when neither exists.
+    try:
+        return SparkSession.active()
+    except PySparkRuntimeError as exc:
+        if exc.getErrorClass() == "NO_ACTIVE_OR_DEFAULT_SESSION":
+            return None
+
+        raise
 
 
 class Column(SparkColumn, Generic[T]):
@@ -57,7 +71,7 @@ class Column(SparkColumn, Generic[T]):
             )
 
         column: SparkColumn
-        if SparkSession.getActiveSession() is None:
+        if _get_active_or_default_session() is None:
             column = EmptyColumn()  # pragma: no cover
         elif alias is not None:
             column = col(f"{alias}.{name}")
@@ -125,8 +139,9 @@ class Column(SparkColumn, Generic[T]):
         return dtype()  # type: ignore
 
     def __repr__(self) -> str:
-        spark = SparkSession.getActiveSession()
-        if spark is None:  # pragma: no cover
+        spark = _get_active_or_default_session()
+        if spark is None or not hasattr(self, "_jc"):  # pragma: no cover
+            # Columns created without a session stay "empty" even if a session appears later.
             return f"Column<'{self.str}'> (no active Spark session)"
 
         return super().__repr__()
