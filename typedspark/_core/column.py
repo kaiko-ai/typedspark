@@ -3,11 +3,11 @@
 from logging import warning
 from typing import Generic, Optional, TypeVar, Union, get_args, get_origin
 
+from pyspark.errors import PySparkRuntimeError
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
 from pyspark.sql.types import DataType
-from pyspark.errors import PySparkRuntimeError
 
 from typedspark._core.datatypes import StructType
 from typedspark._utils.pyspark_compat import attach_mixin
