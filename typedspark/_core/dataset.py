@@ -34,6 +34,7 @@ _Implementation = TypeVar("_Implementation", bound=Schema, covariant=True)
 P = ParamSpec("P")
 _ReturnType = TypeVar("_ReturnType", bound=DataFrame)  # pylint: disable=C0103
 
+ColumnOrName = Union[SparkColumn, str]
 
 class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     """DataSetImplements allows us to define functions such as:
@@ -179,18 +180,18 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
     @overload
     def repartition(
-        self, numPartitions: int, *cols: Union[SparkColumn, str]
+        self, numPartitions: int, *cols: ColumnOrName
     ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     @overload
     def repartition(
-        self, *cols: Union[SparkColumn, str]
+        self, *cols: ColumnOrName
     ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     def repartition(
         self,
         numPartitions: Union[int, SparkColumn, str, None] = None,
-        *cols: Union[SparkColumn, str],
+        *cols: ColumnOrName,
     ) -> DataSet[_Implementation]:
         if isinstance(numPartitions, int):
             res = super().repartition(numPartitions, *cols)
@@ -202,18 +203,18 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
     @overload
     def repartitionByRange(
-        self, numPartitions: int, *cols: Union[SparkColumn, str]
+        self, numPartitions: int, *cols: ColumnOrName
     ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     @overload
     def repartitionByRange(
-        self, *cols: Union[SparkColumn, str]
+        self, *cols: ColumnOrName
     ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     def repartitionByRange(
         self,
         numPartitions: Union[int, SparkColumn, str, None] = None,
-        *cols: Union[SparkColumn, str],
+        *cols: ColumnOrName,
     ) -> DataSet[_Implementation]:  # noqa: N802
         if isinstance(numPartitions, int):
             res = super().repartitionByRange(numPartitions, *cols)
@@ -261,11 +262,11 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     def checkpoint(self, eager: bool = True) -> DataSet[_Implementation]:
         return DataSet[self._schema_annotations](super().checkpoint(eager))  # type: ignore
 
-    def filter(self, condition: Union[SparkColumn, str]) -> DataSet[_Implementation]:  # type: ignore[override]
+    def filter(self, condition: ColumnOrName) -> DataSet[_Implementation]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
-    def where(self, condition: Union[SparkColumn, str]) -> DataSet[_Implementation]:  # type: ignore[override]
+    def where(self, condition: ColumnOrName) -> DataSet[_Implementation]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
@@ -612,18 +613,18 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
 
     @overload
     def repartition(
-        self, numPartitions: int, *cols: Union[SparkColumn, str]
+        self, numPartitions: int, *cols: ColumnOrName
     ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     @overload
     def repartition(
-        self, *cols: Union[SparkColumn, str]
+        self, *cols: ColumnOrName
     ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     def repartition(
         self,
         numPartitions: Union[int, SparkColumn, str, None] = None,
-        *cols: Union[SparkColumn, str],
+        *cols: ColumnOrName,
     ) -> DataSet[_Schema]:
         if isinstance(numPartitions, int):
             res = super().repartition(numPartitions, *cols)
@@ -635,18 +636,18 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
 
     @overload
     def repartitionByRange(
-        self, numPartitions: int, *cols: Union[SparkColumn, str]
+        self, numPartitions: int, *cols: ColumnOrName
     ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     @overload
     def repartitionByRange(
-        self, *cols: Union[SparkColumn, str]
+        self, *cols: ColumnOrName
     ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     def repartitionByRange(
         self,
         numPartitions: Union[int, SparkColumn, str, None] = None,
-        *cols: Union[SparkColumn, str],
+        *cols: ColumnOrName,
     ) -> DataSet[_Schema]:  # noqa: N802
         if isinstance(numPartitions, int):
             res = super().repartitionByRange(numPartitions, *cols)
@@ -694,11 +695,11 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
     def checkpoint(self, eager: bool = True) -> DataSet[_Schema]:
         return DataSet[self._schema_annotations](super().checkpoint(eager))  # type: ignore
 
-    def filter(self, condition: Union[SparkColumn, str]) -> DataSet[_Schema]:  # type: ignore[override]
+    def filter(self, condition: ColumnOrName) -> DataSet[_Schema]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
-    def where(self, condition: Union[SparkColumn, str]) -> DataSet[_Schema]:  # type: ignore[override]
+    def where(self, condition: ColumnOrName) -> DataSet[_Schema]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
