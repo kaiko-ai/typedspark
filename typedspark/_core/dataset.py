@@ -185,9 +185,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     @overload
-    def repartition(
-        self, *cols: ColumnOrName
-    ) -> DataSet[_Implementation]: ...  # pragma: no cover
+    def repartition(self, *cols: ColumnOrName) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     def repartition(
         self,
@@ -618,9 +616,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
     ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     @overload
-    def repartition(
-        self, *cols: ColumnOrName
-    ) -> DataSet[_Schema]: ...  # pragma: no cover
+    def repartition(self, *cols: ColumnOrName) -> DataSet[_Schema]: ...  # pragma: no cover
 
     def repartition(
         self,
@@ -641,9 +637,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
     ) -> DataSet[_Schema]: ...  # pragma: no cover
 
     @overload
-    def repartitionByRange(
-        self, *cols: ColumnOrName
-    ) -> DataSet[_Schema]: ...  # pragma: no cover
+    def repartitionByRange(self, *cols: ColumnOrName) -> DataSet[_Schema]: ...  # pragma: no cover
 
     def repartitionByRange(
         self,
