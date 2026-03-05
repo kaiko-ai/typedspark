@@ -261,11 +261,11 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     def checkpoint(self, eager: bool = True) -> DataSet[_Implementation]:
         return DataSet[self._schema_annotations](super().checkpoint(eager))  # type: ignore
 
-    def filter(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
+    def filter(self, condition: Union[SparkColumn, str]) -> DataSet[_Implementation]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
-    def where(self, condition) -> DataSet[_Implementation]:  # type: ignore[override]
+    def where(self, condition: Union[SparkColumn, str]) -> DataSet[_Implementation]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
@@ -694,11 +694,11 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
     def checkpoint(self, eager: bool = True) -> DataSet[_Schema]:
         return DataSet[self._schema_annotations](super().checkpoint(eager))  # type: ignore
 
-    def filter(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
+    def filter(self, condition: Union[SparkColumn, str]) -> DataSet[_Schema]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().filter(condition))  # type: ignore
 
-    def where(self, condition) -> DataSet[_Schema]:  # type: ignore[override]
+    def where(self, condition: Union[SparkColumn, str]) -> DataSet[_Schema]:  # type: ignore[override]
         """Filters rows using the given condition."""
         return DataSet[self._schema_annotations](super().where(condition))  # type: ignore
 
