@@ -36,6 +36,7 @@ _ReturnType = TypeVar("_ReturnType", bound=DataFrame)  # pylint: disable=C0103
 
 ColumnOrName = Union[SparkColumn, str]
 
+
 class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     """DataSetImplements allows us to define functions such as:
 
