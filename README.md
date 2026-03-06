@@ -1,5 +1,6 @@
 # Typedspark: column-wise type annotations for pyspark DataFrames
 
+
 We love Spark! But in production code we're wary when we see:
 
 ```python
