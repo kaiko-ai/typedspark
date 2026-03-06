@@ -34,7 +34,7 @@ def create_empty_dataset(spark: SparkSession, schema: Type[T], n_rows: int = 3) 
 def create_partially_filled_dataset(
     spark: SparkSession,
     schema: Type[T],
-    data: Union[Dict[Column, List[Any]], List[Dict[Column, Any]]],
+    data: Union[Dict[Column[Any], List[Any]], List[Dict[Column[Any], Any]]],
 ) -> DataSet[T]:
     """Creates a ``DataSet`` with ``Schema`` schema, where ``data`` can
     be defined in either of the following two ways:
@@ -85,7 +85,7 @@ def create_partially_filled_dataset(
     return DataSet[schema](dataframe)  # type: ignore
 
 
-def create_structtype_row(schema: Type[T], data: Dict[Column, Any]) -> Row:
+def create_structtype_row(schema: Type[T], data: Dict[Column[Any], Any]) -> Row:
     """Creates a ``Row`` with ``StructType`` schema, where ``data`` is a mapping from
     column to data in the respective column."""
     data_with_string_index = {k.str: v for k, v in data.items()}
@@ -97,7 +97,7 @@ def create_structtype_row(schema: Type[T], data: Dict[Column, Any]) -> Row:
 
 
 def _create_column_wise_data_from_dict(
-    schema: Type[T], data: Dict[Column, List[Any]]
+    schema: Type[T], data: Dict[Column[Any], List[Any]]
 ) -> List[List[Any]]:
     """Converts a dict of column to data to a list of lists, where each inner list
     contains the data for a column."""
@@ -118,7 +118,7 @@ def _create_column_wise_data_from_dict(
 
 
 def _create_column_wise_data_from_list(
-    schema: Type[T], data: List[Dict[Column, Any]]
+    schema: Type[T], data: List[Dict[Column[Any], Any]]
 ) -> List[List[Any]]:
     """Converts a list of dicts of column to data to a list of lists, where each inner
     list contains the data for a column."""
