@@ -9,9 +9,7 @@ from pyspark.sql import Column as SparkColumn
 
 from typedspark._schema.schema import Schema
 
-ERROR_MSG: Final[
-    str
-] = """Columns {columns} are ambiguous.
+ERROR_MSG: Final[str] = """Columns {columns} are ambiguous.
 Please specify the transformations for these columns explicitly, for example:
 
 schema_a = register_schema_to_dataset(df_a, A)
