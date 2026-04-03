@@ -23,7 +23,7 @@ from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
 from typing_extensions import Concatenate, ParamSpec
 
-from typedspark._core.rename_columns import rename_columns, rename_columns_2
+from typedspark._core.rename_columns import rename_to_internal, rename_to_external
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 from typedspark._transforms.transform_to_schema import transform_to_schema
@@ -100,7 +100,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
         schema = cls._schema_annotations  # type: ignore
 
-        df = rename_columns(df, schema)
+        df = rename_to_internal(df, schema)
         df = transform_to_schema(df, schema)
         if register_to_schema:
             schema = register_schema_to_dataset(df, schema)
@@ -123,7 +123,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         df = cast(DataFrame, self)
         df.__class__ = DataFrame
 
-        df = rename_columns_2(df, self._schema_annotations)
+        df = rename_to_external(df, self._schema_annotations)
 
         return df
 
