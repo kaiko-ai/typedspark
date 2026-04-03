@@ -323,3 +323,28 @@ def test_to_dataframe_nested_struct_round_trip(spark: SparkSession):
     df_out = ds.to_dataframe()
     assert cast(StructType, df_out.schema["details"].dataType).fieldNames() == ["full-name"]
     assert_df_equality(df_out, df)
+
+
+def test_from_dataframe_register_to_schema_false(spark: SparkSession):
+    """With register_to_schema=False the returned schema is still the original class
+    (not a dynamically registered subclass), but data is unchanged."""
+    df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
+    ds, schema = DataSet[A].from_dataframe(df, register_to_schema=False)
+
+    assert isinstance(ds, DataSet)
+    assert_df_equality(ds, df)
+    # Schema is still the original class, not a dynamically registered subclass
+    assert schema is A
+
+
+def test_to_dataframe_no_external_names(spark: SparkSession):
+    """When schema has no external_name annotations, to_dataframe() is a no-op
+    for column names and still returns a plain DataFrame."""
+    df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
+    ds, _ = DataSet[A].from_dataframe(df)
+
+    result = ds.to_dataframe()
+
+    assert type(result) is DataFrame
+    assert result.columns == ["a", "b"]
+    assert_df_equality(result, df)
