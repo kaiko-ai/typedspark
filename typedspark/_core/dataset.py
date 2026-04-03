@@ -26,7 +26,6 @@ from typing_extensions import Concatenate, ParamSpec
 from typedspark._core.rename_columns import rename_to_external, rename_to_internal
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
-from typedspark._transforms.transform_to_schema import transform_to_schema
 from typedspark._utils.pyspark_compat import attach_mixin
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
@@ -95,6 +94,10 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["first-name", "age"])
             ds, schema = DataSet[Person].from_dataframe(df)
         """
+        # Local import to avoid circular dependency:
+        # dataset.py → transform_to_schema.py → dataset.py
+        from typedspark._transforms.transform_to_schema import transform_to_schema  # noqa: PLC0415
+
         if not hasattr(cls, "_schema_annotations"):  # pragma: no cover
             raise SyntaxError("Please define a schema, e.g. `DataSet[Person].from_dataset(df)`.")
 
