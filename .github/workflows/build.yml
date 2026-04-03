@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 200
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         pyspark-version: ["3.5.7", "4.1.1"]
 
     steps:
@@ -70,7 +70,7 @@ jobs:
           bandit typedspark/**/*.py
           black --check .
           isort --check .
-          docformatter --black -c **/*.py
+          python -c "import sys; exit(0 if sys.version_info >= (3, 14) else 1)" || docformatter --black -c **/*.py
       - name: Testing
         env:
           SPARK_CONNECT_URL: ${{ matrix.pyspark-version == '4.1.1' && 'sc://localhost:15002' || '' }}
