@@ -277,3 +277,38 @@ def test_from_dataframe_with_external_name(spark: SparkSession):
     assert isinstance(df_2, DataFrame)
     assert df_2.columns == ["first-name", "age"]
     assert_df_equality(df_2, df)
+
+
+from typedspark._core.datatypes import StructType as TypedSparkStructType
+
+
+class InnerSchema(Schema):
+    full_name: Annotated[Column[StringType], ColumnMeta(external_name="full-name")]
+
+
+class OuterSchema(Schema):
+    details: Column[TypedSparkStructType[InnerSchema]]
+    age: Column[LongType]
+
+
+def test_to_dataframe_nested_struct_round_trip(spark: SparkSession):
+    """When external_name is present on a field inside a nested struct, a
+    from_dataframe/to_dataframe round-trip should restore the original DataFrame.
+    Exercises the recursive call in _build_external_struct (was buggy: called
+    _build_internal_struct instead of itself)."""
+    from pyspark.sql import Row
+
+    data = [
+        Row(details=Row(**{"full-name": "Alice"}), age=24),
+        Row(details=Row(**{"full-name": "Bob"}), age=25),
+    ]
+    df = spark.createDataFrame(data)
+    ds, _ = DataSet[OuterSchema].from_dataframe(df)
+
+    # After from_dataframe, nested field should use the internal name
+    assert ds.schema["details"].dataType.fieldNames() == ["full_name"]
+
+    # Round-trip should restore the original nested field name
+    df_out = ds.to_dataframe()
+    assert df_out.schema["details"].dataType.fieldNames() == ["full-name"]
+    assert_df_equality(df_out, df)
