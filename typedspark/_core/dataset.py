@@ -23,7 +23,7 @@ from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
 from typing_extensions import Concatenate, ParamSpec
 
-from typedspark._core.rename_columns import rename_to_internal, rename_to_external
+from typedspark._core.rename_columns import rename_to_external, rename_to_internal
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 from typedspark._transforms.transform_to_schema import transform_to_schema
@@ -120,14 +120,8 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             ds, schema = DataSet[Person].from_dataframe(df)
             df = ds.to_dataframe()
         """
-        df = cast(DataFrame, self)
-        df.__class__ = DataFrame
-
-        df = rename_to_external(df, self._schema_annotations)
-
-        return df
-
-        # return rename_columns(df, schema)
+        plain_df = DataFrame(self._jdf, self.sparkSession)
+        return rename_to_external(plain_df, self._schema_annotations)
 
     """The following functions are equivalent to their parents in ``DataFrame``, but
     since they don't affect the ``Schema``, we can add type annotations here.
