@@ -231,6 +231,9 @@ def test_create_schema_with_invalid_column_name(spark: SparkSession):
     df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["first-name", "age"])
     ds, schema = create_schema(df)
 
+    df2 = ds.to_dataframe()
+    assert_df_equality(df, df2)
+
 
 def test_create_schema_with_invalid_column_name_in_a_structtype(spark: SparkSession):
     data = [
@@ -260,6 +263,9 @@ def test_create_schema_with_invalid_column_name_in_a_structtype(spark: SparkSess
 
     df = spark.createDataFrame(data)
     ds, schema = create_schema(df)
+
+    df2 = ds.to_dataframe()
+    assert_df_equality(df, df2)
 
 
 def test_create_schema_with_invalid_column_name_in_a_nested_structtype(spark: SparkSession):
@@ -298,3 +304,6 @@ def test_create_schema_with_invalid_column_name_in_a_nested_structtype(spark: Sp
 
     df = spark.createDataFrame(data)
     ds, schema = create_schema(df)
+
+    df2 = ds.to_dataframe()
+    assert_df_equality(df, df2)
