@@ -23,10 +23,11 @@ from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
 from typing_extensions import Concatenate, ParamSpec
 
-from typedspark._core.rename_columns import rename_columns
+from typedspark._core.rename_columns import rename_columns, rename_columns_2
 from typedspark._core.validate_schema import validate_schema
 from typedspark._schema.schema import Schema
 from typedspark._transforms.transform_to_schema import transform_to_schema
+from typedspark._utils.pyspark_compat import attach_mixin
 from typedspark._utils.register_schema_to_dataset import register_schema_to_dataset
 
 _Schema = TypeVar("_Schema", bound=Schema)
@@ -99,7 +100,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
 
         schema = cls._schema_annotations  # type: ignore
 
-        df = rename_columns(df, schema.get_structtype())
+        df = rename_columns(df, schema)
         df = transform_to_schema(df, schema)
         if register_to_schema:
             schema = register_schema_to_dataset(df, schema)
@@ -122,13 +123,11 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         df = cast(DataFrame, self)
         df.__class__ = DataFrame
 
-        for column in self._schema_annotations.get_structtype().fields:
-            if column.metadata:
-                df = df.withColumnRenamed(
-                    column.name, column.metadata.get("external_name", column.name)
-                )
+        df = rename_columns_2(df, self._schema_annotations)
 
         return df
+
+        # return rename_columns(df, schema)
 
     """The following functions are equivalent to their parents in ``DataFrame``, but
     since they don't affect the ``Schema``, we can add type annotations here.
