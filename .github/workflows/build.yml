@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
-        pyspark-version: ["3.5.7", "4.1.0"]
+        pyspark-version: ["3.5.7", "4.1.1"]
 
     steps:
       - uses: actions/checkout@v6
@@ -42,7 +42,7 @@ jobs:
           pip install -r requirements-dev.txt
           pip install pyspark==${{ matrix.pyspark-version }}
       - name: Start Spark Connect
-        if: ${{ matrix.pyspark-version == '4.1.0' }}
+        if: ${{ matrix.pyspark-version == '4.1.1' }}
         run: |
           "${SPARK_HOME}/sbin/start-connect-server.sh" \
             --conf spark.ui.enabled=false \
@@ -61,7 +61,7 @@ jobs:
               raise SystemExit("Spark Connect server did not start on port 15002")
           PY
       - name: Linting
-        if: ${{ matrix.pyspark-version == '4.1.0' }}
+        if: ${{ matrix.pyspark-version == '4.1.1' }}
         run: |
           flake8
           pylint typedspark
@@ -73,7 +73,7 @@ jobs:
           docformatter --black -c **/*.py
       - name: Testing
         env:
-          SPARK_CONNECT_URL: ${{ matrix.pyspark-version == '4.1.0' && 'sc://localhost:15002' || '' }}
+          SPARK_CONNECT_URL: ${{ matrix.pyspark-version == '4.1.1' && 'sc://localhost:15002' || '' }}
         run: |
           # we run this test seperately, to ensure that it is run without an active Spark session
           python -m pytest -m no_spark_session
@@ -81,7 +81,7 @@ jobs:
           coverage run -m pytest
           coverage report -m --fail-under 100
       - name: Run notebooks
-        if: ${{ matrix.pyspark-version == '4.1.0' }}
+        if: ${{ matrix.pyspark-version == '4.1.1' }}
         run: |
           for FILE in docs/*/*.ipynb; do
             BASE=$(basename $FILE)
