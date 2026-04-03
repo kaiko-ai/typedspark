@@ -1,5 +1,5 @@
 import functools
-from typing import Annotated
+from typing import Annotated, cast
 
 import pandas as pd
 import pytest
@@ -7,11 +7,12 @@ from chispa import assert_df_equality  # type: ignore
 from pyspark import StorageLevel
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.types import LongType, StringType, TimestampType
+from pyspark.sql.types import LongType, StringType, StructType, TimestampType
 
 from typedspark import Column, DataSet, Schema
 from typedspark._core.column_meta import ColumnMeta
 from typedspark._core.dataset import DataSetImplements
+from typedspark._core.datatypes import StructType as TypedSparkStructType
 from typedspark._utils.create_dataset import create_empty_dataset
 
 
@@ -279,7 +280,15 @@ def test_from_dataframe_with_external_name(spark: SparkSession):
     assert_df_equality(df_2, df)
 
 
-from typedspark._core.datatypes import StructType as TypedSparkStructType
+def test_to_dataframe_returns_plain_dataframe_not_dataset(spark: SparkSession):
+    """to_dataframe() must return a plain DataFrame, not a DataSet subclass, even when
+    no column renaming is needed."""
+    df = spark.createDataFrame([(1, "a")], ["a", "b"])
+    ds, _ = DataSet[A].from_dataframe(df)
+
+    result = ds.to_dataframe()
+
+    assert type(result) is DataFrame  # not a DataSet subclass
 
 
 class InnerSchema(Schema):
@@ -294,8 +303,10 @@ class OuterSchema(Schema):
 def test_to_dataframe_nested_struct_round_trip(spark: SparkSession):
     """When external_name is present on a field inside a nested struct, a
     from_dataframe/to_dataframe round-trip should restore the original DataFrame.
+
     Exercises the recursive call in _build_external_struct (was buggy: called
-    _build_internal_struct instead of itself)."""
+    _build_internal_struct instead of itself).
+    """
     from pyspark.sql import Row
 
     data = [
@@ -306,9 +317,9 @@ def test_to_dataframe_nested_struct_round_trip(spark: SparkSession):
     ds, _ = DataSet[OuterSchema].from_dataframe(df)
 
     # After from_dataframe, nested field should use the internal name
-    assert ds.schema["details"].dataType.fieldNames() == ["full_name"]
+    assert cast(StructType, ds.schema["details"].dataType).fieldNames() == ["full_name"]
 
     # Round-trip should restore the original nested field name
     df_out = ds.to_dataframe()
-    assert df_out.schema["details"].dataType.fieldNames() == ["full-name"]
+    assert cast(StructType, df_out.schema["details"].dataType).fieldNames() == ["full-name"]
     assert_df_equality(df_out, df)
