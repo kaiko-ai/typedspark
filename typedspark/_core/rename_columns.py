@@ -1,18 +1,19 @@
-"""Helper functions to rename DataFrame columns between their external name
-(defined in ``ColumnMeta(external_name=...)``) and their internal (Python-safe) name."""
+"""Helper functions to rename DataFrame columns between their external name (defined in
+``ColumnMeta(external_name=...)``) and their internal (Python-safe) name."""
 
 from typing import Optional, Type
 
 from pyspark.sql import Column, DataFrame
 from pyspark.sql.functions import col, lit, struct, when
-from pyspark.sql.types import StructField, StructType
+from pyspark.sql.types import StructType
 
 from typedspark._schema.schema import Schema
 
 
 def rename_to_internal(df: DataFrame, schema: Type[Schema]) -> DataFrame:
-    """Renames DataFrame columns from their external name (``ColumnMeta(external_name=...)``)
-    to their internal name (as defined in the Schema class attribute)."""
+    """Renames DataFrame columns from their external name
+    (``ColumnMeta(external_name=...)``) to their internal name (as defined in the Schema
+    class attribute)."""
     for field in schema.get_structtype().fields:
         internal_name = field.name
 
@@ -28,8 +29,8 @@ def rename_to_internal(df: DataFrame, schema: Type[Schema]) -> DataFrame:
 
 
 def rename_to_external(df: DataFrame, schema: Type[Schema]) -> DataFrame:
-    """Renames DataFrame columns from their internal name (as defined in the Schema class
-    attribute) back to their external name (``ColumnMeta(external_name=...)``)."""
+    """Renames DataFrame columns from their internal name (as defined in the Schema
+    class attribute) back to their external name (``ColumnMeta(external_name=...)``)."""
     for field in schema.get_structtype().fields:
         internal_name = field.name
 
@@ -38,7 +39,11 @@ def rename_to_external(df: DataFrame, schema: Type[Schema]) -> DataFrame:
             df = df.withColumnRenamed(internal_name, external_name)
 
         if isinstance(field.dataType, StructType):
-            col_name = field.metadata.get("external_name", internal_name) if field.metadata else internal_name
+            col_name = (
+                field.metadata.get("external_name", internal_name)
+                if field.metadata
+                else internal_name
+            )
             structtype = _build_external_struct(field.dataType, col_name)
             df = df.withColumn(col_name, structtype)
 
@@ -50,14 +55,16 @@ def _build_internal_struct(
     parent: str,
     full_parent_path: Optional[str] = None,
 ) -> Column:
-    """Builds a Column expression that reads from external field paths and outputs
-    a struct with internal field names."""
+    """Builds a Column expression that reads from external field paths and outputs a
+    struct with internal field names."""
     if not full_parent_path:
         full_parent_path = f"`{parent}`"
 
     mapping = []
     for field in schema.fields:
-        external_name = field.metadata.get("external_name", field.name) if field.metadata else field.name
+        external_name = (
+            field.metadata.get("external_name", field.name) if field.metadata else field.name
+        )
         child_path = f"{full_parent_path}.`{external_name}`"
 
         if isinstance(field.dataType, StructType):
@@ -79,15 +86,17 @@ def _build_external_struct(
     parent: str,
     full_parent_path: Optional[str] = None,
 ) -> Column:
-    """Builds a Column expression that reads from internal field paths and outputs
-    a struct with external field names."""
+    """Builds a Column expression that reads from internal field paths and outputs a
+    struct with external field names."""
     if not full_parent_path:
         full_parent_path = f"`{parent}`"
 
     mapping = []
     for field in schema.fields:
         internal_name = field.name
-        external_name = field.metadata.get("external_name", internal_name) if field.metadata else internal_name
+        external_name = (
+            field.metadata.get("external_name", internal_name) if field.metadata else internal_name
+        )
         child_path = f"{full_parent_path}.`{internal_name}`"
 
         if isinstance(field.dataType, StructType):
