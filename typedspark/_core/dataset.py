@@ -102,7 +102,9 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
     ) -> DataSet[_Implementation]:  # noqa: N802
         return DataSet[self._schema_annotations](super().dropDuplicates(subset))  # type: ignore
 
-    def drop_duplicates(self, subset: Optional[List[str]] = None) -> DataSet[_Implementation]:
+    def drop_duplicates(  # type: ignore[override]  # pylint: disable=C0116
+        self, subset: Optional[List[str]] = None
+    ) -> DataSet[_Implementation]:
         return DataSet[self._schema_annotations](super().drop_duplicates(subset))  # type: ignore
 
     def dropDuplicatesWithinWatermark(
@@ -252,7 +254,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             if storageLevel is None:
                 res = super().localCheckpoint(eager)
             else:
-                res = super().localCheckpoint(eager, storageLevel)
+                res = super().localCheckpoint(eager, storageLevel)  # type: ignore[call-arg]
         except TypeError:
             # Fallback for Spark versions that don't accept storageLevel.
             res = super().localCheckpoint(eager)
@@ -533,7 +535,9 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
     def dropDuplicates(self, subset: Optional[List[str]] = None) -> DataSet[_Schema]:  # noqa: N802
         return DataSet[self._schema_annotations](super().dropDuplicates(subset))  # type: ignore
 
-    def drop_duplicates(self, subset: Optional[List[str]] = None) -> DataSet[_Schema]:
+    def drop_duplicates(  # type: ignore[override]  # pylint: disable=C0116
+        self, subset: Optional[List[str]] = None
+    ) -> DataSet[_Schema]:
         return DataSet[self._schema_annotations](super().drop_duplicates(subset))  # type: ignore
 
     def dropDuplicatesWithinWatermark(
@@ -681,7 +685,7 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             if storageLevel is None:
                 res = super().localCheckpoint(eager)
             else:
-                res = super().localCheckpoint(eager, storageLevel)
+                res = super().localCheckpoint(eager, storageLevel)  # type: ignore[call-arg]
         except TypeError:
             # Fallback for Spark versions that don't accept storageLevel.
             res = super().localCheckpoint(eager)
