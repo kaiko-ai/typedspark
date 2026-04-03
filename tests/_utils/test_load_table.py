@@ -307,3 +307,12 @@ def test_create_schema_with_invalid_column_name_in_a_nested_structtype(spark: Sp
 
     df2 = ds.to_dataframe()
     assert_df_equality(df, df2)
+
+
+def test_create_schema_raises_on_duplicate_columns_after_rename(spark: SparkSession):
+    """Columns 'a-b' and 'a_b' both map to 'a_b' after illegal-char replacement —
+    create_schema should raise a descriptive ValueError."""
+    df = spark.createDataFrame([("x", "y")], ["a-b", "a_b"])
+
+    with pytest.raises(ValueError, match="duplicate columns"):
+        create_schema(df)
