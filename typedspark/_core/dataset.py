@@ -123,7 +123,7 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             ds, schema = DataSet[Person].from_dataframe(df)
             df = ds.to_dataframe()
         """
-        plain_df = DataFrame(self._jdf, self.sparkSession)
+        plain_df = self.select(self.columns)
         return rename_to_external(plain_df, self._schema_annotations)
 
     """The following functions are equivalent to their parents in ``DataFrame``, but
