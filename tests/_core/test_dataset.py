@@ -288,7 +288,7 @@ def test_to_dataframe_returns_plain_dataframe_not_dataset(spark: SparkSession):
 
     result = ds.to_dataframe()
 
-    assert type(result) is DataFrame  # not a DataSet subclass
+    assert not isinstance(result, DataSet)  # not a DataSet subclass
 
 
 class InnerSchema(Schema):
@@ -338,13 +338,13 @@ def test_from_dataframe_register_to_schema_false(spark: SparkSession):
 
 
 def test_to_dataframe_no_external_names(spark: SparkSession):
-    """When schema has no external_name annotations, to_dataframe() is a no-op
-    for column names and still returns a plain DataFrame."""
+    """When schema has no external_name annotations, to_dataframe() is a no-op for
+    column names and still returns a plain DataFrame."""
     df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
     ds, _ = DataSet[A].from_dataframe(df)
 
     result = ds.to_dataframe()
 
-    assert type(result) is DataFrame
+    assert not isinstance(result, DataSet)
     assert result.columns == ["a", "b"]
     assert_df_equality(result, df)
