@@ -1,3 +1,4 @@
+import sys
 from typing import Annotated, List, Type
 
 import pytest
@@ -81,6 +82,10 @@ def test_offending_schemas_dtype():
         ColumnWithoutType.a.dtype
 
 
+@pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Python 3.14 relaxed Generic.__class_getitem__ argument-count checking",
+)
 def test_offending_schemas_runtime_error_on_load():
     with pytest.raises(TypeError):
 

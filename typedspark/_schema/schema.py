@@ -53,7 +53,9 @@ class MetaSchema(_ProtocolMeta):  # type: ignore
         # initializes all uninitialied variables with a type annotation as None
         # this allows for auto-complete in Databricks notebooks (uninitialized variables
         # don't show up in auto-complete there).
-        if "__annotations__" in dct.keys():
+        # Note: Python 3.14 (PEP 649) evaluates annotations lazily, so __annotations__
+        # is no longer present in dct at __new__ time — this block is a no-op on 3.14+.
+        if "__annotations__" in dct.keys():  # pragma: no cover
             extra = {attr: None for attr in dct["__annotations__"] if attr not in dct}
             dct = dict(dct, **extra)
 
