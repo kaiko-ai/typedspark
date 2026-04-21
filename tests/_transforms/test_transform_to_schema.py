@@ -434,7 +434,7 @@ def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: Spa
 
 
 def test_fill_unspecified_inner_fields_map_key_type_mismatch_raises(spark: SparkSession):
-    """ Map key type mismatch should raises TypeError."""
+    """Map key type mismatch should raises TypeError."""
 
     class TopMapIntKey(Schema):
         id: Column[IntegerType]
