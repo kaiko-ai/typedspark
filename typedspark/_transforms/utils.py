@@ -47,6 +47,7 @@ def convert_keys_to_strings(
 
     return _transformations
 
+
 def _fill_missing_fields(
     schema_dtype,
     data_dtype,
@@ -139,5 +140,3 @@ def add_nulls_for_unspecified_nested_fields(
         if patched is not None:
             result[schema_field.name] = patched
     return result
-
-

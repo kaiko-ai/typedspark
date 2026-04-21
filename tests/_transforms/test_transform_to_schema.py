@@ -200,6 +200,7 @@ def test_transform_to_schema_parallel(spark: SparkSession):
 
 # Schemas shared across multiple fill_unspecified_inner_fields tests
 
+
 class InnerFull(Schema):
     x: Column[IntegerType]
     y: Column[IntegerType]
@@ -224,11 +225,16 @@ def test_fill_unspecified_inner_fields_simple_missing_field(spark: SparkSession)
         TopStructPartial,
         {TopStructPartial.id: [1, 2], TopStructPartial.inner: [{"x": 10}, {"x": 20}]},
     )
-    observed = transform_to_schema(ds, TopStructFull, {}, fill_unspecified_inner_fields_with_nulls=True)
+    observed = transform_to_schema(
+        ds, TopStructFull, {}, fill_unspecified_inner_fields_with_nulls=True
+    )
     expected = create_partially_filled_dataset(
         spark,
         TopStructFull,
-        {TopStructFull.id: [1, 2], TopStructFull.inner: [{"x": 10, "y": None}, {"x": 20, "y": None}]},
+        {
+            TopStructFull.id: [1, 2],
+            TopStructFull.inner: [{"x": 10, "y": None}, {"x": 20, "y": None}],
+        },
     )
     assert_df_equality(observed, expected)
 
@@ -326,7 +332,9 @@ def test_fill_unspecified_inner_fields_in_array(spark: SparkSession):
             TopArrayPartial.items: [[{"x": 10}, {"x": 11}], [{"x": 20}]],
         },
     )
-    observed = transform_to_schema(ds, TopArrayFull, {}, fill_unspecified_inner_fields_with_nulls=True)
+    observed = transform_to_schema(
+        ds, TopArrayFull, {}, fill_unspecified_inner_fields_with_nulls=True
+    )
     expected = create_partially_filled_dataset(
         spark,
         TopArrayFull,
@@ -358,7 +366,9 @@ def test_fill_unspecified_inner_fields_in_map(spark: SparkSession):
             TopMapPartial.mapping: [{"a": {"x": 10}}, {"b": {"x": 20}}],
         },
     )
-    observed = transform_to_schema(ds, TopMapFull, {}, fill_unspecified_inner_fields_with_nulls=True)
+    observed = transform_to_schema(
+        ds, TopMapFull, {}, fill_unspecified_inner_fields_with_nulls=True
+    )
     expected = create_partially_filled_dataset(
         spark,
         TopMapFull,

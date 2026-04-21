@@ -75,7 +75,11 @@ def transform_to_schema(
         transform = add_nulls_for_unspecified_columns(transform, schema, dataframe.columns)
 
     if fill_unspecified_inner_fields_with_nulls:
-        transform.update(add_nulls_for_unspecified_nested_fields(schema.get_structtype(), dataframe.schema, transform))
+        transform.update(
+            add_nulls_for_unspecified_nested_fields(
+                schema.get_structtype(), dataframe.schema, transform
+            )
+        )
 
     transform = RenameDuplicateColumns(transform, schema, dataframe.columns)
 
