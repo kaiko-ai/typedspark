@@ -413,7 +413,8 @@ def test_fill_unspecified_inner_fields_skips_explicitly_transformed_columns(spar
 
 def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: SparkSession):
     """fill_unspecified_inner_fields_with_nulls should skips top-level columns
-    absent from the data. Without fill_unspecified_columns_with_nulls the missing column should cause an error."""
+    absent from the data. Without fill_unspecified_columns_with_nulls the missing column
+    should cause an error."""
 
     class IdOnly(Schema):
         id: Column[IntegerType]
