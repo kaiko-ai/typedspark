@@ -12,8 +12,8 @@ from typedspark._schema.schema import Schema
 from typedspark._transforms.rename_duplicate_columns import RenameDuplicateColumns
 from typedspark._transforms.utils import (
     add_nulls_for_unspecified_columns,
-    convert_keys_to_strings,
     add_nulls_for_unspecified_nested_fields,
+    convert_keys_to_strings,
 )
 
 T = TypeVar("T", bound=Schema)
