@@ -379,3 +379,77 @@ def test_fill_unspecified_inner_fields_in_map(spark: SparkSession):
         },
     )
     assert_df_equality(observed, expected)
+
+
+def test_fill_unspecified_inner_fields_skips_explicitly_transformed_columns(spark: SparkSession):
+    """Line 132: columns already in transformations are skipped by auto-fill."""
+    from pyspark.sql import functions as F
+
+    class TopStructFull(Schema):
+        id: Column[IntegerType]
+        inner: Column[StructType[InnerFull]]
+
+    ds = create_partially_filled_dataset(
+        spark,
+        TopStructPartial,
+        {TopStructPartial.id: [1, 2], TopStructPartial.inner: [{"x": 10}, {"x": 20}]},
+    )
+    observed = transform_to_schema(
+        ds,
+        TopStructFull,
+        {TopStructFull.inner: F.struct(F.lit(99).alias("x"), F.lit(42).alias("y"))},
+        fill_unspecified_inner_fields_with_nulls=True,
+    )
+    expected = create_partially_filled_dataset(
+        spark,
+        TopStructFull,
+        {
+            TopStructFull.id: [1, 2],
+            TopStructFull.inner: [{"x": 99, "y": 42}, {"x": 99, "y": 42}],
+        },
+    )
+    assert_df_equality(observed, expected, ignore_nullable=True)
+
+
+def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: SparkSession):
+    """Line 134: top-level columns missing from the data are skipped (handled by
+    fill_unspecified_columns_with_nulls instead)."""
+
+    class IdOnly(Schema):
+        id: Column[IntegerType]
+
+    class TopStructFull(Schema):
+        id: Column[IntegerType]
+        inner: Column[StructType[InnerFull]]
+
+    ds = create_partially_filled_dataset(spark, IdOnly, {IdOnly.id: [1, 2]})
+    observed = transform_to_schema(
+        ds,
+        TopStructFull,
+        {},
+        fill_unspecified_columns_with_nulls=True,
+        fill_unspecified_inner_fields_with_nulls=True,
+    )
+    expected = create_partially_filled_dataset(spark, TopStructFull, {TopStructFull.id: [1, 2]})
+    assert_df_equality(observed, expected)
+
+
+def test_fill_unspecified_inner_fields_map_key_type_mismatch_raises(spark: SparkSession):
+    """Lines 97 + 107: map key type mismatch enters the transform_keys branch but
+    cannot fix incompatible primitive types, so validation raises TypeError."""
+
+    class TopMapIntKey(Schema):
+        id: Column[IntegerType]
+        mapping: Column[MapType[IntegerType, StructType[InnerFull]]]
+
+    class TopMapStrKey(Schema):
+        id: Column[IntegerType]
+        mapping: Column[MapType[StringType, StructType[InnerFull]]]
+
+    ds = create_partially_filled_dataset(
+        spark,
+        TopMapIntKey,
+        {TopMapIntKey.id: [1], TopMapIntKey.mapping: [{1: {"x": 10, "y": 20}}]},
+    )
+    with pytest.raises(TypeError):
+        transform_to_schema(ds, TopMapStrKey, {}, fill_unspecified_inner_fields_with_nulls=True)
