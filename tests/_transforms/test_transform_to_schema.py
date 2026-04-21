@@ -412,8 +412,9 @@ def test_fill_unspecified_inner_fields_skips_explicitly_transformed_columns(spar
 
 
 def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: SparkSession):
-    """Line 134: top-level columns missing from the data are skipped (handled by
-    fill_unspecified_columns_with_nulls instead)."""
+    """Line 134: fill_unspecified_inner_fields_with_nulls skips top-level columns
+    absent from the data — they are not its responsibility. Without
+    fill_unspecified_columns_with_nulls the missing column causes an error."""
 
     class IdOnly(Schema):
         id: Column[IntegerType]
@@ -423,15 +424,13 @@ def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: Spa
         inner: Column[StructType[InnerFull]]
 
     ds = create_partially_filled_dataset(spark, IdOnly, {IdOnly.id: [1, 2]})
-    observed = transform_to_schema(
-        ds,
-        TopStructFull,
-        {},
-        fill_unspecified_columns_with_nulls=True,
-        fill_unspecified_inner_fields_with_nulls=True,
-    )
-    expected = create_partially_filled_dataset(spark, TopStructFull, {TopStructFull.id: [1, 2]})
-    assert_df_equality(observed, expected)
+    with pytest.raises(Exception):
+        transform_to_schema(
+            ds,
+            TopStructFull,
+            {},
+            fill_unspecified_inner_fields_with_nulls=True,
+        )
 
 
 def test_fill_unspecified_inner_fields_map_key_type_mismatch_raises(spark: SparkSession):
