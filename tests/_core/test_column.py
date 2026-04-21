@@ -1,8 +1,11 @@
 from dataclasses import dataclass
-from typing import Annotated
+from threading import Thread
+from typing import Annotated, Any, cast
 
 import pandas as pd
 import pytest
+from pyspark.errors import PySparkRuntimeError
+from pyspark.sql import Column as SparkColumn
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
 from pyspark.sql.types import IntegerType, LongType, StringType
@@ -14,6 +17,27 @@ from typedspark._utils.create_dataset import create_partially_filled_dataset
 class A(Schema):
     a: Column[LongType]
     b: Column[StringType]
+
+
+def _make_pyspark_runtime_error(error_class: str) -> PySparkRuntimeError:
+    import inspect
+
+    # PySpark changed the constructor kwargs from error_class/message_parameters (3.x)
+    # to errorClass/messageParameters (4.x), so we select based on signature.
+    constructor = cast(Any, PySparkRuntimeError)
+    params = inspect.signature(PySparkRuntimeError).parameters
+    if "error_class" in params:
+        return constructor(
+            error_class=error_class,
+            message_parameters={},
+        )
+    if "errorClass" in params:
+        return constructor(
+            errorClass=error_class,
+            messageParameters={},
+        )
+
+    return PySparkRuntimeError(error_class)
 
 
 def test_column(spark: SparkSession):
@@ -41,9 +65,48 @@ def test_column_reference_without_spark_session():
     assert a.str == "a"
 
 
+@pytest.mark.no_spark_session
+def test_column_active_raises_no_session(monkeypatch: pytest.MonkeyPatch):
+    def raise_no_session(cls):
+        raise _make_pyspark_runtime_error("NO_ACTIVE_OR_DEFAULT_SESSION")
+
+    monkeypatch.setattr(SparkSession, "active", classmethod(raise_no_session))
+
+    assert repr(A.a) == "Column<'a'> (no active Spark session)"
+
+
+@pytest.mark.no_spark_session
+def test_column_active_reraises_other_errors(monkeypatch: pytest.MonkeyPatch):
+    def raise_unexpected(cls):
+        raise _make_pyspark_runtime_error("NO_ACTIVE_SESSION")
+
+    monkeypatch.setattr(SparkSession, "active", classmethod(raise_unexpected))
+
+    with pytest.raises(PySparkRuntimeError):
+        _ = A.a
+
+
 def test_column_with_deprecated_dataframe_param(spark: SparkSession):
     df = create_partially_filled_dataset(spark, A, {A.a: [1, 2, 3]})
     Column("a", dataframe=df)
+
+
+def test_column_comparison_in_thread_without_active_session(spark: SparkSession):
+    result: dict[str, SparkColumn] = {}
+    error: dict[str, BaseException] = {}
+
+    def compare():
+        try:
+            result["value"] = A.a == A.b
+        except BaseException as exc:  # pragma: no cover
+            error["value"] = exc
+
+    thread = Thread(target=compare)
+    thread.start()
+    thread.join()
+
+    assert "value" not in error
+    assert isinstance(result["value"], SparkColumn)
 
 
 @dataclass

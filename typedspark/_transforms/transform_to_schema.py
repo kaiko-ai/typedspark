@@ -1,7 +1,7 @@
 """Module containing functions that are related to transformations to DataSets."""
 
 from functools import reduce
-from typing import Dict, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Type, TypeVar, Union
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql import DataFrame
@@ -46,7 +46,7 @@ def _rename_temporary_keys_to_original_keys(
 def transform_to_schema(
     dataframe: DataFrame,
     schema: Type[T],
-    transformations: Optional[Dict[Column, SparkColumn]] = None,
+    transformations: Optional[Dict[Column[Any], SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
     fill_unspecified_inner_fields_with_nulls: bool = False,
     run_sequentially: bool = True,

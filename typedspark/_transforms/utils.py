@@ -1,6 +1,7 @@
 """Util functions for typedspark._transforms."""
 
-from typing import Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type
+
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql.functions import lit, transform, transform_values, transform_keys, col
 from pyspark.sql.types import StructType, ArrayType, MapType
@@ -29,7 +30,7 @@ def add_nulls_for_unspecified_columns(
 
 
 def convert_keys_to_strings(
-    transformations: Optional[Dict[Column, SparkColumn]],
+    transformations: Optional[Dict[Column[Any], SparkColumn]],
 ) -> Dict[str, SparkColumn]:
     """Takes the Column keys in transformations and converts them to strings."""
     if transformations is None:

@@ -1,6 +1,6 @@
 """Functionality for dealing with StructType columns."""
 
-from typing import Dict, Optional, Type
+from typing import Any, Dict, Optional, Type
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql.functions import struct
@@ -12,7 +12,7 @@ from typedspark._transforms.utils import add_nulls_for_unspecified_columns, conv
 
 def structtype_column(
     schema: Type[Schema],
-    transformations: Optional[Dict[Column, SparkColumn]] = None,
+    transformations: Optional[Dict[Column[Any], SparkColumn]] = None,
     fill_unspecified_columns_with_nulls: bool = False,
 ) -> SparkColumn:
     """Helps with creating new ``StructType`` columns of a certain schema, for

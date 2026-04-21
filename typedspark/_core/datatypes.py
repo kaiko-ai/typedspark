@@ -60,7 +60,7 @@ class StructType(Generic[_Schema], TypedSparkDataType, metaclass=StructTypeMeta)
     def __init__(
         self,
         schema: Type[_Schema],
-        parent: Column,
+        parent: Column[Any],
     ) -> None:
         self.schema = schema
         self.schema._parent = parent

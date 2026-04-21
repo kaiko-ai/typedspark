@@ -23,10 +23,10 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(include=["typedspark", "typedspark.*"]),
     install_requires=get_requirements(),
-    python_requires=">=3.9.0",
+    python_requires=">=3.10.0",
     classifiers=["Programming Language :: Python", "Typing :: Typed"],
     setuptools_git_versioning={"enabled": True},
-    setup_requires=["setuptools-git-versioning>=2.0,<3"],
+    setup_requires=["setuptools-git-versioning>=3,<4"],
     package_data={"typedspark": ["py.typed"]},
     extras_require={
         "pyspark": ["pyspark"],

@@ -1,31 +1,31 @@
 # pyspark
-pyspark==4.0.1
+pyspark==4.1.1
 # linters
 flake8==7.3.0
-pylint<=4.0.4
-black[jupyter]<=25.11.0
-bandit<=1.9.2
-isort<=7.0.0
+pylint<=4.0.5
+black[jupyter]<=26.3.1
+bandit<=1.9.4
+isort<=8.0.1
 docformatter==1.7.7
-mypy==1.19.0
-pyright<=1.1.407
-autoflake==2.3.1
+mypy==1.20.1
+pyright<=1.1.408
+autoflake==2.3.3
 # stubs
-pandas-stubs<=2.3.2.250926
-types-setuptools==80.9.0.20250822
+pandas-stubs<=3.0.0.260204
+types-setuptools<=82.0.0.20260408
 # testing
-pytest<=9.0.1
-coverage<=7.12.0
-pandas==2.3.3
-setuptools==80.9.0
-chispa==0.11.1
+pytest<=9.0.3
+coverage<=7.13.5
+pandas<=3.0.2
+setuptools==82.0.1
+chispa<=0.12.0
 # notebooks
-nbconvert==7.16.6
+nbconvert==7.17.1
 jupyter==1.1.1
 nbformat==5.10.4
 # readthedocs
-sphinx<=9.0.0
-sphinx-rtd-theme==3.0.2
+sphinx<=9.1.0
+sphinx-rtd-theme==3.1.0
 nbsphinx==0.9.8
 # precommit hook
-pre-commit<=4.5.0
+pre-commit<=4.5.1
