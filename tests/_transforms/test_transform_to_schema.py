@@ -382,7 +382,7 @@ def test_fill_unspecified_inner_fields_in_map(spark: SparkSession):
 
 
 def test_fill_unspecified_inner_fields_skips_explicitly_transformed_columns(spark: SparkSession):
-    """Line 132: columns already in transformations are skipped by auto-fill."""
+    """Columns already in transformations should be skipped by auto-fill."""
     from pyspark.sql import functions as F
 
     class TopStructFull(Schema):
@@ -412,9 +412,8 @@ def test_fill_unspecified_inner_fields_skips_explicitly_transformed_columns(spar
 
 
 def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: SparkSession):
-    """Line 134: fill_unspecified_inner_fields_with_nulls skips top-level columns
-    absent from the data — they are not its responsibility. Without
-    fill_unspecified_columns_with_nulls the missing column causes an error."""
+    """fill_unspecified_inner_fields_with_nulls should skips top-level columns
+    absent from the data. Without fill_unspecified_columns_with_nulls the missing column should cause an error."""
 
     class IdOnly(Schema):
         id: Column[IntegerType]
@@ -434,8 +433,7 @@ def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: Spa
 
 
 def test_fill_unspecified_inner_fields_map_key_type_mismatch_raises(spark: SparkSession):
-    """Lines 97 + 107: map key type mismatch enters the transform_keys branch but
-    cannot fix incompatible primitive types, so validation raises TypeError."""
+    """ Map key type mismatch should raises TypeError."""
 
     class TopMapIntKey(Schema):
         id: Column[IntegerType]
