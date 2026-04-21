@@ -198,6 +198,7 @@ def test_transform_to_schema_parallel(spark: SparkSession):
 
     assert_df_equality(observed, expected)
 
+
 # Schemas shared across multiple fill_unspecified_inner_fields tests
 
 
