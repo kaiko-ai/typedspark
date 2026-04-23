@@ -1,15 +1,18 @@
 import functools
-from typing import cast
+from typing import Annotated, cast
 
 import pandas as pd
 import pytest
+from chispa import assert_df_equality  # type: ignore
 from pyspark import StorageLevel
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.types import LongType, StringType, TimestampType
+from pyspark.sql.types import LongType, StringType, StructType, TimestampType
 
 from typedspark import Column, DataSet, Schema
+from typedspark._core.column_meta import ColumnMeta
 from typedspark._core.dataset import DataSetImplements
+from typedspark._core.datatypes import StructType as TypedSparkStructType
 from typedspark._utils.create_dataset import create_empty_dataset
 
 
@@ -244,3 +247,104 @@ def test_resetting_of_schema_annotations(spark: SparkSession):
     # and then to None again
     a = DataSet(df)
     assert a._schema_annotations is None
+
+
+def test_from_dataframe(spark: SparkSession):
+    df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
+    ds, _ = DataSet[A].from_dataframe(df)
+
+    assert isinstance(ds, DataSet)
+    assert_df_equality(ds, df)
+
+    df_2 = ds.to_dataframe()
+
+    assert isinstance(df_2, DataFrame)
+    assert_df_equality(df_2, df)
+
+
+class Person(Schema):
+    name: Annotated[Column[StringType], ColumnMeta(external_name="first-name")]
+    age: Column[LongType]
+
+
+def test_from_dataframe_with_external_name(spark: SparkSession):
+    df = spark.createDataFrame([("Alice", 1), ("Bob", 2)], ["first-name", "age"])
+    ds, _ = DataSet[Person].from_dataframe(df)
+
+    assert isinstance(ds, DataSet)
+    assert ds.columns == ["name", "age"]
+
+    df_2 = ds.to_dataframe()
+    assert isinstance(df_2, DataFrame)
+    assert df_2.columns == ["first-name", "age"]
+    assert_df_equality(df_2, df)
+
+
+def test_to_dataframe_returns_plain_dataframe_not_dataset(spark: SparkSession):
+    """to_dataframe() must return a plain DataFrame, not a DataSet subclass, even when
+    no column renaming is needed."""
+    df = spark.createDataFrame([(1, "a")], ["a", "b"])
+    ds, _ = DataSet[A].from_dataframe(df)
+
+    result = ds.to_dataframe()
+
+    assert not isinstance(result, DataSet)  # not a DataSet subclass
+
+
+class InnerSchema(Schema):
+    full_name: Annotated[Column[StringType], ColumnMeta(external_name="full-name")]
+
+
+class OuterSchema(Schema):
+    details: Column[TypedSparkStructType[InnerSchema]]
+    age: Column[LongType]
+
+
+def test_to_dataframe_nested_struct_round_trip(spark: SparkSession):
+    """When external_name is present on a field inside a nested struct, a
+    from_dataframe/to_dataframe round-trip should restore the original DataFrame.
+
+    Exercises the recursive call in _build_external_struct (was buggy: called
+    _build_internal_struct instead of itself).
+    """
+    from pyspark.sql import Row
+
+    data = [
+        Row(details=Row(**{"full-name": "Alice"}), age=24),
+        Row(details=Row(**{"full-name": "Bob"}), age=25),
+    ]
+    df = spark.createDataFrame(data)
+    ds, _ = DataSet[OuterSchema].from_dataframe(df)
+
+    # After from_dataframe, nested field should use the internal name
+    assert cast(StructType, ds.schema["details"].dataType).fieldNames() == ["full_name"]
+
+    # Round-trip should restore the original nested field name
+    df_out = ds.to_dataframe()
+    assert cast(StructType, df_out.schema["details"].dataType).fieldNames() == ["full-name"]
+    assert_df_equality(df_out, df)
+
+
+def test_from_dataframe_register_to_schema_false(spark: SparkSession):
+    """With register_to_schema=False the returned schema is still the original class
+    (not a dynamically registered subclass), but data is unchanged."""
+    df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
+    ds, schema = DataSet[A].from_dataframe(df, register_to_schema=False)
+
+    assert isinstance(ds, DataSet)
+    assert_df_equality(ds, df)
+    # Schema is still the original class, not a dynamically registered subclass
+    assert schema is A
+
+
+def test_to_dataframe_no_external_names(spark: SparkSession):
+    """When schema has no external_name annotations, to_dataframe() is a no-op for
+    column names and still returns a plain DataFrame."""
+    df = spark.createDataFrame([(1, "a"), (2, "b")], ["a", "b"])
+    ds, _ = DataSet[A].from_dataframe(df)
+
+    result = ds.to_dataframe()
+
+    assert not isinstance(result, DataSet)
+    assert result.columns == ["a", "b"]
+    assert_df_equality(result, df)
