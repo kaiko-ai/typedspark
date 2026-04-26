@@ -1,5 +1,6 @@
 import pytest
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
+from pyspark.errors import AnalysisException
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, StringType
 
@@ -427,7 +428,7 @@ def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: Spa
         inner: Column[StructType[InnerFull]]
 
     ds = create_partially_filled_dataset(spark, IdOnly, {IdOnly.id: [1, 2]})
-    with pytest.raises(TypeError):
+    with pytest.raises(AnalysisException):
         transform_to_schema(
             ds,
             TopStructFull,
