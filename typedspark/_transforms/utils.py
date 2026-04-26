@@ -49,8 +49,8 @@ def convert_keys_to_strings(
 
 
 def _fill_missing_fields(
-    schema_dtype,
-    data_dtype,
+    schema_dtype: DataType,
+    data_dtype: DataType,
     current: SparkColumn,
 ) -> Optional[SparkColumn]:
     """Return `current` rebuilt with any schema fields absent from the data added as null.
