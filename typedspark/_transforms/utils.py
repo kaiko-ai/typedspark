@@ -83,6 +83,8 @@ def _fill_missing_fields(
     if isinstance(schema_dtype, ArrayType) and isinstance(data_dtype, ArrayType):
         element_schema = schema_dtype.elementType
         element_data = data_dtype.elementType
+        if _fill_missing_fields(element_schema, element_data, col("_")) is None:
+            return None
         return transform(
             current,
             lambda elem: _fill_missing_fields_or_keep(element_schema, element_data, elem),
