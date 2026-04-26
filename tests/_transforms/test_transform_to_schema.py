@@ -424,7 +424,7 @@ def test_fill_unspecified_inner_fields_skips_columns_absent_from_data(spark: Spa
         inner: Column[StructType[InnerFull]]
 
     ds = create_partially_filled_dataset(spark, IdOnly, {IdOnly.id: [1, 2]})
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         transform_to_schema(
             ds,
             TopStructFull,
