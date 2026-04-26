@@ -109,7 +109,7 @@ def _fill_missing_fields(
     return None
 
 
-def _fill_missing_fields_or_keep(schema_dtype, data_dtype, current: SparkColumn) -> SparkColumn:
+def _fill_missing_fields_or_keep(schema_dtype: DataType, data_dtype: DataType, current: SparkColumn) -> SparkColumn:
     filled = _fill_missing_fields(schema_dtype, data_dtype, current)
     return current if filled is None else filled
 
