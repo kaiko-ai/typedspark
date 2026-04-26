@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Type
 
 from pyspark.sql import Column as SparkColumn
 from pyspark.sql.functions import col, lit, transform, transform_keys, transform_values
-from pyspark.sql.types import ArrayType, MapType, StructType
+from pyspark.sql.types import ArrayType, DataType, MapType, StructType
 
 from typedspark._core.column import Column
 from typedspark._core.validate_schema import unpack_schema
@@ -53,7 +53,9 @@ def _fill_missing_fields(
     data_dtype: DataType,
     current: SparkColumn,
 ) -> Optional[SparkColumn]:
-    """Return `current` rebuilt with any schema fields absent from the data added as null.
+    """Return `current` rebuilt with any schema fields absent from the data added as
+    null.
+
     Works on column expressions (not dotted-path strings) so it can recurse into array
     and map elements via higher-order function lambdas. Returns None when no changes are
     needed.
@@ -109,7 +111,9 @@ def _fill_missing_fields(
     return None
 
 
-def _fill_missing_fields_or_keep(schema_dtype: DataType, data_dtype: DataType, current: SparkColumn) -> SparkColumn:
+def _fill_missing_fields_or_keep(
+    schema_dtype: DataType, data_dtype: DataType, current: SparkColumn
+) -> SparkColumn:
     filled = _fill_missing_fields(schema_dtype, data_dtype, current)
     return current if filled is None else filled
 
@@ -119,11 +123,11 @@ def add_nulls_for_unspecified_nested_fields(
     data_struct: StructType,
     transformations: Dict[str, SparkColumn] | None = None,
 ) -> Dict[str, SparkColumn]:
-    """
-    For each top-level column present in both `schema_struct` and `data_struct` whose
+    """For each top-level column present in both `schema_struct` and `data_struct` whose
     type differs, produces a replacement expression that keeps all existing values and
-    adds any schema fields missing from the data as null. Handles structs, arrays of
-    structs, and maps of structs, recursively.
+    adds any schema fields missing from the data as null.
+
+    Handles structs, arrays of structs, and maps of structs, recursively.
     """
     schema_dict = unpack_schema(schema_struct)
     data_dict = unpack_schema(data_struct)
