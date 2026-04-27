@@ -51,7 +51,7 @@ def test_transform_to_schema_with_transformation(spark: SparkSession):
 
 def test_transform_to_schema_with_missing_column(spark):
     df = create_partially_filled_dataset(spark, Person, {Person.c: [1, 2, 3]}).drop(Person.a)
-    with pytest.raises(Exception):
+    with pytest.raises(AnalysisException):
         transform_to_schema(df, PersonDifferentData, {PersonDifferentData.d: Person.c + 3})
 
     observed = transform_to_schema(
