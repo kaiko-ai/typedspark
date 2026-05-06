@@ -439,15 +439,15 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         return res  # pragma: no cover
 
 
-class DataSetExtends(DataSetImplements[_Protocol, _Protocol]):
-    """``DataSetExtends`` allows us to define functions such as:
+class DataSetWith(DataSetImplements[_Protocol, _Protocol]):
+    """``DataSetWith`` allows us to define functions such as:
 
     .. code-block:: python
 
         class Age(Schema, Protocol):
             age: Column[LongType]
 
-        def get_age(df: DataSetExtends[Age]) -> DataSet[Age]:
+        def get_age(df: DataSetWith[Age]) -> DataSet[Age]:
             return DataSet[Age](df.select(Age.age))
 
     Such a function:
@@ -458,26 +458,26 @@ class DataSetExtends(DataSetImplements[_Protocol, _Protocol]):
     2. Returns a ``DataSet[Age]``: typically the projection of the input to ``Age``'s
        columns.
 
-    A ``DataSetExtends`` can also be constructed directly from a ``DataFrame`` whose
+    A ``DataSetWith`` can also be constructed directly from a ``DataFrame`` whose
     schema is a superset of ``_Protocol``:
 
     .. code-block:: python
 
-        ds = DataSetExtends[Age](df_with_extra_columns)
+        ds = DataSetWith[Age](df_with_extra_columns)
 
     Construction validates that ``df`` contains every column declared on ``_Protocol``
     (with matching dtypes); columns not declared on ``_Protocol`` are tolerated and
     pass through unchanged.
     """
 
-    def __new__(cls, dataframe: DataFrame) -> DataSetExtends[_Protocol]:
+    def __new__(cls, dataframe: DataFrame) -> DataSetWith[_Protocol]:
         """``__new__()`` instantiates the object (prior to ``__init__()``).
 
         Like :class:`DataSet`, the underlying ``DataFrame`` is reclassed in place; the
         difference is that schema validation here tolerates columns absent from the
         declared protocol.
         """
-        dataframe = cast(DataSetExtends, dataframe)
+        dataframe = cast(DataSetWith, dataframe)
         attach_mixin(dataframe, cls)
 
         # reset _schema_annotations in case it was inherited from the source DataFrame
@@ -494,7 +494,7 @@ class DataSetExtends(DataSetImplements[_Protocol, _Protocol]):
         pass
 
     def __class_getitem__(cls, item):
-        """Allows us to define a schema for the ``DataSetExtends``.
+        """Allows us to define a schema for the ``DataSetWith``.
 
         TypeVar parameters (e.g. when this class is itself subclassed with a generic
         parameter) are forwarded to ``Generic`` so the standard parameterization
@@ -527,9 +527,9 @@ class DataSetExtends(DataSetImplements[_Protocol, _Protocol]):
                 self.schema[field.name].metadata = field.metadata
 
 
-class DataSet(DataSetExtends[_Schema]):
+class DataSet(DataSetWith[_Schema]):
     # pylint: disable=missing-function-docstring,invalid-name
-    # ``DataSetExtends[_Schema]`` is opaque to astroid because of the custom
+    # ``DataSetWith[_Schema]`` is opaque to astroid because of the custom
     # ``__class_getitem__``, so pylint cannot walk past it to find that the method
     # overrides below override DataFrame's documented methods. The disables below
     # restore the behavior we get on DataSetImplements (whose direct DataFrame parent
@@ -548,8 +548,8 @@ class DataSet(DataSetExtends[_Schema]):
             return df
 
     Functions that should accept ``DataSet[T]`` for any ``T`` whose schema structurally
-    extends a given protocol can use :class:`DataSetExtends` as their parameter
-    annotation; ``DataSet[T]`` is a subclass of ``DataSetExtends[T]``, and ``_Protocol``
+    extends a given protocol can use :class:`DataSetWith` as their parameter
+    annotation; ``DataSet[T]`` is a subclass of ``DataSetWith[T]``, and ``_Protocol``
     is covariant, so callers can pass a ``DataSet`` of any compatible schema.
     """
 

@@ -8,7 +8,7 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import LongType, StringType, TimestampType
 
-from typedspark import Column, DataSet, DataSetExtends, Schema
+from typedspark import Column, DataSet, DataSetWith, Schema
 from typedspark._core.dataset import DataSetImplements
 from typedspark._utils.create_dataset import create_empty_dataset
 
@@ -295,17 +295,17 @@ class _AgeProtocol(Schema, Protocol):
 
 
 def test_dataset_is_subclass_of_dataset_extends(spark: SparkSession):
-    """``DataSet[T]`` must be a subclass of ``DataSetExtends`` so that callers can pass it
-    to functions annotated as ``DataSetExtends[Protocol]`` for any compatible ``Protocol``."""
+    """``DataSet[T]`` must be a subclass of ``DataSetWith`` so that callers can pass it
+    to functions annotated as ``DataSetWith[Protocol]`` for any compatible ``Protocol``."""
     df = create_empty_dataset(spark, A)
-    assert isinstance(df, DataSetExtends)
+    assert isinstance(df, DataSetWith)
 
 
 def test_dataset_extends_accepts_extra_columns(spark: SparkSession):
-    """``DataSetExtends[Protocol]`` validates the declared columns and tolerates extras."""
+    """``DataSetWith[Protocol]`` validates the declared columns and tolerates extras."""
     d = dict(a=[1, 2, 3], b=["a", "b", "c"], extra=[7, 8, 9])
     df = create_dataframe(spark, d)
-    ds = DataSetExtends[_AgeProtocol](df)
+    ds = DataSetWith[_AgeProtocol](df)
     assert set(ds.columns) == {"a", "b", "extra"}
     assert ds.typedspark_schema == _AgeProtocol
 
@@ -315,7 +315,7 @@ def test_dataset_extends_still_requires_declared_columns(spark: SparkSession):
     d = dict(b=["a", "b", "c"])
     df = create_dataframe(spark, d)
     with pytest.raises(TypeError):
-        DataSetExtends[_AgeProtocol](df)
+        DataSetWith[_AgeProtocol](df)
 
 
 def test_dataset_extends_still_validates_dtypes(spark: SparkSession):
@@ -323,27 +323,27 @@ def test_dataset_extends_still_validates_dtypes(spark: SparkSession):
     d = dict(a=["x", "y", "z"], b=["a", "b", "c"])
     df = create_dataframe(spark, d)
     with pytest.raises(TypeError):
-        DataSetExtends[_AgeProtocol](df)
+        DataSetWith[_AgeProtocol](df)
 
 
 def test_dataset_extends_underscored_columns_are_dropped(spark: SparkSession):
     """Columns starting with ``__`` are silently ignored (consistent with ``DataSet``)."""
     d = {"a": [1, 2, 3], "__hidden": [1, 2, 3]}
     df = create_dataframe(spark, d)
-    DataSetExtends[_AgeProtocol](df)
+    DataSetWith[_AgeProtocol](df)
 
 
 def test_dataset_extends_unparameterized_is_not_instantiable(spark: SparkSession):
-    """Calling ``DataSetExtends`` without a schema parameter does nothing useful;
+    """Calling ``DataSetWith`` without a schema parameter does nothing useful;
     the resulting object is just the input DataFrame mixed in, with no validation."""
     df = create_empty_dataset(spark, A)
     # No exception, but no validation either: this mirrors ``DataSet(df)``.
-    DataSetExtends(df)
+    DataSetWith(df)
 
 
 def test_dataset_does_not_relax(spark: SparkSession):
     """``DataSet`` validation must remain strict even though it inherits from
-    ``DataSetExtends``."""
+    ``DataSetWith``."""
     d = dict(a=[1, 2, 3], b=["a", "b", "c"], c=[1, 2, 3])
     df = create_dataframe(spark, d)
     with pytest.raises(TypeError):
@@ -352,10 +352,10 @@ def test_dataset_does_not_relax(spark: SparkSession):
 
 def test_dataset_extends_in_function_annotation(spark: SparkSession):
     """``DataSet[A]`` (which has columns ``a`` and ``b``) should be usable as a
-    ``DataSetExtends[_AgeProtocol]`` (which only declares ``a``) because ``A``
+    ``DataSetWith[_AgeProtocol]`` (which only declares ``a``) because ``A``
     structurally extends ``_AgeProtocol``."""
 
-    def get_a(df: DataSetExtends[_AgeProtocol]) -> DataSet[_AgeProtocol]:
+    def get_a(df: DataSetWith[_AgeProtocol]) -> DataSet[_AgeProtocol]:
         return DataSet[_AgeProtocol](df.select(_AgeProtocol.a))
 
     full = create_empty_dataset(spark, A)
