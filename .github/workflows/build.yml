@@ -16,11 +16,11 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-        pyspark-version: ["3.5.7", "4.1.1"]
+        pyspark-version: ["3.5.8", "4.1.1"]
         exclude:
-          # pyspark 3.5.7 does not support Python 3.14
+          # pyspark 3.5.x does not support Python 3.14
           - python-version: "3.14"
-            pyspark-version: "3.5.7"
+            pyspark-version: "3.5.8"
 
     steps:
       - uses: actions/checkout@v6
@@ -30,10 +30,39 @@ jobs:
         with:
           distribution: "temurin"
           java-version: 21
-      - uses: vemonet/setup-spark@a3f00c89c1cb4e08f82b9f91c2d67201f02aa898 # v1.2.2
+      - name: Cache Spark
+        id: cache-spark
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
-          spark-version: ${{ matrix.pyspark-version }}
-          hadoop-version: "3"
+          path: ~/spark-${{ matrix.pyspark-version }}-bin-hadoop3
+          key: spark-${{ matrix.pyspark-version }}-hadoop3-v2
+      - name: Download Spark
+        if: steps.cache-spark.outputs.cache-hit != 'true'
+        env:
+          SPARK_VERSION: ${{ matrix.pyspark-version }}
+        run: |
+          ARCHIVE="spark-${SPARK_VERSION}-bin-hadoop3.tgz"
+          # Apache's CDN is much faster than archive.apache.org but only
+          # carries currently-supported releases; fall back to the archive
+          # for older versions. archive.apache.org is slow under parallel
+          # load, so allow up to 30 minutes — the cache makes subsequent
+          # runs instant.
+          if ! curl -fsSL --connect-timeout 10 --max-time 600 --retry 3 \
+            "https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/${ARCHIVE}" \
+            -o /tmp/spark.tgz; then
+            curl -fsSL --connect-timeout 10 --max-time 1800 --retry 3 \
+              "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/${ARCHIVE}" \
+              -o /tmp/spark.tgz
+          fi
+          tar -xzf /tmp/spark.tgz -C "$HOME"
+          rm /tmp/spark.tgz
+      - name: Set up SPARK_HOME
+        env:
+          SPARK_VERSION: ${{ matrix.pyspark-version }}
+        run: |
+          SPARK_HOME="$HOME/spark-${SPARK_VERSION}-bin-hadoop3"
+          echo "SPARK_HOME=$SPARK_HOME" >> "$GITHUB_ENV"
+          echo "$SPARK_HOME/bin" >> "$GITHUB_PATH"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
