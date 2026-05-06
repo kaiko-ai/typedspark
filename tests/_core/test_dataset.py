@@ -133,13 +133,48 @@ def test_inherrited_checkpoint_functions(spark: SparkSession, tmp_path):
 
 
 def test_local_checkpoint_storage_level_fallback(spark: SparkSession, tmp_path, monkeypatch):
+    """Verify ``localCheckpoint`` gracefully degrades on Spark versions that don't
+    accept the ``storageLevel`` kwarg.
+
+    The ``storageLevel`` parameter on ``DataFrame.localCheckpoint`` was added in a
+    later Spark release. To stay compatible with older Sparks, both
+    ``DataSet.localCheckpoint`` and ``DataSetImplements.localCheckpoint`` wrap the
+    underlying call in a ``try/except TypeError`` and retry without
+    ``storageLevel``. This test simulates "legacy Spark" by monkey-patching the
+    underlying methods to raise ``TypeError`` whenever ``storageLevel`` is
+    supplied, and asserts that the fallback path is taken at every layer.
+
+    The MRO at play is::
+
+        DataSet -> DataSetImplements -> pyspark.sql.DataFrame
+
+    Each ``localCheckpoint`` override calls ``super().localCheckpoint(...)``, so a
+    ``TypeError`` raised at any level should be caught and retried without
+    ``storageLevel`` by the level above.
+
+    Two scenarios are exercised:
+
+    1. Patch only the base ``DataFrame.localCheckpoint`` (legacy Spark). The
+       ``flags`` dict records that the patched method was invoked first with
+       ``storageLevel`` (raising) and then again without it (the fallback). Both
+       the public ``df.localCheckpoint(...)`` entrypoint and the unbound
+       ``DataSetImplements.localCheckpoint(df, ...)`` form must succeed.
+    2. Additionally patch ``DataSetImplements.localCheckpoint`` to be "legacy"
+       too. Now ``DataSet.localCheckpoint`` itself must catch the ``TypeError``
+       from its own ``super()`` call and retry, proving the fallback works even
+       when the failure originates one layer up from the base ``DataFrame``.
+    """
     df = create_empty_dataset(spark, A)
     spark.sparkContext.setCheckpointDir(str(tmp_path))
+    # Locate the real pyspark ``DataFrame`` class in the MRO so we can patch the
+    # lowest-level ``localCheckpoint`` without touching the typedspark wrappers.
     base_df_cls = next(cls for cls in type(df).mro() if cls.__name__ == "DataFrame")
     original = getattr(base_df_cls, "localCheckpoint")
     flags = {"raised": False, "called_fallback": False}
 
     def legacy_local_checkpoint(self, eager=True, storageLevel=None):
+        # Mimic an older Spark whose ``localCheckpoint`` has no ``storageLevel``
+        # parameter: reject the kwarg, then succeed on the retry without it.
         if storageLevel is not None:
             flags["raised"] = True
             raise TypeError("legacy localCheckpoint without storageLevel support")
@@ -148,14 +183,23 @@ def test_local_checkpoint_storage_level_fallback(spark: SparkSession, tmp_path, 
 
     monkeypatch.setattr(base_df_cls, "localCheckpoint", legacy_local_checkpoint)
 
+    # Scenario 1: failure at the base ``DataFrame`` layer. Both the bound call
+    # (via ``DataSet``) and the unbound ``DataSetImplements`` call must recover.
     assert isinstance(df.localCheckpoint(storageLevel=StorageLevel.MEMORY_AND_DISK), DataSet)
     assert isinstance(
         DataSetImplements.localCheckpoint(df, storageLevel=StorageLevel.MEMORY_AND_DISK),
         DataSet,
     )
+    # Sanity-check that the fallback path actually fired (i.e. the assertions
+    # above didn't pass for some unrelated reason like ``storageLevel`` being
+    # silently dropped).
     assert flags["raised"]
     assert flags["called_fallback"]
 
+    # Scenario 2: also make ``DataSetImplements.localCheckpoint`` "legacy". The
+    # ``TypeError`` now bubbles from the middle of the MRO, so it's
+    # ``DataSet.localCheckpoint`` (the outermost override) that has to catch it
+    # and retry without ``storageLevel``.
     original_ds_local_checkpoint = DataSetImplements.localCheckpoint
 
     def legacy_ds_local_checkpoint(self, eager=True, storageLevel=None):
