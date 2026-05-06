@@ -458,22 +458,82 @@ class DataSetExtends(DataSetImplements[_Protocol, _Protocol]):
     2. Returns a ``DataSet[Age]``: typically the projection of the input to ``Age``'s
        columns.
 
-    Like :class:`DataSetImplements`, ``DataSetExtends`` is solely used as a type
-    annotation; it is never initialized directly.
+    A ``DataSetExtends`` can also be constructed directly from a ``DataFrame`` whose
+    schema is a superset of ``_Protocol``:
+
+    .. code-block:: python
+
+        ds = DataSetExtends[Age](df_with_extra_columns)
+
+    Construction validates that ``df`` contains every column declared on ``_Protocol``
+    (with matching dtypes); columns not declared on ``_Protocol`` are tolerated and
+    pass through unchanged.
     """
 
-    def __new__(cls, *args, **kwargs):
-        raise NotImplementedError(
-            "DataSetExtends should solely be used as a type annotation, it is never initialized."
+    def __new__(cls, dataframe: DataFrame) -> DataSetExtends[_Protocol]:
+        """``__new__()`` instantiates the object (prior to ``__init__()``).
+
+        Like :class:`DataSet`, the underlying ``DataFrame`` is reclassed in place; the
+        difference is that schema validation here tolerates columns absent from the
+        declared protocol.
+        """
+        dataframe = cast(DataSetExtends, dataframe)
+        attach_mixin(dataframe, cls)
+
+        # reset _schema_annotations in case it was inherited from the source DataFrame
+        dataframe._schema_annotations = None  # type: ignore
+
+        if "_schema_annotations" in cls.__dict__:
+            dataframe._schema_annotations = cls._schema_annotations  # type: ignore
+            dataframe._validate_schema()
+            dataframe._add_schema_metadata()
+
+        return dataframe  # type: ignore
+
+    def __init__(self, dataframe: DataFrame):
+        pass
+
+    def __class_getitem__(cls, item):
+        """Allows us to define a schema for the ``DataSetExtends``.
+
+        TypeVar parameters (e.g. when this class is itself subclassed with a generic
+        parameter) are forwarded to ``Generic`` so the standard parameterization
+        machinery applies and no schema is baked into the subclass.
+        """
+        if isinstance(item, TypeVar):
+            return super().__class_getitem__(item)  # type: ignore[misc]
+        subclass_name = f"{cls.__name__}[{item.__name__}]"
+        subclass = type(subclass_name, (cls,), {"_schema_annotations": item})
+        return subclass
+
+    def _validate_schema(self) -> None:
+        """Validates the schema while tolerating columns not declared by ``_Protocol``."""
+        validate_schema(
+            self._schema_annotations.get_structtype(),
+            deepcopy(self.schema),
+            self._schema_annotations.get_schema_name(),
+            ignore_extra_columns=True,
         )
 
-    def __init__(self):  # pragma: no cover - DataSetExtends is never instantiated.
-        raise NotImplementedError(
-            "DataSetExtends should solely be used as a type annotation, it is never initialized."
-        )
+    def _add_schema_metadata(self) -> None:
+        """Adds the ``ColumnMeta`` comments as metadata for the declared columns.
+
+        Columns present on the DataFrame but not declared on the protocol keep their
+        existing metadata.
+        """
+        observed = set(self.schema.fieldNames())
+        for field in self._schema_annotations.get_structtype().fields:
+            if field.name in observed:
+                self.schema[field.name].metadata = field.metadata
 
 
 class DataSet(DataSetExtends[_Schema]):
+    # pylint: disable=missing-function-docstring,invalid-name
+    # ``DataSetExtends[_Schema]`` is opaque to astroid because of the custom
+    # ``__class_getitem__``, so pylint cannot walk past it to find that the method
+    # overrides below override DataFrame's documented methods. The disables below
+    # restore the behavior we get on DataSetImplements (whose direct DataFrame parent
+    # astroid does follow).
     """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same
     functionality, with in addition the possibility to define a schema.
 

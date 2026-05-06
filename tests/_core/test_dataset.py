@@ -301,10 +301,53 @@ def test_dataset_is_subclass_of_dataset_extends(spark: SparkSession):
     assert isinstance(df, DataSetExtends)
 
 
-def test_dataset_extends_is_not_instantiable():
-    """``DataSetExtends`` is solely a type annotation; it must not be instantiated directly."""
-    with pytest.raises(NotImplementedError):
-        DataSetExtends()
+def test_dataset_extends_accepts_extra_columns(spark: SparkSession):
+    """``DataSetExtends[Protocol]`` validates the declared columns and tolerates extras."""
+    d = dict(a=[1, 2, 3], b=["a", "b", "c"], extra=[7, 8, 9])
+    df = create_dataframe(spark, d)
+    ds = DataSetExtends[_AgeProtocol](df)
+    assert set(ds.columns) == {"a", "b", "extra"}
+    assert ds.typedspark_schema == _AgeProtocol
+
+
+def test_dataset_extends_still_requires_declared_columns(spark: SparkSession):
+    """A column declared on the protocol but missing from the data still raises."""
+    d = dict(b=["a", "b", "c"])
+    df = create_dataframe(spark, d)
+    with pytest.raises(TypeError):
+        DataSetExtends[_AgeProtocol](df)
+
+
+def test_dataset_extends_still_validates_dtypes(spark: SparkSession):
+    """A column whose dtype doesn't match the protocol still raises."""
+    d = dict(a=["x", "y", "z"], b=["a", "b", "c"])
+    df = create_dataframe(spark, d)
+    with pytest.raises(TypeError):
+        DataSetExtends[_AgeProtocol](df)
+
+
+def test_dataset_extends_underscored_columns_are_dropped(spark: SparkSession):
+    """Columns starting with ``__`` are silently ignored (consistent with ``DataSet``)."""
+    d = {"a": [1, 2, 3], "__hidden": [1, 2, 3]}
+    df = create_dataframe(spark, d)
+    DataSetExtends[_AgeProtocol](df)
+
+
+def test_dataset_extends_unparameterized_is_not_instantiable(spark: SparkSession):
+    """Calling ``DataSetExtends`` without a schema parameter does nothing useful;
+    the resulting object is just the input DataFrame mixed in, with no validation."""
+    df = create_empty_dataset(spark, A)
+    # No exception, but no validation either: this mirrors ``DataSet(df)``.
+    DataSetExtends(df)
+
+
+def test_dataset_does_not_relax(spark: SparkSession):
+    """``DataSet`` validation must remain strict even though it inherits from
+    ``DataSetExtends``."""
+    d = dict(a=[1, 2, 3], b=["a", "b", "c"], c=[1, 2, 3])
+    df = create_dataframe(spark, d)
+    with pytest.raises(TypeError):
+        DataSet[A](df)
 
 
 def test_dataset_extends_in_function_annotation(spark: SparkSession):
