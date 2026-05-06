@@ -32,7 +32,7 @@ jobs:
           java-version: 21
       - name: Cache Spark
         id: cache-spark
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/spark-${{ matrix.pyspark-version }}-bin-hadoop3
           key: spark-${{ matrix.pyspark-version }}-hadoop3-v2
