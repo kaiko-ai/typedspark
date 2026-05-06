@@ -30,10 +30,28 @@ jobs:
         with:
           distribution: "temurin"
           java-version: 21
-      - uses: vemonet/setup-spark@a3f00c89c1cb4e08f82b9f91c2d67201f02aa898 # v1.2.2
+      - name: Cache Spark
+        id: cache-spark
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
-          spark-version: ${{ matrix.pyspark-version }}
-          hadoop-version: "3"
+          path: ~/spark-${{ matrix.pyspark-version }}-bin-hadoop3
+          key: spark-${{ matrix.pyspark-version }}-hadoop3-v2
+      - name: Download Spark
+        if: steps.cache-spark.outputs.cache-hit != 'true'
+        env:
+          SPARK_VERSION: ${{ matrix.pyspark-version }}
+        run: |
+          curl -fsSL "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz" \
+            -o /tmp/spark.tgz
+          tar -xzf /tmp/spark.tgz -C "$HOME"
+          rm /tmp/spark.tgz
+      - name: Set up SPARK_HOME
+        env:
+          SPARK_VERSION: ${{ matrix.pyspark-version }}
+        run: |
+          SPARK_HOME="$HOME/spark-${SPARK_VERSION}-bin-hadoop3"
+          echo "SPARK_HOME=$SPARK_HOME" >> "$GITHUB_ENV"
+          echo "$SPARK_HOME/bin" >> "$GITHUB_PATH"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
