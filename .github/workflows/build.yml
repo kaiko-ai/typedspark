@@ -115,9 +115,4 @@ jobs:
           coverage report -m --fail-under 100
       - name: Run notebooks
         if: ${{ matrix.pyspark-version == '4.1.1' }}
-        run: |
-          for FILE in docs/*/*.ipynb; do
-            BASE=$(basename $FILE)
-            cp $FILE .
-            jupyter nbconvert --to notebook $BASE --execute
-          done
+        run: python docs/run_notebooks.py docs/*/*.ipynb
