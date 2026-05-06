@@ -439,7 +439,41 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         return res  # pragma: no cover
 
 
-class DataSet(DataSetImplements[_Schema, _Schema]):
+class DataSetExtends(DataSetImplements[_Protocol, _Protocol]):
+    """``DataSetExtends`` allows us to define functions such as:
+
+    .. code-block:: python
+
+        class Age(Schema, Protocol):
+            age: Column[LongType]
+
+        def get_age(df: DataSetExtends[Age]) -> DataSet[Age]:
+            return DataSet[Age](df.select(Age.age))
+
+    Such a function:
+
+    1. Accepts any ``DataSet[T]`` whose schema ``T`` structurally implements ``Age``,
+       even when ``T`` declares additional columns. This is checked at lint time
+       (since ``_Protocol`` is covariant).
+    2. Returns a ``DataSet[Age]``: typically the projection of the input to ``Age``'s
+       columns.
+
+    Like :class:`DataSetImplements`, ``DataSetExtends`` is solely used as a type
+    annotation; it is never initialized directly.
+    """
+
+    def __new__(cls, *args, **kwargs):
+        raise NotImplementedError(
+            "DataSetExtends should solely be used as a type annotation, it is never initialized."
+        )
+
+    def __init__(self):  # pragma: no cover - DataSetExtends is never instantiated.
+        raise NotImplementedError(
+            "DataSetExtends should solely be used as a type annotation, it is never initialized."
+        )
+
+
+class DataSet(DataSetExtends[_Schema]):
     """``DataSet`` subclasses pyspark ``DataFrame`` and hence has all the same
     functionality, with in addition the possibility to define a schema.
 
@@ -452,6 +486,11 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         def foo(df: DataSet[Person]) -> DataSet[Person]:
             # do stuff
             return df
+
+    Functions that should accept ``DataSet[T]`` for any ``T`` whose schema structurally
+    extends a given protocol can use :class:`DataSetExtends` as their parameter
+    annotation; ``DataSet[T]`` is a subclass of ``DataSetExtends[T]``, and ``_Protocol``
+    is covariant, so callers can pass a ``DataSet`` of any compatible schema.
     """
 
     def __new__(cls, dataframe: DataFrame) -> DataSet[_Schema]:

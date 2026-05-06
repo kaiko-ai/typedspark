@@ -1,5 +1,5 @@
 import functools
-from typing import cast
+from typing import Protocol, cast
 
 import pandas as pd
 import pytest
@@ -8,7 +8,7 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import LongType, StringType, TimestampType
 
-from typedspark import Column, DataSet, Schema
+from typedspark import Column, DataSet, DataSetExtends, Schema
 from typedspark._core.dataset import DataSetImplements
 from typedspark._utils.create_dataset import create_empty_dataset
 
@@ -288,3 +288,33 @@ def test_resetting_of_schema_annotations(spark: SparkSession):
     # and then to None again
     a = DataSet(df)
     assert a._schema_annotations is None
+
+
+class _AgeProtocol(Schema, Protocol):
+    a: Column[LongType]
+
+
+def test_dataset_is_subclass_of_dataset_extends(spark: SparkSession):
+    """``DataSet[T]`` must be a subclass of ``DataSetExtends`` so that callers can pass it
+    to functions annotated as ``DataSetExtends[Protocol]`` for any compatible ``Protocol``."""
+    df = create_empty_dataset(spark, A)
+    assert isinstance(df, DataSetExtends)
+
+
+def test_dataset_extends_is_not_instantiable():
+    """``DataSetExtends`` is solely a type annotation; it must not be instantiated directly."""
+    with pytest.raises(NotImplementedError):
+        DataSetExtends()
+
+
+def test_dataset_extends_in_function_annotation(spark: SparkSession):
+    """``DataSet[A]`` (which has columns ``a`` and ``b``) should be usable as a
+    ``DataSetExtends[_AgeProtocol]`` (which only declares ``a``) because ``A``
+    structurally extends ``_AgeProtocol``."""
+
+    def get_a(df: DataSetExtends[_AgeProtocol]) -> DataSet[_AgeProtocol]:
+        return DataSet[_AgeProtocol](df.select(_AgeProtocol.a))
+
+    full = create_empty_dataset(spark, A)
+    projected = get_a(full)
+    assert projected.columns == ["a"]
