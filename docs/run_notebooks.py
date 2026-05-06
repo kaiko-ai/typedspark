@@ -1,10 +1,10 @@
 """Execute notebooks in a single shared Jupyter kernel.
 
-Used by CI to verify the example notebooks. Reusing one kernel means the JVM
-and Spark session start once (on the first ``SparkSession.builder.getOrCreate()``
-call) and are shared across notebooks. ``%reset -f`` between notebooks clears
-the IPython namespace without tearing down the JVM-side Spark session, so each
-notebook still has to create its own imports and ``spark`` handle.
+Used by CI to verify the example notebooks. Reusing one kernel means the JVM and Spark
+session start once (on the first ``SparkSession.builder.getOrCreate()`` call) and are
+shared across notebooks. ``%reset -f`` between notebooks clears the IPython namespace
+without tearing down the JVM-side Spark session, so each notebook still has to create
+its own imports and ``spark`` handle.
 """
 
 from __future__ import annotations
