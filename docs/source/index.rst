@@ -1,7 +1,7 @@
 .. include:: README.rst
 
 .. toctree::
-   
+
    README
    ide
    notebook
