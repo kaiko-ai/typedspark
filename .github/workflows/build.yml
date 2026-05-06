@@ -41,8 +41,17 @@ jobs:
         env:
           SPARK_VERSION: ${{ matrix.pyspark-version }}
         run: |
-          curl -fsSL "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz" \
-            -o /tmp/spark.tgz
+          ARCHIVE="spark-${SPARK_VERSION}-bin-hadoop3.tgz"
+          # Apache's CDN is much faster than archive.apache.org but only
+          # carries currently-supported releases; fall back to the archive
+          # for older versions.
+          if ! curl -fsSL --connect-timeout 10 --max-time 300 \
+            "https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/${ARCHIVE}" \
+            -o /tmp/spark.tgz; then
+            curl -fsSL --connect-timeout 10 --max-time 600 \
+              "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/${ARCHIVE}" \
+              -o /tmp/spark.tgz
+          fi
           tar -xzf /tmp/spark.tgz -C "$HOME"
           rm /tmp/spark.tgz
       - name: Set up SPARK_HOME
