@@ -60,6 +60,50 @@ Compatibility
 Typedspark is tested in CI with PySpark 3.5.7 and 4.1.0. Spark Connect is supported when using
 PySpark 4.x, and the Connect-specific test runs if ``SPARK_CONNECT_URL`` is set.
 
+Spark Connect
+-------------
+
+When you connect to a remote Spark cluster via Spark Connect, PySpark transparently swaps the
+classic ``DataFrame`` and ``Column`` classes for the ``pyspark.sql.connect`` variants.
+Typedspark detects whichever class your session is using and attaches its ``DataSet`` /
+``Column`` behaviour on top of it, so the same schema-aware code works against either backend.
+
+Pointing your session at a remote Connect server:
+
+.. code-block:: python
+
+    from pyspark.sql import SparkSession
+
+    spark = SparkSession.builder.remote("sc://localhost:15002").getOrCreate()
+
+From there, all of the usual typedspark APIs work as you'd expect:
+
+.. code-block:: python
+
+    from pyspark.sql.types import LongType, StringType
+    from typedspark import Column, DataSet, Schema, create_partially_filled_dataset
+
+    class Person(Schema):
+        id: Column[LongType]
+        name: Column[StringType]
+        age: Column[LongType]
+
+    df: DataSet[Person] = create_partially_filled_dataset(
+        spark,
+        Person,
+        {Person.id: [1, 2, 3], Person.name: ["John", "Jane", "Jack"]},
+    )
+
+    def birthday(df: DataSet[Person]) -> DataSet[Person]:
+        return DataSet[Person](df.withColumn(Person.age.str, Person.age + 1))
+
+    birthday(df).show()
+
+Schema validation, ``transform_to_schema()``, ``create_empty_dataset()`` and the typed
+``DataSet`` overloads (``filter``, ``unionByName``, ...) all behave the same on Spark Connect
+as they do in classic PySpark — the underlying ``DataFrame`` simply remains a Connect
+``DataFrame`` after each call.
+
 Demo videos
 ===========
 
