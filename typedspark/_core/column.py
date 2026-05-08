@@ -146,3 +146,6 @@ class Column(SparkColumn, Generic[T]):
             return f"Column<'{self.str}'> (no active Spark session)"
 
         return super().__repr__()
+
+    def __str__(self) -> str:
+        return self.str

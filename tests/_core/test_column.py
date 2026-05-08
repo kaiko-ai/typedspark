@@ -142,6 +142,11 @@ def test_column_repr_no_spark_session():
         assert repr(A.a) == "Column<'a'>"
 
 
+def test_column_str(spark: SparkSession):
+    assert str(A.a) == "a"
+    assert str(A.b) == "b"
+
+
 class Cause(Schema):
     source: Column[StringType]
 
