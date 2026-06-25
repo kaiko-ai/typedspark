@@ -8,7 +8,7 @@ bandit<=1.9.4
 isort<=8.0.1
 docformatter==1.7.8
 mypy==2.1.0
-pyright<=1.1.410
+pyright<=1.1.411
 autoflake==2.3.3
 # stubs
 pandas-stubs<=3.0.3.260530
