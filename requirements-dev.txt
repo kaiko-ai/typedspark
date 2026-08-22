@@ -9,7 +9,7 @@ isort<=8.0.1
 docformatter==1.7.8
 mypy==2.3.1
 pyright<=1.1.411
-autoflake==2.3.3
+autoflake==2.4.0
 # stubs
 pandas-stubs<=3.0.5.260730
 types-setuptools<=84.0.0.20260812
