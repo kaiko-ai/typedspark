@@ -5,7 +5,7 @@ flake8==7.3.0
 pylint<=4.0.7
 black[jupyter]<=26.5.1
 bandit<=1.9.4
-isort<=8.0.1
+isort<=9.0.0
 docformatter==1.7.8
 mypy==2.3.1
 pyright<=1.1.411
