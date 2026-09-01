@@ -1,10 +1,12 @@
 """Module containing functions that are related to registering schema's to DataSets."""
 
 import itertools
-from typing import Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Tuple, Type, TypeVar
 
-from typedspark._core.dataset import DataSet
 from typedspark._schema.schema import Schema
+
+if TYPE_CHECKING:  # pragma: no cover
+    from typedspark._core.dataset import DataSet
 
 T = TypeVar("T", bound=Schema)
 
@@ -13,7 +15,7 @@ def _counter(count: itertools.count = itertools.count()):
     return next(count)
 
 
-def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T]:
+def register_schema_to_dataset(dataframe: "DataSet[T]", schema: Type[T]) -> Type[T]:
     """Helps combat column ambiguity. For example:
 
     .. code-block:: python
@@ -65,8 +67,8 @@ def register_schema_to_dataset(dataframe: DataSet[T], schema: Type[T]) -> Type[T
 
 
 def register_schema_to_dataset_with_alias(
-    dataframe: DataSet[T], schema: Type[T], alias: str
-) -> Tuple[DataSet[T], Type[T]]:
+    dataframe: "DataSet[T]", schema: Type[T], alias: str
+) -> Tuple["DataSet[T]", Type[T]]:
     """When dealing with self-joins, running `register_dataset_to_schema()` is not
     enough.
 
