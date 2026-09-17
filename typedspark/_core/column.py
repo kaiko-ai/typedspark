@@ -9,7 +9,7 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
 from pyspark.sql.types import DataType
 
-from typedspark._core.datatypes import StructType, materialize_dtype
+from typedspark._core.datatypes import StructType, materialize_exact_dtype
 from typedspark._utils.pyspark_compat import attach_mixin
 
 T = TypeVar("T", bound=DataType)
@@ -128,7 +128,15 @@ class Column(SparkColumn, Generic[T]):
 
     @property
     def dtype(self) -> T:
-        """Get the datatype of the column, e.g. Column[IntegerType] -> IntegerType."""
+        """Get the datatype associated with the column.
+
+        Parameters declared by ``ArrayType``, ``MapType``, ``DecimalType``, and
+        ``DayTimeIntervalType`` annotations are not preserved. Use :attr:`exact_dtype`
+        to obtain a fully materialized PySpark datatype.
+
+        For ``StructType``, this returns a TypedSpark wrapper carrying ``schema`` and
+        ``parent`` to support nested column navigation through ``dtype.schema``.
+        """
         dtype = self._dtype
 
         if get_origin(dtype) == StructType:
@@ -140,9 +148,16 @@ class Column(SparkColumn, Generic[T]):
         return dtype()  # type: ignore
 
     @property
-    def spark_dtype(self) -> DataType:
-        """Get the fully materialized PySpark datatype declared for the column."""
-        return materialize_dtype(self._dtype, self.str)  # type: ignore
+    def exact_dtype(self) -> DataType:
+        """Get the PySpark datatype materialized from the complete annotation.
+
+        This preserves parameters declared by ``ArrayType``, ``MapType``,
+        ``DecimalType``, and ``DayTimeIntervalType`` annotations.
+
+        For ``StructType``, this returns a plain PySpark ``StructType`` without
+        TypedSpark schema navigation. Use ``dtype.schema`` for nested columns.
+        """
+        return materialize_exact_dtype(self._dtype, self.str)  # type: ignore
 
     def __repr__(self) -> str:
         spark = _get_active_or_default_session()
