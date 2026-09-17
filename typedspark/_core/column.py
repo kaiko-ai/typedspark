@@ -9,7 +9,7 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col
 from pyspark.sql.types import DataType
 
-from typedspark._core.datatypes import StructType
+from typedspark._core.datatypes import StructType, materialize_dtype
 from typedspark._utils.pyspark_compat import attach_mixin
 
 T = TypeVar("T", bound=DataType)
@@ -138,6 +138,11 @@ class Column(SparkColumn, Generic[T]):
             )  # type: ignore
 
         return dtype()  # type: ignore
+
+    @property
+    def spark_dtype(self) -> DataType:
+        """Get the fully materialized PySpark datatype declared for the column."""
+        return materialize_dtype(self._dtype, self.str)  # type: ignore
 
     def __repr__(self) -> str:
         spark = _get_active_or_default_session()
