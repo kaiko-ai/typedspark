@@ -3,9 +3,15 @@ order to allow e.g. for ``ArrayType[StringType]``."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar
+import inspect
+from typing import TYPE_CHECKING, Any, Dict, Generic, Type, TypeVar, get_args, get_origin
 
+from pyspark.sql.types import ArrayType as SparkArrayType
 from pyspark.sql.types import DataType
+from pyspark.sql.types import DayTimeIntervalType as SparkDayTimeIntervalType
+from pyspark.sql.types import DecimalType as SparkDecimalType
+from pyspark.sql.types import MapType as SparkMapType
+from pyspark.sql.types import StructType as SparkStructType
 
 if TYPE_CHECKING:  # pragma: no cover
     from typedspark._core.column import Column
@@ -104,3 +110,44 @@ class DayTimeIntervalType(Generic[_StartField, _EndField], TypedSparkDataType):
         class TimeInterval(Schema):
             interval: Column[DayTimeIntervalType[IntervalType.HOUR, IntervalType.SECOND]
     """
+
+
+def materialize_dtype(dtype: Type[DataType], colname: str) -> DataType:
+    """Create a PySpark ``DataType`` from a TypedSpark type annotation."""
+    origin = get_origin(dtype)
+    if origin == ArrayType:
+        params = get_args(dtype)
+        return SparkArrayType(materialize_dtype(params[0], colname))
+    if origin == MapType:
+        params = get_args(dtype)
+        return SparkMapType(
+            materialize_dtype(params[0], colname),
+            materialize_dtype(params[1], colname),
+        )
+    if origin == StructType:
+        schema: Type[Schema] = get_args(dtype)[0]
+        return schema.get_structtype()
+    if origin == DecimalType:
+        precision, scale = get_args(dtype)
+        return SparkDecimalType(_unpack_literal(precision), _unpack_literal(scale))
+    if origin == DayTimeIntervalType:
+        start_field, end_field = get_args(dtype)
+        return SparkDayTimeIntervalType(
+            _unpack_literal(start_field),
+            _unpack_literal(end_field),
+        )
+    if (
+        inspect.isclass(dtype)
+        and issubclass(dtype, DataType)
+        and not issubclass(dtype, TypedSparkDataType)
+    ):
+        return dtype()
+
+    raise TypeError(
+        f"Column {colname} does not have a correctly formatted DataType as a parameter."
+    )
+
+
+def _unpack_literal(literal):
+    """Return the value wrapped by a ``Literal`` annotation."""
+    return get_args(literal)[0]
