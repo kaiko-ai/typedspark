@@ -8,7 +8,7 @@ from pyspark.sql.types import DataType, StructField
 
 from typedspark._core.column import Column
 from typedspark._core.column_meta import ColumnMeta
-from typedspark._core.datatypes import materialize_dtype
+from typedspark._core.datatypes import materialize_exact_dtype
 
 _DataType = TypeVar("_DataType", bound=DataType)  # pylint: disable=invalid-name
 
@@ -48,7 +48,7 @@ def _get_structfield_dtype(
         column = _get_column_from_annotation(column, colname)
 
     args = get_args(column)
-    dtype = materialize_dtype(args[0], colname)
+    dtype = materialize_exact_dtype(args[0], colname)
     return dtype
 
 

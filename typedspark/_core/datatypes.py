@@ -112,17 +112,17 @@ class DayTimeIntervalType(Generic[_StartField, _EndField], TypedSparkDataType):
     """
 
 
-def materialize_dtype(dtype: Type[DataType], colname: str) -> DataType:
+def materialize_exact_dtype(dtype: Type[DataType], colname: str) -> DataType:
     """Create a PySpark ``DataType`` from a TypedSpark type annotation."""
     origin = get_origin(dtype)
     if origin == ArrayType:
         params = get_args(dtype)
-        return SparkArrayType(materialize_dtype(params[0], colname))
+        return SparkArrayType(materialize_exact_dtype(params[0], colname))
     if origin == MapType:
         params = get_args(dtype)
         return SparkMapType(
-            materialize_dtype(params[0], colname),
-            materialize_dtype(params[1], colname),
+            materialize_exact_dtype(params[0], colname),
+            materialize_exact_dtype(params[1], colname),
         )
     if origin == StructType:
         schema: Type[Schema] = get_args(dtype)[0]
