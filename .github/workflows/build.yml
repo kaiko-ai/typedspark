@@ -40,7 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          pip install pyspark==${{ matrix.pyspark-version }}
+          pip install "pyspark[connect]==${{ matrix.pyspark-version }}"
       - name: Start Spark Connect
         if: ${{ matrix.pyspark-version == '4.1.1' }}
         run: |
@@ -91,7 +91,13 @@ jobs:
           # we run this test seperately, to ensure that it is run without an active Spark session
           python -m pytest -m no_spark_session
 
-          coverage run -m pytest
+          # likewise for Spark Connect: typedspark dispatches on the active session,
+          # so a local session in the same process shadows the remote one
+          if [ -n "${SPARK_CONNECT_URL}" ]; then
+            python -m pytest -m spark_connect
+          fi
+
+          coverage run -m pytest -m "not spark_connect"
           coverage report -m --fail-under 100
       - name: Run notebooks
         if: ${{ matrix.pyspark-version == '4.1.1' }}
