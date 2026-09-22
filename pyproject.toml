@@ -39,3 +39,9 @@ exclude = ['^docs\/.+\.py$']
 
 [tool.bandit]
 exclude_dirs = ["tests"]
+
+[tool.pytest.ini_options]
+markers = [
+    "no_spark_session: must run without an active Spark session",
+    "spark_connect: must run in its own process against a Spark Connect server",
+]

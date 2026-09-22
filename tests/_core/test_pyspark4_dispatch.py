@@ -54,6 +54,10 @@ def test_column_preserves_classic_column(spark):
     assert isinstance(A.a, classic_col)
 
 
+# Runs in its own pytest process: typedspark dispatches Column on the active
+# session, so a local session in the same process shadows the remote one and
+# A.a comes back as a classic Column.
+@pytest.mark.spark_connect
 def test_dataset_preserves_connect_dataframe():
     connect = _get_connect_classes()
     if connect is None:
