@@ -10,15 +10,66 @@ permissions:
   contents: read
 
 jobs:
+  versions:
+    name: Resolve pyspark versions
+    runs-on: ubuntu-latest
+    outputs:
+      pyspark: ${{ steps.resolve.outputs.pyspark }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - id: resolve
+        # The pin in requirements-dev.txt is what developers and the pre-commit
+        # hook run against, so CI derives its newest leg from it instead of
+        # hardcoding a second version that silently drifts away from it.
+        run: |
+          MIN_SUPPORTED="3.5.8"
+          LATEST=$(sed -n 's/^pyspark==\(.*\)$/\1/p' requirements-dev.txt)
+          if [ -z "${LATEST}" ]; then
+            echo "::error::no pinned 'pyspark==' found in requirements-dev.txt"
+            exit 1
+          fi
+          echo "pyspark=[\"${MIN_SUPPORTED}\", \"${LATEST}\"]" >> "$GITHUB_OUTPUT"
+
+  style:
+    name: Style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: "pip"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+      # These read the source, not the installed pyspark, so they run once
+      # rather than once per matrix leg.
+      - name: Style checks
+        run: |
+          flake8
+          bandit typedspark/**/*.py
+          black --check .
+          isort --check .
+          docformatter --black -c **/*.py
+
   build:
+    needs: versions
     runs-on: ubuntu-latest
     timeout-minutes: 200
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-        pyspark-version: ["3.5.8", "4.1.1"]
+        pyspark-version: ${{ fromJSON(needs.versions.outputs.pyspark) }}
         exclude:
           # pyspark 3.5.x does not support Python 3.14
+          # (3.5.8 is MIN_SUPPORTED in the versions job above)
           - python-version: "3.14"
             pyspark-version: "3.5.8"
 
@@ -42,7 +93,7 @@ jobs:
           pip install -r requirements-dev.txt
           pip install pyspark==${{ matrix.pyspark-version }}
       - name: Start Spark Connect
-        if: ${{ matrix.pyspark-version == '4.1.1' }}
+        if: ${{ startsWith(matrix.pyspark-version, '4.') }}
         run: |
           # The pyspark wheel ships bin/spark-submit and the spark-connect jar,
           # so the Connect server runs straight from the pip install. No Apache
@@ -73,20 +124,18 @@ jobs:
                   print(log.read_text())
               raise SystemExit("Spark Connect server did not start on port 15002")
           PY
-      - name: Linting
-        if: ${{ matrix.pyspark-version == '4.1.1' }}
+      # mypy, pyright and pylint resolve against the installed pyspark, so they
+      # run on every leg: a typing regression against one pyspark version is
+      # exactly what typedspark exists to catch. Style checks live in the
+      # `style` job above.
+      - name: Type checks
         run: |
-          flake8
-          pylint typedspark
           mypy .
           pyright .
-          bandit typedspark/**/*.py
-          black --check .
-          isort --check .
-          docformatter --black -c **/*.py
+          pylint typedspark
       - name: Testing
         env:
-          SPARK_CONNECT_URL: ${{ matrix.pyspark-version == '4.1.1' && 'sc://localhost:15002' || '' }}
+          SPARK_CONNECT_URL: ${{ startsWith(matrix.pyspark-version, '4.') && 'sc://localhost:15002' || '' }}
         run: |
           # we run this test seperately, to ensure that it is run without an active Spark session
           python -m pytest -m no_spark_session
@@ -94,5 +143,5 @@ jobs:
           coverage run -m pytest
           coverage report -m --fail-under 100
       - name: Run notebooks
-        if: ${{ matrix.pyspark-version == '4.1.1' }}
+        if: ${{ startsWith(matrix.pyspark-version, '4.') }}
         run: python docs/run_notebooks.py docs/*/*.ipynb

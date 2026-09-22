@@ -1,3 +1,4 @@
+import importlib
 import os
 from typing import Optional, Tuple, Type
 
@@ -9,13 +10,15 @@ from typedspark import Column, Schema, create_empty_dataset
 
 
 def _get_classic_classes() -> Optional[Tuple[Type[object], Type[object]]]:
+    # Imported dynamically: pyspark.sql.classic only exists on pyspark >= 4, so a
+    # static import fails type checking on the pyspark 3.x leg of the matrix.
     try:
-        from pyspark.sql.classic.column import Column as ClassicColumn
-        from pyspark.sql.classic.dataframe import DataFrame as ClassicDataFrame
+        column = importlib.import_module("pyspark.sql.classic.column")
+        dataframe = importlib.import_module("pyspark.sql.classic.dataframe")
     except Exception:  # pragma: no cover - pyspark < 4
         return None
 
-    return ClassicDataFrame, ClassicColumn
+    return dataframe.DataFrame, column.Column
 
 
 def _get_connect_classes() -> Optional[Tuple[Type[object], Type[object]]]:
@@ -65,7 +68,9 @@ def test_dataset_preserves_connect_dataframe():
         pytest.skip("SPARK_CONNECT_URL not set; skipping Spark Connect test")
 
     connect_df, connect_col = connect
-    spark = SparkSession.builder.remote(connect_url).getOrCreate()
+    # SparkSession.builder.remote() only exists on pyspark >= 4; unreachable on
+    # 3.x because _get_connect_classes() returns None there.
+    spark = SparkSession.builder.remote(connect_url).getOrCreate()  # type: ignore[attr-defined]
     try:
         df = create_empty_dataset(spark, A, 1)
         assert isinstance(df, connect_df)
