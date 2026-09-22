@@ -23,10 +23,10 @@ jobs:
             pyspark-version: "3.5.8"
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: "temurin"
           # Spark 3.5.x relies on Hadoop's UserGroupInformation, which calls
@@ -34,16 +34,18 @@ jobs:
           # so 3.5.x stays on JDK 21. Spark 4.x does not use it.
           java-version: ${{ startsWith(matrix.pyspark-version, '4.') && '25' || '21' }}
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
       - name: Install dependencies
+        env:
+          PYSPARK_VERSION: ${{ matrix.pyspark-version }}
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          pip install pyspark==${{ matrix.pyspark-version }}
+          pip install "pyspark[connect]==${PYSPARK_VERSION}"
       - name: Start Spark Connect
         if: ${{ matrix.pyspark-version == '4.1.1' }}
         run: |
@@ -94,7 +96,13 @@ jobs:
           # we run this test seperately, to ensure that it is run without an active Spark session
           python -m pytest -m no_spark_session
 
-          coverage run -m pytest
+          # likewise for Spark Connect: typedspark dispatches on the active session,
+          # so a local session in the same process shadows the remote one
+          if [ -n "${SPARK_CONNECT_URL}" ]; then
+            python -m pytest -m spark_connect
+          fi
+
+          coverage run -m pytest -m "not spark_connect"
           coverage report -m --fail-under 100
       - name: Run notebooks
         if: ${{ matrix.pyspark-version == '4.1.1' }}
