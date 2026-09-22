@@ -25,7 +25,7 @@ jobs:
         # hardcoding a second version that silently drifts away from it.
         run: |
           MIN_SUPPORTED="3.5.8"
-          LATEST=$(sed -n 's/^pyspark==\(.*\)$/\1/p' requirements-dev.txt)
+          LATEST=$(sed -n 's/^pyspark\(\[[^]]*\]\)\{0,1\}==\(.*\)$/\2/p' requirements-dev.txt)
           if [ -z "${LATEST}" ]; then
             echo "::error::no pinned 'pyspark==' found in requirements-dev.txt"
             exit 1
