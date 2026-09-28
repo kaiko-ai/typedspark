@@ -124,21 +124,12 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             super().dropna(how=how, thresh=thresh, subset=subset)
         )
 
-    @overload
+    # Not overloaded: both cases return DataSet[_Implementation], and mypy will not split a
+    # union argument across overloads, so a single signature mirroring
+    # DataFrame.fillna is both simpler and compatible with the supertype.
     def fillna(
         self,
-        value: Union[bool, float, int, str],
-        subset: Optional[Union[str, Tuple[str, ...], List[str]]] = ...,
-    ) -> DataSet[_Implementation]: ...  # pragma: no cover
-
-    @overload
-    def fillna(
-        self, value: Dict[str, Union[bool, float, int, str]]
-    ) -> DataSet[_Implementation]: ...  # pragma: no cover
-
-    def fillna(
-        self,
-        value,
+        value: Union[bool, float, int, str, Dict[str, Union[bool, float, int, str]]],
         subset: Optional[Union[str, Tuple[str, ...], List[str]]] = None,
     ) -> DataSet[_Implementation]:
         return DataSet[self._schema_annotations](super().fillna(value, subset))  # type: ignore
@@ -181,14 +172,9 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
             super().replace(to_replace, value, subset)
         )
 
-    @overload
-    def repartition(
-        self, numPartitions: int, *cols: ColumnOrName
-    ) -> DataSet[_Implementation]: ...  # pragma: no cover
-
-    @overload
-    def repartition(self, *cols: ColumnOrName) -> DataSet[_Implementation]: ...  # pragma: no cover
-
+    # Not overloaded: both call shapes return the same type, and once
+    # numPartitions accepts ColumnOrName (as DataFrame.repartition does since
+    # pyspark 4.2) a separate *cols-only overload is unreachable.
     def repartition(
         self,
         numPartitions: Union[int, SparkColumn, str, None] = None,
@@ -201,16 +187,6 @@ class DataSetImplements(DataFrame, Generic[_Protocol, _Implementation]):
         else:
             res = super().repartition(numPartitions, *cols)
         return DataSet[self._schema_annotations](res)  # type: ignore
-
-    @overload
-    def repartitionByRange(
-        self, numPartitions: int, *cols: ColumnOrName
-    ) -> DataSet[_Implementation]: ...  # pragma: no cover
-
-    @overload
-    def repartitionByRange(
-        self, *cols: ColumnOrName
-    ) -> DataSet[_Implementation]: ...  # pragma: no cover
 
     def repartitionByRange(
         self,
@@ -557,21 +533,12 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             super().dropna(how=how, thresh=thresh, subset=subset)
         )
 
-    @overload
+    # Not overloaded: both cases return DataSet[_Schema], and mypy will not split a
+    # union argument across overloads, so a single signature mirroring
+    # DataFrame.fillna is both simpler and compatible with the supertype.
     def fillna(
         self,
-        value: Union[bool, float, int, str],
-        subset: Optional[Union[str, Tuple[str, ...], List[str]]] = ...,
-    ) -> DataSet[_Schema]: ...  # pragma: no cover
-
-    @overload
-    def fillna(
-        self, value: Dict[str, Union[bool, float, int, str]]
-    ) -> DataSet[_Schema]: ...  # pragma: no cover
-
-    def fillna(
-        self,
-        value,
+        value: Union[bool, float, int, str, Dict[str, Union[bool, float, int, str]]],
         subset: Optional[Union[str, Tuple[str, ...], List[str]]] = None,
     ) -> DataSet[_Schema]:
         return DataSet[self._schema_annotations](super().fillna(value, subset))  # type: ignore
@@ -614,14 +581,9 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
             super().replace(to_replace, value, subset)
         )
 
-    @overload
-    def repartition(
-        self, numPartitions: int, *cols: ColumnOrName
-    ) -> DataSet[_Schema]: ...  # pragma: no cover
-
-    @overload
-    def repartition(self, *cols: ColumnOrName) -> DataSet[_Schema]: ...  # pragma: no cover
-
+    # Not overloaded: both call shapes return the same type, and once
+    # numPartitions accepts ColumnOrName (as DataFrame.repartition does since
+    # pyspark 4.2) a separate *cols-only overload is unreachable.
     def repartition(
         self,
         numPartitions: Union[int, SparkColumn, str, None] = None,
@@ -634,14 +596,6 @@ class DataSet(DataSetImplements[_Schema, _Schema]):
         else:
             res = super().repartition(numPartitions, *cols)
         return DataSet[self._schema_annotations](res)  # type: ignore
-
-    @overload
-    def repartitionByRange(
-        self, numPartitions: int, *cols: ColumnOrName
-    ) -> DataSet[_Schema]: ...  # pragma: no cover
-
-    @overload
-    def repartitionByRange(self, *cols: ColumnOrName) -> DataSet[_Schema]: ...  # pragma: no cover
 
     def repartitionByRange(
         self,
