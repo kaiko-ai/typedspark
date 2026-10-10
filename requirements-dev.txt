@@ -3,7 +3,7 @@ pyspark[connect]==4.2.0
 # linters
 flake8==7.4.1
 pylint<=4.1.2
-black[jupyter]<=26.10.0
+black[jupyter]<=26.10.1
 bandit<=1.9.4
 isort<=9.0.2
 docformatter==1.7.8
