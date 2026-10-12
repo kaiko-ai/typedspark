@@ -29,7 +29,10 @@ jobs:
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: "temurin"
-          java-version: 21
+          # Spark 3.5.x relies on Hadoop's UserGroupInformation, which calls
+          # Subject.getSubject(). That method was removed in JDK 24 (JEP 486),
+          # so 3.5.x stays on JDK 21. Spark 4.x does not use it.
+          java-version: ${{ startsWith(matrix.pyspark-version, '4.') && '25' || '21' }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
