@@ -8,11 +8,22 @@ from typedspark._utils.create_dataset_from_structtype import create_schema_from_
 
 
 def validate_schema(
-    structtype_expected: StructType, structtype_observed: StructType, schema_name: str
+    structtype_expected: StructType,
+    structtype_observed: StructType,
+    schema_name: str,
+    ignore_extra_columns: bool = False,
 ) -> None:
-    """Checks whether the expected and the observed StructType match."""
+    """Checks whether the expected and the observed StructType match.
+
+    When ``ignore_extra_columns`` is ``True``, columns present in the observed
+    schema but not in the expected schema are silently dropped before
+    validation. Columns missing from the observed schema still raise.
+    """
     expected = unpack_schema(structtype_expected)
     observed = unpack_schema(structtype_observed)
+
+    if ignore_extra_columns:
+        observed = {name: field for name, field in observed.items() if name in expected}
 
     check_names(expected, observed, schema_name)
     check_dtypes(expected, observed, schema_name)
