@@ -20,6 +20,7 @@ class ColumnMeta:
     """
 
     comment: Optional[str] = None
+    external_name: Optional[str] = None
 
     def get_metadata(self) -> Optional[Dict[str, str]]:
         """Returns the metadata of this column."""
