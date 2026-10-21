@@ -24,7 +24,7 @@ nbconvert==7.17.2
 jupyter==1.1.1
 nbformat==5.11.1
 # readthedocs
-sphinx<=9.1.1
+sphinx<=9.2.0
 sphinx-rtd-theme==3.1.0
 nbsphinx==0.9.8
 # precommit hook
