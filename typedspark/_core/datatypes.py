@@ -11,7 +11,6 @@ from pyspark.sql.types import DataType
 from pyspark.sql.types import DayTimeIntervalType as SparkDayTimeIntervalType
 from pyspark.sql.types import DecimalType as SparkDecimalType
 from pyspark.sql.types import MapType as SparkMapType
-from pyspark.sql.types import StructType as SparkStructType
 
 if TYPE_CHECKING:  # pragma: no cover
     from typedspark._core.column import Column
