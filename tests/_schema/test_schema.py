@@ -180,3 +180,22 @@ def test_dtype_attributes(spark: SparkSession):
         },
     )
     assert df.filter(ComplexDatatypes.value.dtype.schema.b == "b").count() == 1
+
+
+@pytest.mark.parametrize("schema", [A, Values, ComplexDatatypes])
+def test_exact_dtype_matches_structfield(schema: Type[Schema]):
+    structtype = schema.get_structtype()
+
+    for column_name in schema.all_column_names():
+        column = getattr(schema, column_name)
+        assert column.exact_dtype == structtype[column_name].dataType
+
+
+def test_exact_dtype_preserves_decimal_parameters():
+    assert Values.a.exact_dtype.simpleString() == "decimal(38,18)"
+
+
+def test_exact_dtype_on_nested_column():
+    nested_column = ComplexDatatypes.value.dtype.schema.a
+
+    assert nested_column.exact_dtype.simpleString() == "decimal(38,18)"
