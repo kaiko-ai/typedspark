@@ -1,5 +1,5 @@
 # pyspark
-pyspark[connect]==4.2.1
+pyspark[connect]==4.3.0
 # linters
 flake8==7.4.1
 pylint<=4.1.3
