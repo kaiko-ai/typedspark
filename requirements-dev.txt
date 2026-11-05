@@ -15,7 +15,7 @@ pandas-stubs<=3.1.0.261029
 types-setuptools<=84.2.0.20261104
 # testing
 pytest<=9.2.0
-coverage<=7.17.1
+coverage<=7.17.2
 pandas<=3.1.1
 setuptools==84.2.1
 chispa<=0.12.0
