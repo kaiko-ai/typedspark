@@ -2,7 +2,7 @@ from typing import Literal
 
 import pytest
 from chispa.dataframe_comparer import assert_df_equality  # type: ignore
-from pyspark.sql import SparkSession
+from pyspark.sql import Row, SparkSession
 from pyspark.sql.functions import first
 from pyspark.sql.types import IntegerType, StringType
 
@@ -225,3 +225,94 @@ def test_get_spark_session_without_spark_session():
     if SparkSession.getActiveSession() is None:
         with pytest.raises(ValueError):
             _get_spark_session(None)
+
+
+def test_create_schema_with_invalid_column_name(spark: SparkSession):
+    df = spark.createDataFrame([("Alice", 24), ("Bob", 25)], ["first-name", "age"])
+    ds, schema = create_schema(df)
+
+    df2 = ds.to_dataframe()
+    assert_df_equality(df, df2)
+
+
+def test_create_schema_with_invalid_column_name_in_a_structtype(spark: SparkSession):
+    data = [
+        Row(
+            **{
+                "full-name": Row(
+                    **{
+                        "first-name": "Alice",
+                        "last-name": "Smith",
+                    },
+                ),
+                "age": 24,
+            }
+        ),
+        Row(
+            **{
+                "full-name": Row(
+                    **{
+                        "first-name": "Bob",
+                        "last-name": "Brown",
+                    },
+                ),
+                "age": 25,
+            },
+        ),
+    ]
+
+    df = spark.createDataFrame(data)
+    ds, schema = create_schema(df)
+
+    df2 = ds.to_dataframe()
+    assert_df_equality(df, df2)
+
+
+def test_create_schema_with_invalid_column_name_in_a_nested_structtype(spark: SparkSession):
+    data = [
+        Row(
+            **{
+                "details": Row(
+                    **{
+                        "full-name": Row(
+                            **{
+                                "first-name": "Alice",
+                                "last-name": "Smith",
+                            }
+                        ),
+                        "age": 24,
+                    }
+                )
+            }
+        ),
+        Row(
+            **{
+                "details": Row(
+                    **{
+                        "full-name": Row(
+                            **{
+                                "first-name": "Bob",
+                                "last-name": "Brown",
+                            }
+                        ),
+                        "age": 25,
+                    }
+                )
+            }
+        ),
+    ]
+
+    df = spark.createDataFrame(data)
+    ds, schema = create_schema(df)
+
+    df2 = ds.to_dataframe()
+    assert_df_equality(df, df2)
+
+
+def test_create_schema_raises_on_duplicate_columns_after_rename(spark: SparkSession):
+    """Columns 'a-b' and 'a_b' both map to 'a_b' after illegal-char replacement —
+    create_schema should raise a descriptive ValueError."""
+    df = spark.createDataFrame([("x", "y")], ["a-b", "a_b"])
+
+    with pytest.raises(ValueError, match="duplicate columns"):
+        create_schema(df)
